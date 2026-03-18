@@ -1,0 +1,48 @@
+.main-layout {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-base);
+}
+
+.main-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Sidebars */
+.sidebar {
+  flex-shrink: 0;
+  overflow: hidden;
+  transition: width var(--transition-mid), opacity var(--transition-mid);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-surface);
+  border-color: var(--border-subtle);
+}
+
+.sidebar-left {
+  width: var(--sidebar-left);
+  border-right: 1px solid var(--border-subtle);
+}
+
+.sidebar-right {
+  width: var(--sidebar-right);
+  border-left: 1px solid var(--border-subtle);
+}
+
+.sidebar.collapsed {
+  width: 0;
+  opacity: 0;
+}
+
+/* Central canvas */
+.canvas-area {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
