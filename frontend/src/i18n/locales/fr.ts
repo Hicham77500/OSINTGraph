@@ -85,6 +85,8 @@ const fr: Translations = {
       whois_lookup:  { display_name: 'Lookup Whois',    description: "Récupérer les données d'enregistrement Whois du domaine" },
       hibp_lookup:   { display_name: 'HaveIBeenPwned',  description: "Vérifier si l'e-mail figure dans des bases de violations connues" },
       shodan_lookup: { display_name: 'Lookup Shodan',   description: "Découvrir les ports et services ouverts d'une IP via Shodan" },
+      sherlock_lookup: { display_name: 'Sherlock — Profils sociaux', description: 'Rechercher le pseudo sur 378+ réseaux sociaux (sherlock-project)' },
+      holehe_lookup:   { display_name: 'Holehe — Comptes e-mail',   description: "Trouver les comptes enregistrés avec cet e-mail (120+ services)" },
     },
   },
 

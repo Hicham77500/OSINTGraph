@@ -13,3 +13,6 @@ python-whois>=0.9.5
 shodan>=1.31.0
 dnspython>=2.7.0
 celery[redis]>=5.4.0
+# OSINT community tools
+sherlock-project>=0.16.0
+holehe>=1.61

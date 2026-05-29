@@ -83,6 +83,8 @@ const en = {
       whois_lookup:  { display_name: 'Whois Lookup',   description: 'Retrieve Whois registration data for a domain' },
       hibp_lookup:   { display_name: 'HaveIBeenPwned', description: 'Check if email appears in known breach databases' },
       shodan_lookup: { display_name: 'Shodan Lookup',  description: 'Discover open ports and services on an IP via Shodan' },
+      sherlock_lookup: { display_name: 'Sherlock — Social Profiles', description: 'Search username across 378+ social networks (sherlock-project)' },
+      holehe_lookup:   { display_name: 'Holehe — Email Accounts',   description: 'Find accounts registered with this email across 120+ services' },
     },
   },
 
