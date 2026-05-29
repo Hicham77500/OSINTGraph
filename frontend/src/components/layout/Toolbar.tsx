@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import {
-  GitGraph, Plus, Upload, Save, LayoutGrid, ZoomIn, ZoomOut,
-  Maximize2, Undo, Redo, Search, ChevronLeft, ChevronRight,
-  Layers, Play, Cpu
+  GitGraph, Upload, Save, LayoutGrid,
+  Undo, Redo, Search, ChevronLeft, ChevronRight,
+  Layers, Cpu, Globe, Link2
 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import i18n from '../../i18n'
 import { useGraphStore } from '../../graph/graphStore'
 import { ImportModal } from '../modals/ImportModal'
 import { apiClient } from '../../services/api'
@@ -20,7 +22,10 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   leftCollapsed, rightCollapsed, onToggleLeft, onToggleRight
 }) => {
   const { layoutType, setLayout, undo, redo, clearGraph, history, historyIndex,
-    currentWorkspace, nodes, edges } = useGraphStore()
+    currentWorkspace, nodes, edges, connectMode, setConnectMode } = useGraphStore()
+  const { t, i18n: i18nInstance } = useTranslation()
+  const currentLang = i18nInstance.language.startsWith('fr') ? 'fr' : 'en'
+  const toggleLang = () => i18n.changeLanguage(currentLang === 'fr' ? 'en' : 'fr')
   const [showImport, setShowImport] = useState(false)
   const [saving, setSaving] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -53,7 +58,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
         {/* Panel toggles */}
         <button className="btn btn-ghost toolbar-btn" onClick={onToggleLeft}
-          data-tooltip={leftCollapsed ? 'Show entity panel' : 'Hide entity panel'}>
+          data-tooltip={leftCollapsed ? t('toolbar.showEntityPanel') : t('toolbar.hideEntityPanel')}>
           <ChevronLeft size={14} style={{ transform: leftCollapsed ? 'rotate(180deg)' : undefined }} />
           <Layers size={14} />
         </button>
@@ -62,11 +67,11 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
         {/* History */}
         <button className="btn btn-ghost toolbar-btn" onClick={undo} disabled={!canUndo}
-          data-tooltip="Undo (Ctrl+Z)">
+          data-tooltip={t('toolbar.undo')}>
           <Undo size={14} />
         </button>
         <button className="btn btn-ghost toolbar-btn" onClick={redo} disabled={!canRedo}
-          data-tooltip="Redo (Ctrl+Y)">
+          data-tooltip={t('toolbar.redo')}>
           <Redo size={14} />
         </button>
 
@@ -75,32 +80,44 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         {/* Layout picker */}
         <div className="layout-group">
           <button className={`btn toolbar-btn ${layoutType === 'force' ? 'active' : 'btn-ghost'}`}
-            onClick={() => setLayout('force')} data-tooltip="Force-directed layout">
+            onClick={() => setLayout('force')} data-tooltip={t('toolbar.layoutForce')}>
             <Cpu size={14} />
           </button>
           <button className={`btn toolbar-btn ${layoutType === 'hierarchical' ? 'active' : 'btn-ghost'}`}
-            onClick={() => setLayout('hierarchical')} data-tooltip="Hierarchical layout">
+            onClick={() => setLayout('hierarchical')} data-tooltip={t('toolbar.layoutHierarchy')}>
             <GitGraph size={14} />
           </button>
           <button className={`btn toolbar-btn ${layoutType === 'grid' ? 'active' : 'btn-ghost'}`}
-            onClick={() => setLayout('grid')} data-tooltip="Grid layout">
+            onClick={() => setLayout('grid')} data-tooltip={t('toolbar.layoutGrid')}>
             <LayoutGrid size={14} />
           </button>
         </div>
 
         <div className="toolbar-divider" />
 
+        {/* Connect mode */}
+        <button
+          className={`btn toolbar-btn ${connectMode ? 'active connect-active' : 'btn-ghost'}`}
+          onClick={() => setConnectMode(!connectMode)}
+          data-tooltip={t('toolbar.connectTooltip')}
+        >
+          <Link2 size={14} />
+          <span>{t('toolbar.connect')}</span>
+        </button>
+
+        <div className="toolbar-divider" />
+
         {/* Actions */}
         <button className="btn btn-ghost toolbar-btn" onClick={() => setShowImport(true)}
-          data-tooltip="Import CSV / JSON">
+          data-tooltip={t('toolbar.importTooltip')}>
           <Upload size={14} />
-          <span>Import</span>
+          <span>{t('toolbar.import')}</span>
         </button>
 
         <button className={`btn btn-ghost toolbar-btn ${saving ? 'loading' : ''}`}
-          onClick={handleSave} data-tooltip="Save graph">
+          onClick={handleSave} data-tooltip={t('toolbar.saveTooltip')}>
           <Save size={14} className={saving ? 'loading-spin' : ''} />
-          <span>Save</span>
+          <span>{t('toolbar.save')}</span>
         </button>
 
         <div className="toolbar-divider" />
@@ -110,7 +127,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
           <Search size={12} className="search-icon" />
           <input
             type="text"
-            placeholder="Search nodes…"
+            placeholder={t('toolbar.searchPlaceholder')}
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
           />
@@ -120,14 +137,28 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
         {/* Stats */}
         <div className="toolbar-stats">
-          <span>{nodes.length} nodes</span>
+          <span>{t('toolbar.nodes', { count: nodes.length })}</span>
           <span className="stat-sep">·</span>
-          <span>{edges.length} edges</span>
+          <span>{t('toolbar.edges', { count: edges.length })}</span>
         </div>
+
+        <div className="toolbar-divider" />
+
+        {/* Language switcher */}
+        <button
+          className="btn btn-ghost toolbar-btn lang-switcher"
+          onClick={toggleLang}
+          data-tooltip={currentLang === 'fr' ? 'Switch to English' : 'Passer en Français'}
+        >
+          <Globe size={13} />
+          <span className="lang-label">{currentLang.toUpperCase()}</span>
+        </button>
+
+        <div className="toolbar-divider" />
 
         {/* Right toggle */}
         <button className="btn btn-ghost toolbar-btn" onClick={onToggleRight}
-          data-tooltip={rightCollapsed ? 'Show inspector' : 'Hide inspector'}>
+          data-tooltip={rightCollapsed ? t('toolbar.showInspector') : t('toolbar.hideInspector')}>
           <ChevronRight size={14} style={{ transform: rightCollapsed ? 'rotate(180deg)' : undefined }} />
         </button>
       </div>

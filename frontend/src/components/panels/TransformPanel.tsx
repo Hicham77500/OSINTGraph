@@ -1,9 +1,26 @@
 import React, { useState, useEffect } from 'react'
-import { Play, Loader, CheckCircle, XCircle, ChevronRight } from 'lucide-react'
-import { NodeData } from '../../graph/nodeTypes'
+import { Play, Loader } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import {
+  NodeData, EdgeData, EdgeType, NodeType,
+  ALL_EDGE_TYPES, createNode, createEdge,
+} from '../../graph/nodeTypes'
 import { useGraphStore } from '../../graph/graphStore'
 import { apiClient } from '../../services/api'
-import { wsClient } from '../../services/websocket'
+
+/** Maps a transform name to the most semantically accurate EdgeType */
+const TRANSFORM_EDGE_TYPE: Record<string, EdgeType> = {
+  dns_lookup:    'resolves_to',
+  whois_lookup:  'owns',
+  hibp_lookup:   'linked_to',
+  shodan_lookup: 'linked_to',
+}
+
+function resolveEdgeType(transformName: string, outputType: string): EdgeType {
+  if (TRANSFORM_EDGE_TYPE[transformName]) return TRANSFORM_EDGE_TYPE[transformName]
+  if (ALL_EDGE_TYPES.includes(outputType as EdgeType)) return outputType as EdgeType
+  return 'linked_to'
+}
 
 interface Transform {
   name: string
@@ -35,6 +52,7 @@ export const TransformPanel: React.FC<TransformPanelProps> = ({ node }) => {
   const [logs, setLogs] = useState<string[]>([])
   const [results, setResults] = useState<TransformResult | null>(null)
   const { addNode, addEdge, updateNode } = useGraphStore()
+  const { t } = useTranslation()
 
   useEffect(() => {
     apiClient.get('/transforms').then(res => {
@@ -57,7 +75,7 @@ export const TransformPanel: React.FC<TransformPanelProps> = ({ node }) => {
 
   const runTransform = async (transform: Transform) => {
     setRunning(transform.name)
-    setLogs([`[${transform.display_name}] Starting...`])
+    setLogs([t('transforms.starting', { name: transform.display_name })])
     setResults(null)
 
     try {
@@ -71,20 +89,19 @@ export const TransformPanel: React.FC<TransformPanelProps> = ({ node }) => {
       if (res.ok && res.data) {
         const data = res.data as TransformResult
         setResults(data)
-        setLogs(prev => [...prev, ...(data.log ?? []), `✓ ${data.nodes.length} results found`])
+        setLogs(prev => [...prev, ...(data.log ?? []), t('transforms.done', { count: data.nodes.length })])
 
-        // Merge returned nodes/edges into graph
-        const newNodes = data.nodes.map(n => {
-          const store = useGraphStore.getState()
-          return store.addNode(n.type as any, n.label, n.properties ?? {})
-        })
+        // Build node + edge objects, then merge atomically (single history entry)
+        const edgeType = resolveEdgeType(transform.name, transform.output_type)
+        const newNodeObjects: NodeData[] = data.nodes.map(n =>
+          createNode(n.type as NodeType, n.label, n.properties ?? {})
+        )
+        const newEdgeObjects: EdgeData[] = newNodeObjects.map(n =>
+          createEdge(node.id, n.id, edgeType)
+        )
+        useGraphStore.getState().mergeNodes(newNodeObjects, newEdgeObjects)
 
-        // Create edges from source node → new nodes
-        newNodes.forEach(n => {
-          useGraphStore.getState().addEdge(node.id, n.id, transform.output_type as any || 'linked_to')
-        })
-
-        // Update transform history
+        // Update transform history on the source node
         updateNode(node.id, {
           transformHistory: [
             ...(node.transformHistory ?? []),
@@ -93,12 +110,12 @@ export const TransformPanel: React.FC<TransformPanelProps> = ({ node }) => {
               ranAt: new Date().toISOString(),
               resultCount: data.nodes.length,
               status: 'success',
-            }
-          ]
+            },
+          ],
         })
       }
     } catch (err: any) {
-      setLogs(prev => [...prev, `✗ Error: ${err.message}`])
+      setLogs(prev => [...prev, t('transforms.error', { message: err.message })])
       updateNode(node.id, {
         transformHistory: [
           ...(node.transformHistory ?? []),
@@ -108,8 +125,8 @@ export const TransformPanel: React.FC<TransformPanelProps> = ({ node }) => {
             resultCount: 0,
             status: 'error',
             error: err.message,
-          }
-        ]
+          },
+        ],
       })
     } finally {
       setRunning(null)
@@ -120,30 +137,35 @@ export const TransformPanel: React.FC<TransformPanelProps> = ({ node }) => {
     <div className="transform-panel">
       {transforms.length === 0 && (
         <div className="node-list-empty" style={{ padding: '20px 16px' }}>
-          No transforms available for <strong>{node.type}</strong>
+          {t('transforms.noTransforms', { type: node.type })}
         </div>
       )}
 
       <div className="transform-list">
-        {transforms.map(t => (
-          <div key={t.name} className="transform-item">
+        {transforms.map(tf => {
+          const catalogKey = `transforms.catalog.${tf.name}`
+          const displayName = t(`${catalogKey}.display_name`, { defaultValue: tf.display_name })
+          const description = t(`${catalogKey}.description`, { defaultValue: tf.description })
+          return (
+          <div key={tf.name} className="transform-item">
             <div className="transform-info">
-              <div className="transform-name">{t.display_name}</div>
-              <div className="transform-desc">{t.description}</div>
+              <div className="transform-name">{displayName}</div>
+              <div className="transform-desc">{description}</div>
             </div>
             <button
-              className={`btn btn-primary transform-run-btn ${running === t.name ? 'loading' : ''}`}
-              onClick={() => runTransform(t)}
+              className={`btn btn-primary transform-run-btn ${running === tf.name ? 'loading' : ''}`}
+              onClick={() => runTransform(tf)}
               disabled={running !== null}
             >
-              {running === t.name
+              {running === tf.name
                 ? <Loader size={12} className="loading-spin" />
                 : <Play size={12} />
               }
-              Run
+              {t('transforms.run')}
             </button>
           </div>
-        ))}
+          )
+        })}
       </div>
 
       {/* Execution log */}

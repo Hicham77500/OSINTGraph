@@ -1,12 +1,14 @@
 import React, { useState } from 'react'
 import { NODE_TYPE_CONFIG, EDGE_TYPE_CONFIG } from '../../graph/nodeTypes'
 import { useGraphStore } from '../../graph/graphStore'
+import { useTranslation } from 'react-i18next'
 import { Tag, Clock, Zap, Trash2, ChevronDown, ChevronUp, Copy, ExternalLink } from 'lucide-react'
 import { TransformPanel } from './TransformPanel'
 import './InspectorPanel.css'
 
 export const InspectorPanel: React.FC = () => {
   const { nodes, edges, selectedNodeId, selectedEdgeId, removeNode, removeEdge } = useGraphStore()
+  const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState<'properties' | 'transforms' | 'history'>('properties')
 
   const selectedNode = nodes.find(n => n.id === selectedNodeId)
@@ -16,11 +18,11 @@ export const InspectorPanel: React.FC = () => {
     return (
       <div className="inspector-panel">
         <div className="panel-header">
-          <h3>Inspector</h3>
+          <h3>{t('inspector.title')}</h3>
         </div>
         <div className="inspector-empty">
           <div className="inspector-empty-icon">🔍</div>
-          <p>Select a node or edge to inspect</p>
+          <p>{t('inspector.empty')}</p>
         </div>
       </div>
     )
@@ -34,7 +36,7 @@ export const InspectorPanel: React.FC = () => {
     return (
       <div className="inspector-panel">
         <div className="panel-header">
-          <h3>Edge</h3>
+          <h3>{t('inspector.edgeTitle')}</h3>
           <button className="btn btn-danger icon-btn" onClick={() => removeEdge(selectedEdge.id)}>
             <Trash2 size={12} />
           </button>
@@ -42,7 +44,7 @@ export const InspectorPanel: React.FC = () => {
         <div className="inspector-content">
           <div className="edge-summary">
             <span className="edge-tag" style={{ background: `${edgeCfg.color}22`, color: edgeCfg.color, border: `1px solid ${edgeCfg.color}44` }}>
-              {edgeCfg.label}
+              {t(`edgeTypes.${selectedEdge.type}` as any, { defaultValue: edgeCfg.label })}
             </span>
             <div className="edge-nodes">
               <span className="edge-node">{sourceNode?.label ?? selectedEdge.source}</span>
@@ -52,7 +54,7 @@ export const InspectorPanel: React.FC = () => {
           </div>
           {selectedEdge.createdAt && (
             <div className="prop-row">
-              <span className="prop-key"><Clock size={10} /> Created</span>
+              <span className="prop-key"><Clock size={10} /> {t('inspector.propCreated')}</span>
               <span className="prop-val">{new Date(selectedEdge.createdAt).toLocaleString()}</span>
             </div>
           )}
@@ -74,11 +76,11 @@ export const InspectorPanel: React.FC = () => {
           </span>
           <div>
             <div className="inspector-node-label">{selectedNode.label}</div>
-            <div className="inspector-node-type" style={{ color: cfg.color }}>{cfg.label}</div>
+            <div className="inspector-node-type" style={{ color: cfg.color }}>{t(`nodeTypes.${selectedNode.type}.label`)}</div>
           </div>
         </div>
         <button className="btn btn-danger icon-btn" onClick={() => removeNode(selectedNode.id)}
-          data-tooltip="Delete node">
+          data-tooltip={t('inspector.deleteNode')}>
           <Trash2 size={12} />
         </button>
       </div>
@@ -87,7 +89,7 @@ export const InspectorPanel: React.FC = () => {
       {selectedNode.metadata?.confidence !== undefined && (
         <div className="confidence-bar-wrapper">
           <div className="confidence-label">
-            <span>Confidence</span>
+            <span>{t('inspector.confidence')}</span>
             <span>{selectedNode.metadata.confidence}%</span>
           </div>
           <div className="confidence-bar">
@@ -101,7 +103,7 @@ export const InspectorPanel: React.FC = () => {
         {(['properties', 'transforms', 'history'] as const).map(tab => (
           <button key={tab} className={`inspector-tab ${activeTab === tab ? 'active' : ''}`}
             onClick={() => setActiveTab(tab)}>
-            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            {t(`inspector.tab${tab.charAt(0).toUpperCase() + tab.slice(1)}` as any)}
           </button>
         ))}
       </div>
@@ -112,13 +114,13 @@ export const InspectorPanel: React.FC = () => {
           <div className="props-list fade-in">
             {selectedNode.metadata?.source && (
               <div className="prop-row">
-                <span className="prop-key">Source</span>
+                <span className="prop-key">{t('inspector.propSource')}</span>
                 <span className="prop-val">{selectedNode.metadata.source}</span>
               </div>
             )}
             {selectedNode.metadata?.createdAt && (
               <div className="prop-row">
-                <span className="prop-key"><Clock size={10} /> Created</span>
+                <span className="prop-key"><Clock size={10} /> {t('inspector.propCreated')}</span>
                 <span className="prop-val">{new Date(selectedNode.metadata.createdAt).toLocaleString()}</span>
               </div>
             )}
@@ -132,10 +134,10 @@ export const InspectorPanel: React.FC = () => {
             ))}
             {selectedNode.metadata?.tags?.length && (
               <div className="prop-row">
-                <span className="prop-key">Tags</span>
+                <span className="prop-key">{t('inspector.propTags')}</span>
                 <div className="tag-list">
-                  {selectedNode.metadata.tags.map(t => (
-                    <span key={t} className="tag">{t}</span>
+                  {selectedNode.metadata.tags.map(tag => (
+                    <span key={tag} className="tag">{tag}</span>
                   ))}
                 </div>
               </div>
@@ -152,13 +154,13 @@ export const InspectorPanel: React.FC = () => {
         {activeTab === 'history' && (
           <div className="history-list fade-in">
             {(!selectedNode.transformHistory || selectedNode.transformHistory.length === 0) && (
-              <div className="node-list-empty">No transform history</div>
+              <div className="node-list-empty">{t('inspector.noHistory')}</div>
             )}
             {selectedNode.transformHistory?.map((entry, i) => (
               <div key={i} className={`history-item status-${entry.status}`}>
                 <div className="history-transform">{entry.transformName}</div>
                 <div className="history-meta">
-                  <span>{entry.resultCount} results</span>
+                  <span>{t('inspector.historyResults', { count: entry.resultCount })}</span>
                   <span>{new Date(entry.ranAt).toLocaleTimeString()}</span>
                 </div>
                 {entry.error && <div className="history-error">{entry.error}</div>}

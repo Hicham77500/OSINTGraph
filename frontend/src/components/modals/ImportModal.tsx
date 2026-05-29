@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react'
 import { X, Upload, FileText, Table } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useGraphStore } from '../../graph/graphStore'
 import { NodeType, ALL_NODE_TYPES } from '../../graph/nodeTypes'
 import './ImportModal.css'
@@ -15,6 +16,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({ onClose }) => {
   const [labelCol, setLabelCol] = useState<number>(0)
   const fileRef = useRef<HTMLInputElement>(null)
   const { addNode } = useGraphStore()
+  const { t } = useTranslation()
 
   const handleFile = (f: File) => {
     setFile(f)
@@ -52,7 +54,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({ onClose }) => {
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal-panel fade-in" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
-          <div className="modal-title"><Upload size={16} /> Import Data</div>
+          <div className="modal-title"><Upload size={16} /> {t('importModal.title')}</div>
           <button className="btn btn-ghost icon-btn" onClick={onClose}><X size={14} /></button>
         </div>
 
@@ -69,8 +71,8 @@ export const ImportModal: React.FC<ImportModalProps> = ({ onClose }) => {
               <div className="drop-file-name">{file.name}</div>
             ) : (
               <>
-                <div className="drop-label">Drop a CSV or JSON file</div>
-                <div className="drop-sub">or click to browse</div>
+                <div className="drop-label">{t('importModal.dropLabel')}</div>
+                <div className="drop-sub">{t('importModal.dropSub')}</div>
               </>
             )}
           </div>
@@ -78,7 +80,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({ onClose }) => {
           {/* Preview */}
           {preview.length > 0 && (
             <div className="preview-section">
-              <div className="section-label" style={{ padding: '10px 0 4px' }}>Preview & Column Mapping</div>
+              <div className="section-label" style={{ padding: '10px 0 4px' }}>{t('importModal.previewSection')}</div>
               <div className="preview-table-wrap">
                 <table className="preview-table">
                   <thead>
@@ -88,8 +90,8 @@ export const ImportModal: React.FC<ImportModalProps> = ({ onClose }) => {
                           <select value={columns[i] ?? ''}
                             onChange={e => setColumns(c => ({ ...c, [i]: e.target.value as NodeType | '' }))}
                             style={{ width: '100%' }}>
-                            <option value="">— ignore —</option>
-                            {ALL_NODE_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                            <option value="">{t('importModal.ignore')}</option>
+                            {ALL_NODE_TYPES.map(tp => <option key={tp} value={tp}>{t(`nodeTypes.${tp}.label`)}</option>)}
                           </select>
                         </th>
                       ))}
@@ -114,9 +116,9 @@ export const ImportModal: React.FC<ImportModalProps> = ({ onClose }) => {
         </div>
 
         <div className="modal-footer">
-          <button className="btn btn-ghost" onClick={onClose}>Cancel</button>
+          <button className="btn btn-ghost" onClick={onClose}>{t('importModal.cancel')}</button>
           <button className="btn btn-primary" onClick={handleImport} disabled={preview.length < 2}>
-            Import nodes
+            {t('importModal.importButton')}
           </button>
         </div>
       </div>

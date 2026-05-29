@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 import { Expand, Trash2, Copy, Scissors, Link, Zap, ChevronRight } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useGraphStore } from '../../graph/graphStore'
 import { ALL_EDGE_TYPES, EDGE_TYPE_CONFIG } from '../../graph/nodeTypes'
 import './ContextMenu.css'
@@ -15,6 +16,7 @@ interface ContextMenuProps {
 export const ContextMenu: React.FC<ContextMenuProps> = ({ x, y, nodeId, edgeId, onClose }) => {
   const ref = useRef<HTMLDivElement>(null)
   const { nodes, removeNode, removeEdge, selectNode } = useGraphStore()
+  const { t } = useTranslation()
   const node = nodes.find(n => n.id === nodeId)
 
   // Clamp to viewport
@@ -58,16 +60,16 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ x, y, nodeId, edgeId, 
           <div className="context-divider" />
 
           <button className="context-item" onClick={handleExpand}>
-            <Expand size={13} /> Inspect node
+            <Expand size={13} /> {t('contextMenu.inspectNode')}
           </button>
           <button className="context-item" onClick={handleCopy}>
-            <Copy size={13} /> Copy value
+            <Copy size={13} /> {t('contextMenu.copyValue')}
           </button>
 
           <div className="context-divider" />
 
           <button className="context-item context-item-danger" onClick={handleDelete}>
-            <Trash2 size={13} /> Delete node
+            <Trash2 size={13} /> {t('contextMenu.deleteNode')}
           </button>
         </>
       )}
@@ -75,10 +77,10 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ x, y, nodeId, edgeId, 
       {edgeId && !nodeId && (
         <>
           <div className="context-header">
-            <span className="context-node-label">Edge</span>
+            <span className="context-node-label">{t('inspector.edgeTitle')}</span>
           </div>
           <button className="context-item context-item-danger" onClick={handleDelete}>
-            <Trash2 size={13} /> Delete edge
+            <Trash2 size={13} /> {t('contextMenu.deleteEdge')}
           </button>
         </>
       )}
@@ -86,10 +88,10 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({ x, y, nodeId, edgeId, 
       {!nodeId && !edgeId && (
         <>
           <div className="context-header">
-            <span className="context-node-label">Canvas</span>
+            <span className="context-node-label">{t('contextMenu.canvas')}</span>
           </div>
           <button className="context-item" onClick={onClose}>
-            <Zap size={13} /> New investigation
+            <Zap size={13} /> {t('contextMenu.newInvestigation')}
           </button>
         </>
       )}

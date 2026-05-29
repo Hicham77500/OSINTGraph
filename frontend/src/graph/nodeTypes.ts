@@ -90,7 +90,8 @@ export const NODE_TYPE_CONFIG: Record<NodeType, NodeTypeConfig> = {
     color: '#ef4444',
     bgColor: 'rgba(239,68,68,0.15)',
     borderColor: 'rgba(239,68,68,0.6)',
-    iconSvg: '<rect width="20" height="8" x="2" y="2" rx="2"/><rect width="20" height="8" x="2" y="14" rx="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/>',
+    // Network topology: hub node (top) linked to two endpoint nodes (bottom)
+    iconSvg: '<rect x="9" y="2" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="16" y="16" width="6" height="6" rx="1"/><path d="M5.69 16.25 12 8m6.31 8.25L12 8"/>',
     label: 'IP Address',
     description: 'IPv4 or IPv6 address',
   },
@@ -106,7 +107,8 @@ export const NODE_TYPE_CONFIG: Record<NodeType, NodeTypeConfig> = {
     color: '#38bdf8',
     bgColor: 'rgba(56,189,248,0.15)',
     borderColor: 'rgba(56,189,248,0.6)',
-    iconSvg: '<rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/>',
+    // Building2: main tower + two wings + horizontal window lines (reads well at any size)
+    iconSvg: '<path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/>',
     label: 'Organization',
     description: 'A company, group, or institution',
   },

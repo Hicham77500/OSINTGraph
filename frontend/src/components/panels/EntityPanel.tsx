@@ -1,11 +1,13 @@
 import React, { useState } from 'react'
-import { ALL_NODE_TYPES, NODE_TYPE_CONFIG, NodeType, createNode } from '../../graph/nodeTypes'
+import { ALL_NODE_TYPES, NODE_TYPE_CONFIG, NodeType } from '../../graph/nodeTypes'
 import { useGraphStore } from '../../graph/graphStore'
-import { Plus, Search, ChevronDown } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { Plus, Search } from 'lucide-react'
 import './EntityPanel.css'
 
 export const EntityPanel: React.FC = () => {
   const { addNode, nodes } = useGraphStore()
+  const { t } = useTranslation()
   const [search, setSearch] = useState('')
   const [addingType, setAddingType] = useState<NodeType | null>(null)
   const [newLabel, setNewLabel] = useState('')
@@ -39,17 +41,18 @@ export const EntityPanel: React.FC = () => {
   return (
     <div className="entity-panel">
       <div className="panel-header">
-        <h3>Entities</h3>
+        <h3>{t('entityPanel.title')}</h3>
         <span className="panel-badge">{nodes.length}</span>
       </div>
 
       {/* Entity type palette */}
       <div className="entity-types-section">
-        <div className="section-label">Types</div>
+        <div className="section-label">{t('entityPanel.sectionTypes')}</div>
         <div className="entity-type-list">
           {ALL_NODE_TYPES.map(type => {
             const cfg = NODE_TYPE_CONFIG[type]
             const isAdding = addingType === type
+            const typeLabel = t(`nodeTypes.${type}.label`)
             return (
               <div key={type} className={`entity-type-item ${isAdding ? 'adding' : ''}`}
                 style={{ '--entity-color': cfg.color } as React.CSSProperties}>
@@ -58,11 +61,11 @@ export const EntityPanel: React.FC = () => {
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke={cfg.color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" dangerouslySetInnerHTML={{ __html: cfg.iconSvg }} />
                   </div>
                   <div className="entity-info">
-                    <span className="entity-label">{cfg.label}</span>
+                    <span className="entity-label">{typeLabel}</span>
                     <span className="entity-count">{countByType(type)}</span>
                   </div>
                   <button className="entity-add-btn" onClick={() => handleAdd(type)}
-                    title={`Add ${cfg.label}`}>
+                    title={t('entityPanel.addTooltip', { label: typeLabel })}>
                     <Plus size={12} />
                   </button>
                 </div>
@@ -71,13 +74,13 @@ export const EntityPanel: React.FC = () => {
                     <input
                       autoFocus
                       type="text"
-                      placeholder={`Enter ${cfg.label.toLowerCase()} value…`}
+                      placeholder={t('entityPanel.addPlaceholder', { label: typeLabel.toLowerCase() })}
                       value={newLabel}
                       onChange={e => setNewLabel(e.target.value)}
                       onKeyDown={e => handleKeyDown(e, type)}
                     />
                     <button className="btn btn-primary" style={{ padding: '4px 10px', fontSize: 11 }}
-                      onClick={() => handleAdd(type)}>Add</button>
+                      onClick={() => handleAdd(type)}>{t('entityPanel.addButton')}</button>
                   </div>
                 )}
               </div>
@@ -90,15 +93,15 @@ export const EntityPanel: React.FC = () => {
 
       {/* Node list */}
       <div className="entity-list-section">
-        <div className="section-label">In graph</div>
+        <div className="section-label">{t('entityPanel.sectionInGraph')}</div>
         <div className="entity-search">
           <Search size={11} className="search-icon" />
-          <input type="text" placeholder="Filter…" value={search}
+          <input type="text" placeholder={t('entityPanel.filterPlaceholder')} value={search}
             onChange={e => setSearch(e.target.value)} />
         </div>
         <div className="node-list">
           {filteredNodes.length === 0 && (
-            <div className="node-list-empty">No nodes yet</div>
+            <div className="node-list-empty">{t('entityPanel.noNodes')}</div>
           )}
           {filteredNodes.map(n => {
             const cfg = NODE_TYPE_CONFIG[n.type]
@@ -111,7 +114,7 @@ export const EntityPanel: React.FC = () => {
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" dangerouslySetInnerHTML={{ __html: cfg.iconSvg }} />
                 </span>
                 <span className="node-list-label">{n.label}</span>
-                <span className="node-list-type">{cfg.label}</span>
+                <span className="node-list-type">{t(`nodeTypes.${n.type}.label`)}</span>
               </button>
             )
           })}

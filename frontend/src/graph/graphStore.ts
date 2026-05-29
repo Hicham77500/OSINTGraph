@@ -25,6 +25,7 @@ export interface GraphState {
   // UI state
   isLoading: boolean
   layoutType: 'force' | 'hierarchical' | 'grid'
+  connectMode: boolean
 
   // Actions
   addNode: (type: NodeType, label: string, properties?: Record<string, string>) => NodeData
@@ -46,6 +47,7 @@ export interface GraphState {
   clearGraph: () => void
   setWorkspace: (name: string) => void
   setLayout: (layout: 'force' | 'hierarchical' | 'grid') => void
+  setConnectMode: (v: boolean) => void
 }
 
 export const useGraphStore = create<GraphState>((set, get) => ({
@@ -59,18 +61,19 @@ export const useGraphStore = create<GraphState>((set, get) => ({
   historyIndex: 0,
   isLoading: false,
   layoutType: 'force',
+  connectMode: false,
 
   addNode: (type, label, properties = {}) => {
     const node = createNode(type, label, properties)
-    get()._pushHistory(`Add ${type}: ${label}`)
     set(s => ({ nodes: [...s.nodes, node] }))
+    get()._pushHistory(`Add ${type}: ${label}`)
     return node
   },
 
   addEdge: (source, target, type) => {
     const edge = createEdge(source, target, type)
-    get()._pushHistory(`Add relation: ${type}`)
     set(s => ({ edges: [...s.edges, edge] }))
+    get()._pushHistory(`Add relation: ${type}`)
     return edge
   },
 
@@ -81,24 +84,23 @@ export const useGraphStore = create<GraphState>((set, get) => ({
   },
 
   removeNode: (id) => {
-    get()._pushHistory('Remove node')
     set(s => ({
       nodes: s.nodes.filter(n => n.id !== id),
       edges: s.edges.filter(e => e.source !== id && e.target !== id),
       selectedNodeId: s.selectedNodeId === id ? null : s.selectedNodeId,
     }))
+    get()._pushHistory('Remove node')
   },
 
   removeEdge: (id) => {
-    get()._pushHistory('Remove edge')
     set(s => ({ edges: s.edges.filter(e => e.id !== id) }))
+    get()._pushHistory('Remove edge')
   },
 
   selectNode: (id) => set({ selectedNodeId: id, selectedEdgeId: null }),
   selectEdge: (id) => set({ selectedEdgeId: id, selectedNodeId: null }),
 
   mergeNodes: (incoming, incomingEdges = []) => {
-    get()._pushHistory(`Merge ${incoming.length} nodes`)
     set(s => {
       const existingIds = new Set(s.nodes.map(n => n.id))
       const existingEdgeIds = new Set(s.edges.map(e => e.id))
@@ -109,6 +111,7 @@ export const useGraphStore = create<GraphState>((set, get) => ({
         edges: [...s.edges, ...newEdges],
       }
     })
+    get()._pushHistory(`Merge ${incoming.length} nodes`)
   },
 
   _pushHistory: (description) => {
@@ -150,14 +153,22 @@ export const useGraphStore = create<GraphState>((set, get) => ({
   },
 
   loadGraph: (nodes, edges) => {
-    set({ nodes, edges, selectedNodeId: null, selectedEdgeId: null })
+    set({
+      nodes,
+      edges,
+      selectedNodeId: null,
+      selectedEdgeId: null,
+      history: [{ nodes: JSON.parse(JSON.stringify(nodes)), edges: JSON.parse(JSON.stringify(edges)), description: 'loaded' }],
+      historyIndex: 0,
+    })
   },
 
   clearGraph: () => {
-    get()._pushHistory('Clear graph')
     set({ nodes: [], edges: [], selectedNodeId: null, selectedEdgeId: null })
+    get()._pushHistory('Clear graph')
   },
 
   setWorkspace: (name) => set({ currentWorkspace: name }),
   setLayout: (layout) => set({ layoutType: layout }),
+  setConnectMode: (v) => set({ connectMode: v }),
 }))

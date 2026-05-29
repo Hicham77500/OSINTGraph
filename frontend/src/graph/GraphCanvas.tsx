@@ -1,11 +1,12 @@
-import React, { useEffect, useRef, FC } from 'react'
+import React, { useEffect, useRef, useState, FC } from 'react'
 import cytoscape from 'cytoscape'
+import { useTranslation } from 'react-i18next'
 // @ts-ignore
 import cola from 'cytoscape-cola'
 // @ts-ignore
 import dagre from 'cytoscape-dagre'
 import { useGraphStore } from './graphStore'
-import { NODE_TYPE_CONFIG, NodeData, EdgeData } from './nodeTypes'
+import { NODE_TYPE_CONFIG, EDGE_TYPE_CONFIG, NodeData, EdgeData, EdgeType } from './nodeTypes'
 import './GraphCanvas.css'
 
 cytoscape.use(cola)
@@ -30,75 +31,79 @@ function getIconSvgUri(svgPath: string, color: string): string {
 // Cytoscape stylesheet
 // -------------------------------------------------------
 function buildCytoscapeStyle(): cytoscape.StylesheetStyle[] {
-  // For pure icon rendering, we don't need color maps per type here anymore
-  // since the SVG itself will be colored, and backgrounds are transparent.
-  const typeStyles = Object.entries(NODE_TYPE_CONFIG).map(([type, cfg]) => ({
-    selector: `node[type="${type}"]`,
-    style: {} as any,
-  }))
-
   return [
     // ── Nodes ──────────────────────────────────────────
     {
       selector: 'node',
       style: {
-        shape: 'rectangle', // Shape doesn't matter visually due to 0 opacity
-        width:  48,         // Icon size mapped precisely
-        height: 48,
-        'background-opacity': 0, // Transparent, Maltego-style standalone icons
-        'border-width': 0,
-        
-        // Pure SVG icon
-        'background-image':   'data(iconImage)',
-        'background-fit':     'contain',
+        shape: 'ellipse',
+        width:  64,
+        height: 64,
 
-        // Label below the icon
-        content:         'data(label)',
-        'text-valign':   'bottom',
-        'text-halign':   'center',
-        'font-family':   'Inter, sans-serif',
-        'font-size':     '11px',
-        'font-weight':   '500',
-        color:           '#e2e8f0',
-        'text-margin-y':    6,
+        // Colored bubble (entity-type color via data attribute)
+        'background-color':   'data(bgColor)',
+        'background-opacity': 0.13,
+        'border-width':       1.5,
+        'border-color':       'data(bgColor)',
+        'border-opacity':     0.45,
+
+        // Icon centered inside the bubble
+        'background-image':    'data(iconImage)',
+        'background-width':    '62%',
+        'background-height':   '62%',
+        'background-position-x': '50%',
+        'background-position-y': '50%',
+
+        // Label below the node
+        content:              'data(label)',
+        'text-valign':        'bottom',
+        'text-halign':        'center',
+        'font-family':        'Inter, sans-serif',
+        'font-size':          '11px',
+        'font-weight':        '500',
+        color:                '#e2e8f0',
+        'text-margin-y':      8,
         'text-outline-width': 3,
         'text-outline-color': '#0a0c14',
-        'text-max-width':   '110px',
-        'text-wrap':        'ellipsis',
+        'text-max-width':     '110px',
+        'text-wrap':          'ellipsis',
       } as any,
     },
-    // Per-type colors
-    ...typeStyles,
-    // Selected (Maltego style glow around the icon)
+    // Selected: brighter ring + glow
     {
       selector: 'node:selected',
       style: {
-        'underlay-color': '#6366f1',
-        'underlay-padding': 6,
-        'underlay-opacity': 0.3,
-        'underlay-shape': 'ellipse',
+        'background-opacity': 0.28,
+        'border-width':       2.5,
+        'border-opacity':     0.9,
+        'underlay-color':     'data(bgColor)',
+        'underlay-padding':   10,
+        'underlay-opacity':   0.18,
+        'underlay-shape':     'ellipse',
       } as any,
     },
     {
       selector: 'node:active',
-      style: { 'overlay-opacity': 0.08 } as any,
+      style: { 'overlay-opacity': 0.07 } as any,
     },
 
     // ── Edges ──────────────────────────────────────────
     {
       selector: 'edge',
       style: {
-        width: 1.5,
-        'line-color':          'rgba(148,163,184,0.4)',
-        'target-arrow-color':  'rgba(148,163,184,0.4)',
+        width:                 1.8,
+        'line-color':          'data(edgeColor)',
+        'target-arrow-color':  'data(edgeColor)',
         'target-arrow-shape':  'triangle',
+        'arrow-scale':         0.9,
         'curve-style':         'bezier',
         label:                 'data(label)',
         'font-size':           '10px',
         'font-family':         'Inter, sans-serif',
-        color:                 '#64748b',
+        color:                 '#94a3b8',
         'text-outline-width':  2,
         'text-outline-color':  '#0a0c14',
+        'text-background-opacity': 0,
       } as any,
     },
     {
@@ -106,12 +111,21 @@ function buildCytoscapeStyle(): cytoscape.StylesheetStyle[] {
       style: {
         'line-color':         '#6366f1',
         'target-arrow-color': '#6366f1',
-        width: 2.5,
+        width: 2.8,
       } as any,
     },
+    // ── Connect-mode highlight ──────────────────────
     {
-      selector: '.faded',
-      style: { opacity: 0.2 } as any,
+      selector: 'node.connect-source',
+      style: {
+        'background-opacity': 0.5,
+        'border-width':       3,
+        'border-opacity':     1,
+        'underlay-color':     'data(bgColor)',
+        'underlay-padding':   14,
+        'underlay-opacity':   0.30,
+        'underlay-shape':     'ellipse',
+      } as any,
     },
   ]
 }
@@ -151,8 +165,30 @@ const LAYOUT_OPTIONS: Record<string, any> = {
 export const GraphCanvas: FC<GraphCanvasProps> = ({ onContextMenu }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const cyRef        = useRef<cytoscape.Core | null>(null)
+  const prevNodeCountRef = useRef(0)
+  const { t, i18n } = useTranslation()
 
-  const { nodes, edges, layoutType, selectNode, selectEdge } = useGraphStore()
+  // Connect mode local state
+  const [pendingSource, setPendingSource] = useState<string | null>(null)
+  const [pendingTarget, setPendingTarget] = useState<string | null>(null)
+
+  const {
+    nodes, edges, layoutType, selectNode, selectEdge,
+    connectMode, setConnectMode, addEdge,
+  } = useGraphStore()
+
+  // Cancel connect mode with Escape key
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && connectMode) {
+        setConnectMode(false)
+        setPendingSource(null)
+        setPendingTarget(null)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [connectMode, setConnectMode])
 
   // ── Init Cytoscape once ────────────────────────────
   useEffect(() => {
@@ -173,10 +209,44 @@ export const GraphCanvas: FC<GraphCanvasProps> = ({ onContextMenu }) => {
 
     cyRef.current = cy
 
-    cy.on('tap', 'node', e => selectNode(e.target.id()))
-    cy.on('tap', 'edge', e => selectEdge(e.target.id()))
-    cy.on('tap',         e => { if (e.target === cy) { selectNode(null); selectEdge(null) } })
-    cy.on('cxttap',      e => {
+    // Use refs to avoid stale closures in Cytoscape event handlers
+    const connectModeRef   = { current: false }
+    const pendingSourceRef = { current: null as string | null }
+
+    // Expose mutable refs so the effect below can update them
+    ;(cy as any)._connectModeRef   = connectModeRef
+    ;(cy as any)._pendingSourceRef = pendingSourceRef
+
+    cy.on('tap', 'node', e => {
+      const nodeId = e.target.id()
+      if (connectModeRef.current) {
+        if (!pendingSourceRef.current) {
+          // First click: set source
+          pendingSourceRef.current = nodeId
+          setPendingSource(nodeId)
+        } else if (pendingSourceRef.current !== nodeId) {
+          // Second click: set target, show type picker
+          setPendingTarget(nodeId)
+        }
+        return
+      }
+      selectNode(nodeId)
+    })
+    cy.on('tap', 'edge', e => { if (!connectModeRef.current) selectEdge(e.target.id()) })
+    cy.on('tap', e => {
+      if (e.target === cy) {
+        if (connectModeRef.current) {
+          // Click on canvas cancels pending source
+          pendingSourceRef.current = null
+          setPendingSource(null)
+          setPendingTarget(null)
+        } else {
+          selectNode(null)
+          selectEdge(null)
+        }
+      }
+    })
+    cy.on('cxttap', e => {
       const isNode = e.target !== cy && e.target.isNode?.()
       const isEdge = e.target !== cy && e.target.isEdge?.()
       onContextMenu?.({
@@ -189,6 +259,22 @@ export const GraphCanvas: FC<GraphCanvasProps> = ({ onContextMenu }) => {
 
     return () => cy.destroy()
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Sync connect mode into Cytoscape refs ─────────
+  useEffect(() => {
+    const cy = cyRef.current
+    if (!cy) return
+    const cmRef = (cy as any)._connectModeRef
+    const psRef = (cy as any)._pendingSourceRef
+    if (cmRef) cmRef.current = connectMode
+    if (psRef) psRef.current = pendingSource
+
+    // Highlight pending source node
+    cy.nodes().removeClass('connect-source connect-target')
+    if (pendingSource) {
+      cy.getElementById(pendingSource).addClass('connect-source')
+    }
+  }, [connectMode, pendingSource])
 
   // ── Sync store → Cytoscape ────────────────────────
   useEffect(() => {
@@ -205,42 +291,56 @@ export const GraphCanvas: FC<GraphCanvasProps> = ({ onContextMenu }) => {
     // Add / update nodes
     nodes.forEach((n: NodeData) => {
       const cfg = NODE_TYPE_CONFIG[n.type]
+      const iconImage = getIconSvgUri(cfg.iconSvg, cfg.color)
       if (cy.getElementById(n.id).length === 0) {
         cy.add({
           group: 'nodes',
           data: {
-            id:    n.id,
-            label: n.label,
-            type:  n.type,
-            iconImage: getIconSvgUri(cfg.iconSvg, cfg.color), // Colored raw SVG string
+            id:        n.id,
+            label:     n.label,
+            type:      n.type,
+            iconImage,
+            bgColor:   cfg.color,
           },
         })
       } else {
-        // Update label if it changed
-        cy.getElementById(n.id).data('label', n.label)
+        // Update label, type, icon and color on change
+        const el = cy.getElementById(n.id)
+        el.data('label',     n.label)
+        el.data('type',      n.type)
+        el.data('iconImage', iconImage)
+        el.data('bgColor',   cfg.color)
       }
     })
 
-    // Add new edges
+    // Add / update edges
     edges.forEach((e: EdgeData) => {
+      const edgeCfg = EDGE_TYPE_CONFIG[e.type as EdgeType]
+      const translatedLabel = t(`edgeTypes.${e.type}` as any, { defaultValue: edgeCfg?.label ?? e.type })
       if (cy.getElementById(e.id).length === 0) {
         cy.add({
           group: 'edges',
           data: {
-            id:     e.id,
-            source: e.source,
-            target: e.target,
-            label:  e.label ?? e.type,
+            id:        e.id,
+            source:    e.source,
+            target:    e.target,
+            label:     translatedLabel,
+            edgeColor: edgeCfg ? `${edgeCfg.color}99` : 'rgba(148,163,184,0.5)',
           },
         })
+      } else {
+        // Update label when language changes
+        cy.getElementById(e.id).data('label', translatedLabel)
       }
     })
 
-    // Re-run layout only when node count changes
-    if (nodes.length > 0) {
+    // Re-run layout only when the number of nodes changes (not on metadata updates)
+    const nodeCountChanged = nodes.length !== prevNodeCountRef.current
+    prevNodeCountRef.current = nodes.length
+    if (nodes.length > 0 && nodeCountChanged) {
       cy.layout(LAYOUT_OPTIONS[layoutType] ?? LAYOUT_OPTIONS.force).run()
     }
-  }, [nodes, edges, layoutType])
+  }, [nodes, edges, layoutType, i18n.language])
 
   // ── Re-layout on layout-type switch ───────────────
   useEffect(() => {
@@ -249,14 +349,72 @@ export const GraphCanvas: FC<GraphCanvasProps> = ({ onContextMenu }) => {
     cy.layout(LAYOUT_OPTIONS[layoutType] ?? LAYOUT_OPTIONS.force).run()
   }, [layoutType])
 
+  const handleEdgeTypePick = (type: EdgeType) => {
+    if (pendingSource && pendingTarget) {
+      addEdge(pendingSource, pendingTarget, type)
+    }
+    setPendingSource(null)
+    setPendingTarget(null)
+    // Keep connect mode active for chaining
+    // (cy refs will be updated by the sync effect)
+    const cy = cyRef.current
+    if (cy) {
+      const cmRef = (cy as any)._connectModeRef
+      const psRef = (cy as any)._pendingSourceRef
+      if (cmRef) cmRef.current = connectMode
+      if (psRef) psRef.current = null
+      cy.nodes().removeClass('connect-source')
+    }
+  }
+
+  const cancelConnect = () => {
+    setPendingSource(null)
+    setPendingTarget(null)
+    setConnectMode(false)
+  }
+
   return (
-    <div className="graph-canvas-wrapper">
+    <div className={`graph-canvas-wrapper${connectMode ? ' connecting-mode' : ''}`}>
       <div ref={containerRef} className="graph-canvas" />
+
+      {/* Connect mode hint banner */}
+      {connectMode && !pendingTarget && (
+        <div className="connect-hint">
+          {pendingSource
+            ? t('canvas.connectPickTarget')
+            : t('canvas.connectPickSource')}
+          <button className="connect-hint-cancel" onClick={cancelConnect}>✕ {t('canvas.connectCancel')}</button>
+        </div>
+      )}
+
+      {/* Edge type picker — shown when source + target are both selected */}
+      {pendingSource && pendingTarget && (
+        <div className="edge-type-picker-overlay" onClick={e => e.stopPropagation()}>
+          <div className="edge-type-picker">
+            <div className="etp-title">{t('canvas.connectChooseType')}</div>
+            {(Object.entries(EDGE_TYPE_CONFIG) as [EdgeType, {color: string; label: string}][]).map(([type, cfg]) => (
+              <button
+                key={type}
+                className="etp-option"
+                style={{ '--edge-color': cfg.color } as React.CSSProperties}
+                onClick={() => handleEdgeTypePick(type)}
+              >
+                <span className="etp-dot" />
+                <span className="etp-label">{t(`edgeTypes.${type}` as any, { defaultValue: cfg.label })}</span>
+              </button>
+            ))}
+            <button className="etp-cancel" onClick={() => { setPendingSource(null); setPendingTarget(null) }}>
+              {t('canvas.connectCancel')}
+            </button>
+          </div>
+        </div>
+      )}
+
       {nodes.length === 0 && (
         <div className="graph-empty-state">
           <div className="graph-empty-icon">🕵️</div>
-          <h2>Start your investigation</h2>
-          <p>Add an entity from the left panel, or import a CSV / JSON file</p>
+          <h2>{t('canvas.emptyTitle')}</h2>
+          <p>{t('canvas.emptyDesc')}</p>
         </div>
       )}
     </div>

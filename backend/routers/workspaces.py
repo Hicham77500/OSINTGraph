@@ -31,6 +31,5 @@ async def create_workspace(body: WorkspaceCreate):
 async def delete_workspace(workspace_id: str):
     if workspace_id == "default":
         return {"error": "Cannot delete default workspace"}
-    # Save empty data effectively removes it from active use
-    await sqlite_client.save_graph(workspace_id, {"nodes": [], "edges": [], "deleted": True})
+    await sqlite_client.delete_workspace(workspace_id)
     return {"deleted": workspace_id}

@@ -58,6 +58,11 @@ class SQLiteClient:
         data["edges"].append(edge)
         await self.save_graph(workspace_id, data)
 
+    async def delete_workspace(self, workspace_id: str):
+        async with await self._get_db() as db:
+            await db.execute("DELETE FROM graphs WHERE workspace_id = ?", (workspace_id,))
+            await db.commit()
+
     async def list_workspaces(self) -> list[str]:
         async with await self._get_db() as db:
             async with db.execute("SELECT workspace_id FROM graphs") as cursor:
