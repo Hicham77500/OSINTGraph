@@ -153,7 +153,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         <button
           className="btn btn-ghost toolbar-btn lang-switcher"
           onClick={toggleLang}
-          data-tooltip={currentLang === 'fr' ? 'Switch to English' : 'Passer en Français'}
+          data-tooltip={currentLang === 'fr' ? t('toolbar.switchToEnglish') : t('toolbar.switchToFrench')}
         >
           <Globe size={13} />
           <span className="lang-label">{currentLang.toUpperCase()}</span>

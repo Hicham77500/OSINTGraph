@@ -21,6 +21,8 @@ const en = {
     connectTooltip:   'Draw a manual link between two nodes',
     hideInspector:    'Hide inspector',
     showInspector:    'Show inspector',
+    switchToEnglish:  'Switch to English',
+    switchToFrench:   'Switch to French',
   },
 
   // ── Entity Panel ─────────────────────────────────────────
@@ -110,6 +112,16 @@ const en = {
   },
 
   // ── Graph Canvas ─────────────────────────────────────────
+  graph: {
+    depth1:        'Depth: 1 hop',
+    depth2:        'Depth: 2 hops',
+    depth3:        'Depth: 3 hops',
+    allRelations:  'All relations',
+    focusNode:     'Focus node',
+    clearFocus:    'Clear focus',
+    legend:        'Graph legend',
+  },
+
   canvas: {
     connectPickSource: 'Click a source node',
     connectPickTarget: 'Now click the target node',
@@ -222,6 +234,54 @@ const en = {
       chronologie:     'Observations appear here once entities are collected in the graph or other notebooks.',
       notes:           'Capture analyst notes directly in this view — no graph required.',
       custom:          'Add entities from the full graph to populate this notebook.',
+    },
+  },
+
+  commandSearch: {
+    placeholder:      'Search persons, aliases, usernames, emails…',
+    noResults:        'No results',
+    matchExact:       'Exact',
+    matchNormalized:  'Normalized',
+    matchPotential:   'Potential',
+  },
+
+  personView: {
+    loading:       'Loading…',
+    backToDossier: 'Dossier',
+    confidence:    'Confidence {{percent}}%',
+    sources:       '{{count}} sources',
+    tabs: {
+      overview:   'Overview',
+      identities: 'Identities',
+      social:     'Social',
+      relations:  'Relations',
+      timeline:   'Timeline',
+      evidence:   'Evidence',
+      ai:         'AI Analysis',
+    },
+    overview: {
+      title:           'Analytical summary',
+      identity:        'Identity: {{label}} ({{type}})',
+      properties:      'Properties: {{props}}',
+      keyObservations: 'Key observations: {{count}}',
+    },
+    social: {
+      empty: 'No documented social accounts.',
+    },
+    relations: {
+      item:          '{{type}} — confidence {{percent}}%',
+      evidenceCount: '{{count}} evidence items',
+    },
+    timeline: {
+      item: 'Observed fact — {{platform}}: {{value}}',
+    },
+    ai: {
+      readinessTitle:   'Context Readiness — {{score}}%',
+      runAnalysis:      'Run assisted analysis',
+      confirm:          'Confirm',
+      reject:           'Reject',
+      markForReview:    'Mark for review',
+      insufficientData: 'Insufficient data for reliable analysis.',
     },
   },
 } as const

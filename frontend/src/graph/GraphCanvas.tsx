@@ -430,14 +430,16 @@ export const GraphCanvas: FC<GraphCanvasProps> = ({ onContextMenu }) => {
     <div className={`graph-canvas-wrapper${connectMode ? ' connecting-mode' : ''}`}>
       <div className="graph-filters">
         <select value={graphDepth} onChange={e => setGraphDepth(Number(e.target.value) as 1 | 2 | 3)}>
-          <option value={1}>Depth: 1 hop</option>
-          <option value={2}>Depth: 2 hops</option>
-          <option value={3}>Depth: 3 hops</option>
+          <option value={1}>{t('graph.depth1')}</option>
+          <option value={2}>{t('graph.depth2')}</option>
+          <option value={3}>{t('graph.depth3')}</option>
         </select>
         <select value={relationFilter} onChange={e => setRelationFilter(e.target.value)}>
-          <option value="all">All relations</option>
-          {(Object.keys(EDGE_TYPE_CONFIG) as EdgeType[]).map(t => (
-            <option key={t} value={t}>{EDGE_TYPE_CONFIG[t].label}</option>
+          <option value="all">{t('graph.allRelations')}</option>
+          {(Object.keys(EDGE_TYPE_CONFIG) as EdgeType[]).map(type => (
+            <option key={type} value={type}>
+              {t(`edgeTypes.${type}` as any, { defaultValue: EDGE_TYPE_CONFIG[type].label })}
+            </option>
           ))}
         </select>
         <button
@@ -446,7 +448,7 @@ export const GraphCanvas: FC<GraphCanvasProps> = ({ onContextMenu }) => {
           onClick={() => setFocusNodeId(selectedNodeId)}
           disabled={!selectedNodeId}
         >
-          Focus node
+          {t('graph.focusNode')}
         </button>
         {focusNodeId && (
           <button
@@ -454,16 +456,16 @@ export const GraphCanvas: FC<GraphCanvasProps> = ({ onContextMenu }) => {
             style={{ fontSize: '0.75rem', padding: '0.35rem 0.5rem' }}
             onClick={() => setFocusNodeId(null)}
           >
-            Clear focus
+            {t('graph.clearFocus')}
           </button>
         )}
       </div>
 
-      <div className="graph-legend" aria-label="Graph legend">
+      <div className="graph-legend" aria-label={t('graph.legend')}>
         {(Object.entries(NODE_TYPE_CONFIG) as [NodeType, typeof NODE_TYPE_CONFIG.person][]).slice(0, 4).map(([type, cfg]) => (
           <span key={type} className="legend-item">
             <span className="legend-dot" style={{ background: cfg.color }} />
-            {cfg.label}
+            {t(`nodeTypes.${type}.label` as any, { defaultValue: cfg.label })}
           </span>
         ))}
       </div>

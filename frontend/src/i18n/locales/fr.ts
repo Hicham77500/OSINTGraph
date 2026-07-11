@@ -23,6 +23,8 @@ const fr: Translations = {
     connectTooltip:    'Tracer un lien manuel entre deux noeuds',
     hideInspector:    "Masquer l'inspecteur",
     showInspector:    "Afficher l'inspecteur",
+    switchToEnglish:  'Passer en anglais',
+    switchToFrench:   'Passer en français',
   },
 
   // ── Entity Panel ─────────────────────────────────────────
@@ -112,6 +114,16 @@ const fr: Translations = {
   },
 
   // ── Graph Canvas ─────────────────────────────────────────
+  graph: {
+    depth1:        'Profondeur : 1 saut',
+    depth2:        'Profondeur : 2 sauts',
+    depth3:        'Profondeur : 3 sauts',
+    allRelations:  'Toutes les relations',
+    focusNode:     'Focaliser le nœud',
+    clearFocus:    'Effacer la focalisation',
+    legend:        'Légende du graphe',
+  },
+
   canvas: {
     connectPickSource: 'Cliquez sur le noeud source',
     connectPickTarget: 'Cliquez maintenant sur le noeud cible',
@@ -224,6 +236,54 @@ const fr: Translations = {
       chronologie:     'Les observations apparaissent ici une fois des entités collectées dans le graphe ou d\'autres carnets.',
       notes:           'Capturez des notes analyste directement dans cette vue — sans graphe.',
       custom:          'Ajoutez des entités depuis le graphe complet pour peupler ce carnet.',
+    },
+  },
+
+  commandSearch: {
+    placeholder:      'Rechercher personnes, alias, pseudonymes, e-mails…',
+    noResults:        'Aucun résultat',
+    matchExact:       'Exact',
+    matchNormalized:  'Normalisé',
+    matchPotential:   'Potentiel',
+  },
+
+  personView: {
+    loading:       'Chargement…',
+    backToDossier: 'Dossier',
+    confidence:    'Confiance {{percent}}%',
+    sources:       '{{count}} fiches sources',
+    tabs: {
+      overview:   'Vue d\'ensemble',
+      identities: 'Identités',
+      social:     'Réseaux sociaux',
+      relations:  'Relations',
+      timeline:   'Chronologie',
+      evidence:   'Preuves',
+      ai:         'Analyse IA',
+    },
+    overview: {
+      title:           'Résumé analytique',
+      identity:        'Identité : {{label}} ({{type}})',
+      properties:      'Propriétés : {{props}}',
+      keyObservations: 'Observations clés : {{count}}',
+    },
+    social: {
+      empty: 'Aucun compte social documenté.',
+    },
+    relations: {
+      item:          '{{type}} — confiance {{percent}}%',
+      evidenceCount: '{{count}} preuves',
+    },
+    timeline: {
+      item: 'Fait observé — {{platform}} : {{value}}',
+    },
+    ai: {
+      readinessTitle:   'Context Readiness — {{score}}%',
+      runAnalysis:      'Lancer analyse assistée',
+      confirm:          'Confirmer',
+      reject:           'Rejeter',
+      markForReview:    'Marquer à vérifier',
+      insufficientData: 'Données insuffisantes pour une analyse fiable.',
     },
   },
 }

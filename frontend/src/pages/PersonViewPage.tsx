@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import {
   ArrowLeft, User, Share2, GitBranch, Clock, FileSearch, Sparkles,
 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { apiClient } from '../services/api'
 import type { AIAnalysis, ContextReadiness, Entity, Observation, Relation } from '../types/domain'
 import './PersonViewPage.css'
@@ -11,6 +12,7 @@ type Tab = 'overview' | 'identities' | 'social' | 'relations' | 'timeline' | 'ev
 
 export const PersonViewPage: React.FC = () => {
   const { dossierId, entityId } = useParams<{ dossierId: string; entityId: string }>()
+  const { t } = useTranslation()
   const [entity, setEntity] = useState<Entity | null>(null)
   const [observations, setObservations] = useState<Observation[]>([])
   const [relations, setRelations] = useState<Relation[]>([])
@@ -40,27 +42,29 @@ export const PersonViewPage: React.FC = () => {
     if (res.ok) setAnalysis(res.data as AIAnalysis)
   }
 
+  const tabs = useMemo(() => ([
+    { id: 'overview' as const, label: t('personView.tabs.overview'), icon: <User size={14} /> },
+    { id: 'identities' as const, label: t('personView.tabs.identities'), icon: <User size={14} /> },
+    { id: 'social' as const, label: t('personView.tabs.social'), icon: <Share2 size={14} /> },
+    { id: 'relations' as const, label: t('personView.tabs.relations'), icon: <GitBranch size={14} /> },
+    { id: 'timeline' as const, label: t('personView.tabs.timeline'), icon: <Clock size={14} /> },
+    { id: 'evidence' as const, label: t('personView.tabs.evidence'), icon: <FileSearch size={14} /> },
+    { id: 'ai' as const, label: t('personView.tabs.ai'), icon: <Sparkles size={14} /> },
+  ]), [t])
+
   if (!entity) {
-    return <div className="person-view loading">Chargement…</div>
+    return <div className="person-view loading">{t('personView.loading')}</div>
   }
 
   const socialObs = observations.filter(o =>
     ['instagram', 'tiktok', 'linkedin', 'github', 'x', 'facebook'].includes(o.platform)
   )
 
-  const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
-    { id: 'overview', label: 'Overview', icon: <User size={14} /> },
-    { id: 'identities', label: 'Identities', icon: <User size={14} /> },
-    { id: 'social', label: 'Social', icon: <Share2 size={14} /> },
-    { id: 'relations', label: 'Relations', icon: <GitBranch size={14} /> },
-    { id: 'timeline', label: 'Timeline', icon: <Clock size={14} /> },
-    { id: 'evidence', label: 'Evidence', icon: <FileSearch size={14} /> },
-    { id: 'ai', label: 'AI Analysis', icon: <Sparkles size={14} /> },
-  ]
-
   return (
     <div className="person-view">
-      <Link to={`/dossier/${dossierId}`} className="back-link"><ArrowLeft size={14} /> Dossier</Link>
+      <Link to={`/dossier/${dossierId}`} className="back-link">
+        <ArrowLeft size={14} /> {t('personView.backToDossier')}
+      </Link>
 
       <header className="person-header glass-panel">
         <div className="person-avatar"><User size={32} /></div>
@@ -69,20 +73,22 @@ export const PersonViewPage: React.FC = () => {
           <p className="person-type">{entity.entity_type}</p>
           <div className="person-badges">
             <span className={`badge badge-${entity.status.toLowerCase()}`}>{entity.status}</span>
-            <span className="badge">Confiance {Math.round(entity.confidence * 100)}%</span>
-            <span className="badge">{observations.length} sources</span>
+            <span className="badge">
+              {t('personView.confidence', { percent: Math.round(entity.confidence * 100) })}
+            </span>
+            <span className="badge">{t('personView.sources', { count: observations.length })}</span>
           </div>
         </div>
       </header>
 
       <nav className="person-tabs">
-        {tabs.map(t => (
+        {tabs.map(item => (
           <button
-            key={t.id}
-            className={`person-tab ${tab === t.id ? 'active' : ''}`}
-            onClick={() => setTab(t.id)}
+            key={item.id}
+            className={`person-tab ${tab === item.id ? 'active' : ''}`}
+            onClick={() => setTab(item.id)}
           >
-            {t.icon} {t.label}
+            {item.icon} {item.label}
           </button>
         ))}
       </nav>
@@ -90,16 +96,16 @@ export const PersonViewPage: React.FC = () => {
       <div className="person-content glass-panel">
         {tab === 'overview' && (
           <div>
-            <h3>Résumé analytique</h3>
-            <p>Identité : {entity.label} ({entity.entity_type})</p>
-            <p>Propriétés : {JSON.stringify(entity.properties)}</p>
-            <p>Observations clés : {observations.length}</p>
+            <h3>{t('personView.overview.title')}</h3>
+            <p>{t('personView.overview.identity', { label: entity.label, type: entity.entity_type })}</p>
+            <p>{t('personView.overview.properties', { props: JSON.stringify(entity.properties) })}</p>
+            <p>{t('personView.overview.keyObservations', { count: observations.length })}</p>
           </div>
         )}
 
         {tab === 'social' && (
           <div className="social-grid">
-            {socialObs.length === 0 && <p>Aucun compte social documenté.</p>}
+            {socialObs.length === 0 && <p>{t('personView.social.empty')}</p>}
             {socialObs.map(o => (
               <div key={o.id} className="social-card">
                 <h4>{o.platform}</h4>
@@ -118,9 +124,14 @@ export const PersonViewPage: React.FC = () => {
           <ul className="relation-list">
             {relations.map(r => (
               <li key={r.id}>
-                <strong>{r.relation_type}</strong> — confiance {Math.round(r.confidence * 100)}%
+                {t('personView.relations.item', {
+                  type: r.relation_type,
+                  percent: Math.round(r.confidence * 100),
+                })}
                 <span className={`badge badge-${r.status.toLowerCase()}`}>{r.status}</span>
-                <span className="evidence-count">{r.evidence_ids.length} preuves</span>
+                <span className="evidence-count">
+                  {t('personView.relations.evidenceCount', { count: r.evidence_ids.length })}
+                </span>
               </li>
             ))}
           </ul>
@@ -131,7 +142,12 @@ export const PersonViewPage: React.FC = () => {
             {observations.map(o => (
               <li key={o.id}>
                 <time>{new Date(o.observed_at).toLocaleDateString()}</time>
-                <span>Fait observé — {o.platform}: {String(o.content.value ?? o.content.field)}</span>
+                <span>
+                  {t('personView.timeline.item', {
+                    platform: o.platform,
+                    value: String(o.content.value ?? o.content.field),
+                  })}
+                </span>
               </li>
             ))}
           </ul>
@@ -154,14 +170,16 @@ export const PersonViewPage: React.FC = () => {
           <div>
             {readiness && (
               <div className={`readiness ${readiness.sufficient ? 'ready' : 'not-ready'}`}>
-                <h4>Context Readiness — {readiness.score}%</h4>
+                <h4>{t('personView.ai.readinessTitle', { score: readiness.score })}</h4>
                 <p>{readiness.message}</p>
               </div>
             )}
             {readiness?.sufficient ? (
               <>
                 {!analysis && (
-                  <button className="btn btn-primary" onClick={runAnalysis}>Lancer analyse assistée</button>
+                  <button className="btn btn-primary" onClick={runAnalysis}>
+                    {t('personView.ai.runAnalysis')}
+                  </button>
                 )}
                 {analysis && (
                   <div className="ai-result">
@@ -169,15 +187,15 @@ export const PersonViewPage: React.FC = () => {
                     <p>{analysis.reasoning_summary}</p>
                     <span className={`badge badge-${analysis.status.toLowerCase()}`}>{analysis.status}</span>
                     <div className="ai-actions">
-                      <button className="btn btn-primary">Confirmer</button>
-                      <button className="btn btn-ghost">Rejeter</button>
-                      <button className="btn btn-ghost">Marquer à vérifier</button>
+                      <button className="btn btn-primary">{t('personView.ai.confirm')}</button>
+                      <button className="btn btn-ghost">{t('personView.ai.reject')}</button>
+                      <button className="btn btn-ghost">{t('personView.ai.markForReview')}</button>
                     </div>
                   </div>
                 )}
               </>
             ) : (
-              <p className="text-muted">Données insuffisantes pour une analyse fiable.</p>
+              <p className="text-muted">{t('personView.ai.insufficientData')}</p>
             )}
           </div>
         )}

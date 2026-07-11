@@ -1,11 +1,13 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Search } from 'lucide-react'
 import { apiClient } from '../../services/api'
 import type { SearchResult } from '../../types/domain'
 import './CommandSearch.css'
 
 export const CommandSearch: React.FC = () => {
+  const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<SearchResult[]>([])
@@ -49,6 +51,9 @@ export const CommandSearch: React.FC = () => {
     }
   }
 
+  const matchTypeKey = (matchType: SearchResult['match_type']) =>
+    `commandSearch.match${matchType.charAt(0).toUpperCase()}${matchType.slice(1)}` as const
+
   if (!open) return null
 
   return (
@@ -58,20 +63,22 @@ export const CommandSearch: React.FC = () => {
           <Search size={16} />
           <input
             autoFocus
-            placeholder="Rechercher personnes, alias, usernames, emails…"
+            placeholder={t('commandSearch.placeholder')}
             value={query}
             onChange={e => setQuery(e.target.value)}
           />
           <kbd>Esc</kbd>
         </div>
         <ul className="command-search-results">
-          {results.length === 0 && query && <li className="empty">Aucun résultat</li>}
+          {results.length === 0 && query && <li className="empty">{t('commandSearch.noResults')}</li>}
           {results.map(r => (
             <li key={r.id} onClick={() => selectResult(r)}>
               <span className="result-label">{r.label}</span>
               <span className="result-type">{r.entity_type}</span>
               <span className="result-dossier">{r.dossier_name}</span>
-              <span className={`match-type match-${r.match_type}`}>{r.match_type}</span>
+              <span className={`match-type match-${r.match_type}`}>
+                {t(matchTypeKey(r.match_type))}
+              </span>
             </li>
           ))}
         </ul>
