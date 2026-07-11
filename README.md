@@ -40,6 +40,18 @@
 
 *Planifié : Neo4j, Agent-OS orchestrator*
 
+## Déploiement NAS (Docker)
+
+Stack Docker (`api` + `web` nginx) avec SQLite sur volume persistant — adapté UGREEN DXP2800, Tailscale, accès self-hosted.
+
+```bash
+cp .env.docker.example .env   # éditer secrets
+docker compose up -d --build
+# → http://<nas-ip>:8080
+```
+
+Guide complet : [`deploy/nas-ugreen.md`](deploy/nas-ugreen.md)
+
 ## Quickstart
 
 ### Prerequisites

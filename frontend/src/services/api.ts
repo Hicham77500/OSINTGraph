@@ -1,10 +1,11 @@
 // ============================================================
 // API Client — OsintGraph
-// Points at FastAPI backend on http://localhost:8000
-// Falls back to window.osint.api (Electron IPC) if available
+// Dev: Vite proxy or http://localhost:8000 via VITE_API_BASE
+// Docker/nginx: empty VITE_API_BASE → same-origin relative paths
+// Electron: window.osint.api IPC bridge
 // ============================================================
 
-const BASE_URL = 'http://localhost:8000'
+const BASE_URL = import.meta.env.VITE_API_BASE ?? ''
 
 export interface ApiResponse {
   ok: boolean

@@ -33,6 +33,10 @@ sio = socketio.AsyncServer(
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("OSINTGraph backend starting")
+    db_path = os.getenv("SQLITE_PATH", "osintgraph.db")
+    db_dir = os.path.dirname(os.path.abspath(db_path))
+    if db_dir:
+        os.makedirs(db_dir, exist_ok=True)
     await domain_client.init_schema()
     await domain_client.ensure_default_dossier()
     yield
