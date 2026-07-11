@@ -18,6 +18,73 @@
   margin-bottom: 2rem;
 }
 
+.workspace-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.workspace-header-row .workspace-subtitle {
+  margin-bottom: 0;
+}
+
+.trash-link {
+  flex-shrink: 0;
+  border: 1px solid var(--border-subtle);
+}
+
+.dossier-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.dossier-page-header .workspace-subtitle {
+  margin-bottom: 0;
+}
+
+.dossier-delete-btn,
+.btn-danger {
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.35);
+}
+
+.dossier-delete-btn:hover,
+.btn-danger:hover {
+  border-color: #f87171;
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.08);
+}
+
+.dossier-card-trash {
+  cursor: default;
+}
+
+.dossier-card-trash:hover {
+  transform: none;
+}
+
+.trash-deleted-at {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.trash-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.trash-empty {
+  padding: 2rem;
+  text-align: center;
+  border-radius: var(--radius-lg);
+  color: var(--text-muted);
+}
+
 .dossier-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));

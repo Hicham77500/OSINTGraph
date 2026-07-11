@@ -9,6 +9,7 @@ from models.domain import (
     CarnetCreate,
     DossierCreate,
     EntityCreate,
+    EntityUpdate,
     RelationCreate,
 )
 from services.ai_analysis import analyze_entity
@@ -27,6 +28,11 @@ async def list_dossiers():
     return await domain_client.list_dossiers()
 
 
+@router.get("/dossiers/trash")
+async def list_trash_dossiers():
+    return await domain_client.list_deleted_dossiers()
+
+
 @router.post("/dossiers", status_code=201)
 async def create_dossier(data: DossierCreate, request: Request):
     return await domain_client.create_dossier(data, actor=_actor(request))
@@ -36,6 +42,31 @@ async def create_dossier(data: DossierCreate, request: Request):
 async def get_dossier(dossier_id: str):
     try:
         return await domain_client.get_dossier(dossier_id)
+    except ValueError:
+        raise HTTPException(404, "Dossier not found")
+
+
+@router.delete("/dossiers/{dossier_id}")
+async def soft_delete_dossier(dossier_id: str, request: Request):
+    try:
+        return await domain_client.soft_delete_dossier(dossier_id, actor=_actor(request))
+    except ValueError:
+        raise HTTPException(404, "Dossier not found")
+
+
+@router.post("/dossiers/{dossier_id}/restore")
+async def restore_dossier(dossier_id: str, request: Request):
+    try:
+        return await domain_client.restore_dossier(dossier_id, actor=_actor(request))
+    except ValueError:
+        raise HTTPException(404, "Dossier not found")
+
+
+@router.delete("/dossiers/{dossier_id}/permanent")
+async def permanent_delete_dossier(dossier_id: str, request: Request):
+    try:
+        await domain_client.permanent_delete_dossier(dossier_id, actor=_actor(request))
+        return {"ok": True}
     except ValueError:
         raise HTTPException(404, "Dossier not found")
 
@@ -67,6 +98,23 @@ async def create_entity(dossier_id: str, data: EntityCreate, request: Request):
 async def get_entity(entity_id: str):
     try:
         return await domain_client.get_entity(entity_id)
+    except ValueError:
+        raise HTTPException(404, "Entity not found")
+
+
+@router.patch("/entities/{entity_id}")
+async def update_entity(entity_id: str, data: EntityUpdate, request: Request):
+    try:
+        return await domain_client.update_entity(entity_id, data, actor=_actor(request))
+    except ValueError:
+        raise HTTPException(404, "Entity not found")
+
+
+@router.delete("/entities/{entity_id}")
+async def delete_entity(entity_id: str, request: Request):
+    try:
+        await domain_client.delete_entity(entity_id, actor=_actor(request))
+        return {"ok": True}
     except ValueError:
         raise HTTPException(404, "Entity not found")
 

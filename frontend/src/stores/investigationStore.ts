@@ -25,6 +25,20 @@ interface InvestigationState {
       properties?: Record<string, unknown>
     },
   ) => Promise<Entity | null>
+  updateEntity: (
+    entityId: string,
+    data: {
+      label?: string
+      properties?: Record<string, unknown>
+    },
+    dossierId?: string,
+    carnetId?: string,
+  ) => Promise<Entity | null>
+  deleteEntity: (entityId: string, dossierId?: string, carnetId?: string) => Promise<boolean>
+  fetchTrashDossiers: () => Promise<Dossier[]>
+  softDeleteDossier: (dossierId: string) => Promise<boolean>
+  restoreDossier: (dossierId: string) => Promise<boolean>
+  permanentDeleteDossier: (dossierId: string) => Promise<boolean>
   setCurrentDossier: (dossier: Dossier | null) => void
 }
 
@@ -95,6 +109,58 @@ export const useInvestigationStore = create<InvestigationState>((set, get) => ({
       return res.data as Entity
     }
     return null
+  },
+
+  updateEntity: async (entityId, data, dossierId, carnetId) => {
+    const res = await apiClient.patch(`/api/v1/entities/${entityId}`, data)
+    if (res.ok && res.data) {
+      if (dossierId && carnetId) {
+        await get().fetchEntities(dossierId, carnetId)
+      }
+      return res.data as Entity
+    }
+    return null
+  },
+
+  deleteEntity: async (entityId, dossierId, carnetId) => {
+    const res = await apiClient.delete(`/api/v1/entities/${entityId}`)
+    if (res.ok) {
+      if (dossierId && carnetId) {
+        await get().fetchEntities(dossierId, carnetId)
+      }
+      return true
+    }
+    return false
+  },
+
+  fetchTrashDossiers: async () => {
+    const res = await apiClient.get('/api/v1/dossiers/trash')
+    if (res.ok && res.data) {
+      return res.data as Dossier[]
+    }
+    return []
+  },
+
+  softDeleteDossier: async (dossierId) => {
+    const res = await apiClient.delete(`/api/v1/dossiers/${dossierId}`)
+    if (res.ok) {
+      await get().fetchDossiers()
+      if (get().currentDossier?.id === dossierId) {
+        set({ currentDossier: null })
+      }
+      return true
+    }
+    return false
+  },
+
+  restoreDossier: async (dossierId) => {
+    const res = await apiClient.post(`/api/v1/dossiers/${dossierId}/restore`)
+    return res.ok
+  },
+
+  permanentDeleteDossier: async (dossierId) => {
+    const res = await apiClient.delete(`/api/v1/dossiers/${dossierId}/permanent`)
+    return res.ok
   },
 
   setCurrentDossier: (dossier) => set({ currentDossier: dossier }),

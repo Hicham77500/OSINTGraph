@@ -57,13 +57,18 @@ The carnet grid is **kept** as secondary navigation under investigation axes. Ea
 
 **Note creation API:** `POST /api/v1/dossiers/:id/entities` with `entity_type: CUSTOM`, `carnet_id` set to the Notes carnet, `properties: { title, content }`. Backend adds MANUAL source + label observation + notes observation when `content` is present.
 
+**Note edit/delete:** `PATCH /api/v1/entities/:id` (update `properties`, `label`) and `DELETE /api/v1/entities/:id` (cascade observations/sources). Note cards show `created_at` / `updated_at` and observation `observed_at` when present. Seed marker `__osintgraph_demo_seed_v1__` is hidden from the notes list.
+
+**Dossier trash:** `DELETE /api/v1/dossiers/:id` soft-deletes (`deleted_at`); `GET /api/v1/dossiers/trash`, `POST /api/v1/dossiers/:id/restore`, `DELETE /api/v1/dossiers/:id/permanent`.
+
 Entities are loaded via `GET /api/v1/dossiers/:id/entities?carnet_id=:carnetId`. Client-side filters apply `notebook_type` → allowed `entity_type` values.
 
 ## Routing map
 
 | Route | Component | Data |
 |-------|-----------|------|
-| `/` | `DossiersPage` | All dossiers |
+| `/` | `DossiersPage` | Active dossiers (excludes trash) |
+| `/trash` | `TrashPage` | Soft-deleted dossiers |
 | `/dossier/:dossierId` | `DossierPage` | Carnets for dossier |
 | `/dossier/:dossierId/carnet/:carnetId` | `CarnetViewPage` | Entities + observations per carnet type |
 | `/dossier/:dossierId/graph` | `CarnetGraphPage` | Legacy graph (`workspace_id` or dossier id) |

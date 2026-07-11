@@ -1,11 +1,16 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ArrowLeft, ChevronRight, GitGraph, Plus } from 'lucide-react'
+import { ArrowLeft, ChevronRight, GitGraph, Pencil, Plus, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useInvestigationStore } from '../stores/investigationStore'
 import { apiClient } from '../services/api'
 import type { Carnet, Entity, Observation } from '../types/domain'
 import { carnetDescriptionKey, carnetIcon } from '../utils/carnetMeta'
+import {
+  collectNoteItems,
+  formatNoteDate,
+  type NoteItem,
+} from '../utils/noteHelpers'
 import './DossiersPage.css'
 import './CarnetViewPage.css'
 
@@ -25,13 +30,6 @@ type TimelineEntry = {
   platform: string
 }
 
-type NoteItem = {
-  id: string
-  title: string
-  text: string
-  entity: Entity
-}
-
 function filterEntitiesByNotebook(entities: Entity[], notebookType: string): Entity[] {
   const allowed = NOTEBOOK_ENTITY_TYPES[notebookType]
   if (!allowed || allowed.length === 0) return entities
@@ -45,41 +43,13 @@ function observationSummary(obs: Observation): string {
   return JSON.stringify(content)
 }
 
-function collectNotes(entities: Entity[], observationsByEntity: Map<string, Observation[]>): NoteItem[] {
-  const items: NoteItem[] = []
-  for (const entity of entities) {
-    const title = typeof entity.properties.title === 'string'
-      ? entity.properties.title
-      : entity.label
-    const content = typeof entity.properties.content === 'string'
-      ? entity.properties.content
-      : typeof entity.properties.notes === 'string'
-        ? entity.properties.notes
-        : ''
-
-    if (content.trim()) {
-      items.push({ id: entity.id, title, text: content, entity })
-    }
-
-    const obs = observationsByEntity.get(entity.id) ?? []
-    for (const o of obs) {
-      if (o.platform === 'manual' && o.content.field === 'notes') {
-        const text = String(o.content.value ?? '')
-        if (text.trim()) {
-          items.push({ id: `${entity.id}-${o.id}`, title: entity.label, text, entity })
-        }
-      }
-    }
-  }
-  return items
-}
-
 export const CarnetViewPage: React.FC = () => {
   const { dossierId, carnetId } = useParams<{ dossierId: string; carnetId: string }>()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const {
     currentDossier, carnets, entities,
     fetchDossier, fetchCarnets, fetchEntities, createEntity,
+    updateEntity, deleteEntity,
   } = useInvestigationStore()
   const [timeline, setTimeline] = useState<TimelineEntry[]>([])
   const [notes, setNotes] = useState<NoteItem[]>([])
@@ -89,6 +59,11 @@ export const CarnetViewPage: React.FC = () => {
   const [savingNote, setSavingNote] = useState(false)
   const [quickUsername, setQuickUsername] = useState('')
   const [addingUsername, setAddingUsername] = useState(false)
+  const [editingNote, setEditingNote] = useState<NoteItem | null>(null)
+  const [editTitle, setEditTitle] = useState('')
+  const [editBody, setEditBody] = useState('')
+  const [savingEdit, setSavingEdit] = useState(false)
+  const [deletingNoteId, setDeletingNoteId] = useState<string | null>(null)
 
   const carnet = useMemo(
     () => carnets.find(c => c.id === carnetId) ?? null,
@@ -99,6 +74,8 @@ export const CarnetViewPage: React.FC = () => {
     () => (carnet ? filterEntitiesByNotebook(entities, carnet.notebook_type) : []),
     [entities, carnet],
   )
+
+  const locale = i18n.language.startsWith('fr') ? 'fr-FR' : 'en-US'
 
   useEffect(() => {
     if (!dossierId || !carnetId) return
@@ -152,7 +129,7 @@ export const CarnetViewPage: React.FC = () => {
 
       if (carnet.notebook_type === 'notes') {
         const obsMap = new Map(results.map(r => [r.entity.id, r.obs]))
-        setNotes(collectNotes(entityList, obsMap))
+        setNotes(collectNoteItems(entityList, obsMap))
       }
 
       setLoadingObs(false)
@@ -182,6 +159,34 @@ export const CarnetViewPage: React.FC = () => {
     setSavingNote(false)
   }
 
+  const openEditNote = (note: NoteItem) => {
+    setEditingNote(note)
+    setEditTitle(note.title)
+    setEditBody(note.text)
+  }
+
+  const handleSaveEdit = async () => {
+    if (!editingNote || !editBody.trim() || !carnetId) return
+    setSavingEdit(true)
+    const title = editTitle.trim() || t('carnetView.untitledNote')
+    await updateEntity(
+      editingNote.entityId,
+      { label: title, properties: { title, content: editBody.trim() } },
+      dossierId,
+      carnetId,
+    )
+    setSavingEdit(false)
+    setEditingNote(null)
+  }
+
+  const handleDeleteNote = async (entityId: string) => {
+    if (!carnetId) return
+    if (!window.confirm(t('carnetView.deleteNoteConfirm'))) return
+    setDeletingNoteId(entityId)
+    await deleteEntity(entityId, dossierId, carnetId)
+    setDeletingNoteId(null)
+  }
+
   const handleQuickAddUsername = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!quickUsername.trim() || !carnetId) return
@@ -195,6 +200,18 @@ export const CarnetViewPage: React.FC = () => {
     setQuickUsername('')
     setAddingUsername(false)
   }
+
+  const renderNoteDates = (note: NoteItem) => (
+    <div className="note-meta">
+      <span>{t('carnetView.createdAt', { date: formatNoteDate(note.createdAt, locale) })}</span>
+      {note.updatedAt !== note.createdAt && (
+        <span>{t('carnetView.updatedAt', { date: formatNoteDate(note.updatedAt, locale) })}</span>
+      )}
+      {note.observedAt && (
+        <span>{t('carnetView.datedAt', { date: formatNoteDate(note.observedAt, locale) })}</span>
+      )}
+    </div>
+  )
 
   const renderEmptyState = (
     titleKey: string,
@@ -310,11 +327,66 @@ export const CarnetViewPage: React.FC = () => {
           ) : (
             <div className="notes-list">
               {notes.map(note => (
-                <div key={note.id} className="note-item glass-panel">
-                  <div className="note-entity">{note.title}</div>
+                <div key={note.entityId} className="note-item glass-panel">
+                  <div className="note-item-header">
+                    <div className="note-item-title-block">
+                      <div className="note-entity">{note.title}</div>
+                      {renderNoteDates(note)}
+                    </div>
+                    <div className="note-item-actions">
+                      <button
+                        type="button"
+                        className="btn-icon"
+                        title={t('carnetView.editNote')}
+                        onClick={() => openEditNote(note)}
+                      >
+                        <Pencil size={15} />
+                      </button>
+                      <button
+                        type="button"
+                        className="btn-icon btn-icon-danger"
+                        title={t('carnetView.deleteNote')}
+                        disabled={deletingNoteId === note.entityId}
+                        onClick={() => handleDeleteNote(note.entityId)}
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
+                  </div>
                   <p className="note-text">{note.text}</p>
                 </div>
               ))}
+            </div>
+          )}
+
+          {editingNote && (
+            <div className="modal-overlay" onClick={() => setEditingNote(null)}>
+              <div className="modal glass-panel note-edit-modal" onClick={e => e.stopPropagation()}>
+                <h3>{t('carnetView.editNote')}</h3>
+                <input
+                  value={editTitle}
+                  onChange={e => setEditTitle(e.target.value)}
+                  placeholder={t('carnetView.noteTitlePlaceholder')}
+                />
+                <textarea
+                  value={editBody}
+                  onChange={e => setEditBody(e.target.value)}
+                  rows={6}
+                  required
+                />
+                <div className="modal-actions">
+                  <button className="btn btn-ghost" onClick={() => setEditingNote(null)}>
+                    {t('carnetView.cancelEdit')}
+                  </button>
+                  <button
+                    className="btn btn-primary"
+                    disabled={savingEdit || !editBody.trim()}
+                    onClick={handleSaveEdit}
+                  >
+                    {savingEdit ? t('carnetView.savingNote') : t('carnetView.saveChanges')}
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </div>

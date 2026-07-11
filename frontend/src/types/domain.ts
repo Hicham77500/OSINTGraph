@@ -12,6 +12,7 @@ export interface Dossier {
   workspace_id?: string
   created_at: string
   updated_at: string
+  deleted_at?: string | null
   stats: { persons: number; accounts: number; relations: number }
 }
 

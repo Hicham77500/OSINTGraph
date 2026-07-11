@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import { ArrowLeft, ChevronRight } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { ArrowLeft, ChevronRight, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useInvestigationStore } from '../stores/investigationStore'
 import { carnetDescriptionKey, carnetIcon, graphIcon } from '../utils/carnetMeta'
@@ -9,8 +9,10 @@ import './DossiersPage.css'
 
 export const DossierPage: React.FC = () => {
   const { dossierId } = useParams<{ dossierId: string }>()
+  const navigate = useNavigate()
   const { t } = useTranslation()
-  const { currentDossier, carnets, fetchDossier, fetchCarnets } = useInvestigationStore()
+  const { currentDossier, carnets, fetchDossier, fetchCarnets, softDeleteDossier } = useInvestigationStore()
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     if (dossierId) {
@@ -23,15 +25,34 @@ export const DossierPage: React.FC = () => {
 
   const empty = isDossierEmpty(currentDossier, carnets)
 
+  const handleDeleteDossier = async () => {
+    if (!window.confirm(t('dossier.deleteConfirm', { name: currentDossier?.name ?? '' }))) return
+    setDeleting(true)
+    const ok = await softDeleteDossier(dossierId)
+    if (ok) navigate('/')
+    setDeleting(false)
+  }
+
   return (
     <div className="workspace-page">
       <Link to="/" className="back-link">
         <ArrowLeft size={14} /> {t('dossier.backToDossiers')}
       </Link>
 
-      <header className="workspace-header">
-        <h1>{currentDossier?.name ?? t('dossier.title')}</h1>
-        <p className="workspace-subtitle">{t('dossier.hubSubtitle')}</p>
+      <header className="workspace-header dossier-page-header">
+        <div>
+          <h1>{currentDossier?.name ?? t('dossier.title')}</h1>
+          <p className="workspace-subtitle">{t('dossier.hubSubtitle')}</p>
+        </div>
+        <button
+          type="button"
+          className="btn btn-ghost btn-danger dossier-delete-btn"
+          disabled={deleting}
+          onClick={handleDeleteDossier}
+        >
+          <Trash2 size={16} />
+          {t('dossier.deleteDossier')}
+        </button>
       </header>
 
       {empty && (

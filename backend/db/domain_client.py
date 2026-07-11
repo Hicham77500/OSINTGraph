@@ -19,6 +19,7 @@ from models.domain import (
     EntityCreate,
     EntityOut,
     EntityType,
+    EntityUpdate,
     RelationCreate,
     RelationOut,
     new_id,
@@ -40,7 +41,8 @@ CREATE TABLE IF NOT EXISTS dossiers (
     description TEXT,
     workspace_id TEXT UNIQUE,
     created_at TEXT DEFAULT (datetime('now')),
-    updated_at TEXT DEFAULT (datetime('now'))
+    updated_at TEXT DEFAULT (datetime('now')),
+    deleted_at TEXT NULL
 );
 
 CREATE TABLE IF NOT EXISTS carnets (
@@ -188,10 +190,17 @@ class DomainClient:
         db = await self._connect()
         try:
             await db.executescript(SCHEMA_SQL)
+            await self._migrate_schema(db)
             await db.commit()
         finally:
             await db.close()
         logger.info("Domain schema initialized")
+
+    async def _migrate_schema(self, db: aiosqlite.Connection) -> None:
+        async with db.execute("PRAGMA table_info(dossiers)") as cur:
+            cols = [row[1] for row in await cur.fetchall()]
+        if "deleted_at" not in cols:
+            await db.execute("ALTER TABLE dossiers ADD COLUMN deleted_at TEXT NULL")
 
     async def ensure_default_dossier(self) -> None:
         dossiers = await self.list_dossiers()
@@ -275,26 +284,90 @@ class DomainClient:
         await self.record_audit(actor, "DOSSIER_CREATED", "dossier", did, None, {"name": data.name})
         return await self.get_dossier(did)
 
-    async def list_dossiers(self) -> list[DossierOut]:
+    async def list_dossiers(self, include_deleted: bool = False) -> list[DossierOut]:
+        query = "SELECT * FROM dossiers"
+        if not include_deleted:
+            query += " WHERE deleted_at IS NULL"
+        query += " ORDER BY updated_at DESC"
         async with self._session() as db:
             db.row_factory = aiosqlite.Row
-            async with db.execute("SELECT * FROM dossiers ORDER BY updated_at DESC") as cur:
+            async with db.execute(query) as cur:
                 rows = await cur.fetchall()
         result = []
         for row in rows:
             stats = await self._dossier_stats(row["id"])
-            result.append(
-                DossierOut(
-                    id=row["id"],
-                    name=row["name"],
-                    description=row["description"],
-                    workspace_id=row["workspace_id"],
-                    created_at=row["created_at"],
-                    updated_at=row["updated_at"],
-                    stats=stats,
-                )
-            )
+            result.append(self._row_to_dossier(row, stats))
         return result
+
+    def _row_to_dossier(self, row: aiosqlite.Row, stats: dict[str, int]) -> DossierOut:
+        return DossierOut(
+            id=row["id"],
+            name=row["name"],
+            description=row["description"],
+            workspace_id=row["workspace_id"],
+            created_at=row["created_at"],
+            updated_at=row["updated_at"],
+            deleted_at=row["deleted_at"] if "deleted_at" in row.keys() else None,
+            stats=stats,
+        )
+
+    async def list_deleted_dossiers(self) -> list[DossierOut]:
+        async with self._session() as db:
+            db.row_factory = aiosqlite.Row
+            async with db.execute(
+                "SELECT * FROM dossiers WHERE deleted_at IS NOT NULL ORDER BY deleted_at DESC"
+            ) as cur:
+                rows = await cur.fetchall()
+        result = []
+        for row in rows:
+            stats = await self._dossier_stats(row["id"])
+            result.append(self._row_to_dossier(row, stats))
+        return result
+
+    async def soft_delete_dossier(self, dossier_id: str, actor: str = "system") -> DossierOut:
+        dossier = await self.get_dossier(dossier_id)
+        if dossier.deleted_at:
+            return dossier
+        async with self._session() as db:
+            await db.execute(
+                "UPDATE dossiers SET deleted_at = datetime('now'), updated_at = datetime('now') WHERE id = ?",
+                (dossier_id,),
+            )
+            await db.commit()
+        await self.record_audit(
+            actor, "DOSSIER_DELETED", "dossier", dossier_id,
+            {"name": dossier.name, "deleted_at": None},
+            {"name": dossier.name, "deleted_at": "now"},
+        )
+        return await self.get_dossier(dossier_id, include_deleted=True)
+
+    async def restore_dossier(self, dossier_id: str, actor: str = "system") -> DossierOut:
+        dossier = await self.get_dossier(dossier_id, include_deleted=True)
+        if not dossier.deleted_at:
+            return dossier
+        async with self._session() as db:
+            await db.execute(
+                "UPDATE dossiers SET deleted_at = NULL, updated_at = datetime('now') WHERE id = ?",
+                (dossier_id,),
+            )
+            await db.commit()
+        await self.record_audit(
+            actor, "DOSSIER_RESTORED", "dossier", dossier_id,
+            {"name": dossier.name, "deleted_at": dossier.deleted_at},
+            {"name": dossier.name, "deleted_at": None},
+        )
+        return await self.get_dossier(dossier_id)
+
+    async def permanent_delete_dossier(self, dossier_id: str, actor: str = "system") -> None:
+        dossier = await self.get_dossier(dossier_id, include_deleted=True)
+        async with self._session() as db:
+            await db.execute("DELETE FROM dossiers WHERE id = ?", (dossier_id,))
+            await db.commit()
+        await self.record_audit(
+            actor, "DOSSIER_PERMANENTLY_DELETED", "dossier", dossier_id,
+            {"name": dossier.name},
+            None,
+        )
 
     async def _dossier_stats(self, dossier_id: str) -> dict[str, int]:
         async with self._session() as db:
@@ -314,22 +387,17 @@ class DomainClient:
                 relations = (await c.fetchone())[0]
         return {"persons": persons, "accounts": accounts, "relations": relations}
 
-    async def get_dossier(self, dossier_id: str) -> DossierOut:
+    async def get_dossier(self, dossier_id: str, include_deleted: bool = False) -> DossierOut:
         async with self._session() as db:
             db.row_factory = aiosqlite.Row
-            async with db.execute("SELECT * FROM dossiers WHERE id = ?", (dossier_id,)) as cur:
+            query = "SELECT * FROM dossiers WHERE id = ?"
+            if not include_deleted:
+                query += " AND deleted_at IS NULL"
+            async with db.execute(query, (dossier_id,)) as cur:
                 row = await cur.fetchone()
         if not row:
             raise ValueError("Dossier not found")
-        return DossierOut(
-            id=row["id"],
-            name=row["name"],
-            description=row["description"],
-            workspace_id=row["workspace_id"],
-            created_at=row["created_at"],
-            updated_at=row["updated_at"],
-            stats=await self._dossier_stats(dossier_id),
-        )
+        return self._row_to_dossier(row, await self._dossier_stats(dossier_id))
 
     async def list_carnets(self, dossier_id: str) -> list[CarnetOut]:
         async with self._session() as db:
@@ -409,6 +477,67 @@ class DomainClient:
             )
         await self.record_audit(actor, "ENTITY_CREATED", "entity", eid, None, {"label": data.label})
         return await self.get_entity(eid)
+
+    async def update_entity(
+        self, entity_id: str, data: EntityUpdate, actor: str = "system"
+    ) -> EntityOut:
+        current = await self.get_entity(entity_id)
+        updates: dict[str, Any] = {}
+        if data.label is not None:
+            updates["label"] = data.label
+        if data.properties is not None:
+            updates["properties"] = json.dumps(data.properties)
+        if data.carnet_id is not None:
+            updates["carnet_id"] = data.carnet_id
+        if data.confidence is not None:
+            updates["confidence"] = data.confidence
+        if data.status is not None:
+            updates["status"] = data.status.value
+        if not updates:
+            return current
+
+        set_clause = ", ".join(f"{k} = ?" for k in updates)
+        params = list(updates.values()) + [entity_id]
+        async with self._session() as db:
+            await db.execute(
+                f"UPDATE entities SET {set_clause}, updated_at = datetime('now') WHERE id = ?",
+                params,
+            )
+            await db.execute(
+                "UPDATE dossiers SET updated_at = datetime('now') WHERE id = ?",
+                (current.dossier_id,),
+            )
+            await db.commit()
+        await self.record_audit(
+            actor,
+            "ENTITY_UPDATED",
+            "entity",
+            entity_id,
+            {"label": current.label, "properties": current.properties},
+            {
+                "label": data.label if data.label is not None else current.label,
+                "properties": data.properties if data.properties is not None else current.properties,
+            },
+        )
+        return await self.get_entity(entity_id)
+
+    async def delete_entity(self, entity_id: str, actor: str = "system") -> None:
+        current = await self.get_entity(entity_id)
+        async with self._session() as db:
+            await db.execute("DELETE FROM entities WHERE id = ?", (entity_id,))
+            await db.execute(
+                "UPDATE dossiers SET updated_at = datetime('now') WHERE id = ?",
+                (current.dossier_id,),
+            )
+            await db.commit()
+        await self.record_audit(
+            actor,
+            "ENTITY_DELETED",
+            "entity",
+            entity_id,
+            {"label": current.label, "properties": current.properties},
+            None,
+        )
 
     async def get_entity(self, entity_id: str) -> EntityOut:
         async with self._session() as db:
@@ -590,7 +719,8 @@ class DomainClient:
             async with db.execute(
                 """SELECT e.*, d.name as dossier_name FROM entities e
                    JOIN dossiers d ON d.id = e.dossier_id
-                   WHERE lower(e.label) LIKE ? OR lower(e.properties) LIKE ?
+                   WHERE d.deleted_at IS NULL
+                     AND (lower(e.label) LIKE ? OR lower(e.properties) LIKE ?)
                    LIMIT ?""",
                 (f"%{q}%", f"%{q}%", limit),
             ) as cur:

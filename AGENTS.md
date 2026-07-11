@@ -94,6 +94,7 @@ Une hypothèse IA n'est **jamais** un fait. Toujours conserver provenance et niv
 | Route | Vue | Usage |
 |-------|-----|-------|
 | `/` | Dossiers | Liste des investigations |
+| `/trash` | TrashPage | Corbeille — dossiers supprimés (restauration / suppression définitive) |
 | `/dossier/:id` | Dossier | Grille des carnets |
 | `/dossier/:id/carnet/:cid` | CarnetViewPage | Liste / chronologie / notes selon `notebook_type` |
 | `/dossier/:id/graph` | CarnetGraphPage | Graphe legacy Cytoscape |

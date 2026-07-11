@@ -14,3 +14,8 @@ Thumbs.db
 frontend/out/
 frontend/.vite/
 backend/.env
+
+# Local SQLite databases
+*.db
+*.db-wal
+*.db-shm

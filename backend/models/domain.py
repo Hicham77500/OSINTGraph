@@ -87,6 +87,7 @@ class DossierOut(BaseModel):
     workspace_id: str | None = None
     created_at: str
     updated_at: str
+    deleted_at: str | None = None
     stats: dict[str, int] = Field(default_factory=dict)
 
 
@@ -111,6 +112,14 @@ class EntityCreate(BaseModel):
     properties: dict[str, Any] = Field(default_factory=dict)
     confidence: float = 0.5
     status: ConfidenceStatus = ConfidenceStatus.UNVERIFIED
+
+
+class EntityUpdate(BaseModel):
+    label: str | None = None
+    properties: dict[str, Any] | None = None
+    carnet_id: str | None = None
+    confidence: float | None = None
+    status: ConfidenceStatus | None = None
 
 
 class EntityOut(BaseModel):

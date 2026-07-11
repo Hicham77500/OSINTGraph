@@ -2,6 +2,35 @@
 
 > Desktop OSINT / Graph Intelligence Application — Maltego-inspired
 
+**FR** — OSINTGraph organise vos investigations en **dossiers** et **carnets**, relie personnes, comptes et artefacts dans un **graphe relationnel**, et trace chaque fait avec **provenance** et niveaux de confiance. Sources ouvertes et données fournies par l'analyste uniquement.
+
+**EN** — OSINTGraph structures investigations into **dossiers** and **carnets**, links people, accounts, and artifacts in a **relational graph**, and tracks every datum with **provenance** and confidence levels. Open sources and analyst-provided data only.
+
+## Aperçu / Preview
+
+### Hub d'investigation
+
+![Hub dossier](docs/screenshots/dossier-hub.png)
+
+### Carnet Notes
+
+![Notes](docs/screenshots/notes-carnet.png)
+
+### Graphe relationnel
+
+![Graphe](docs/screenshots/graph-canvas.png)
+
+## Fonctionnalités / Features
+
+| Module | Description |
+|--------|-------------|
+| **Dossiers** | Investigations isolées avec métadonnées et accès rapide aux carnets |
+| **Carnets** | Notes, chronologie, listes — typés selon le besoin d'investigation |
+| **Graphe** | Canvas Cytoscape, transforms OSINT, navigation relationnelle |
+| **Provenance** | Source, observation, evidence, confiance (CONFIRMED → CONTRADICTED) |
+| **Notes** | Saisie datée, édition et suppression dans les carnets |
+| **Corbeille** | Dossiers supprimés — restauration ou suppression définitive |
+
 ## Stack
 
 - **Frontend**: Electron + React 18 + TypeScript + Vite + Cytoscape.js
@@ -34,6 +63,14 @@ cd .. && npm run dev
 - Backend: http://127.0.0.1:8000
 - Health: http://127.0.0.1:8000/health
 
+### Données de démo / Demo data
+
+Pour peupler un dossier de test (carnets, entités, graphe) :
+
+```bash
+cd backend && .venv/bin/python scripts/seed_test_dossier.py
+```
+
 ### Electron desktop
 
 ```bash
@@ -60,11 +97,13 @@ OSINTGraph/
   docs/               Documentation
 ```
 
+**Contexte projet** — [`AGENTS.md`](AGENTS.md) (guide agents, routing, conventions) · [`docs/PROJECT_CONTEXT.md`](docs/PROJECT_CONTEXT.md) (UX investigation, carnets, navigation)
+
 ## Entity Types (legacy graph)
 
 `Person` · `Email` · `Domain` · `IP` · `Username` · `Organization`
 
-Domain model (v1): see `.agent/specs/001-domain-model.md`
+Domain model (v1): see [`.agent/specs/001-domain-model.md`](.agent/specs/001-domain-model.md)
 
 ## Built-in Transforms
 

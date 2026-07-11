@@ -5,6 +5,7 @@ import { DossierPage } from './pages/DossierPage'
 import { CarnetViewPage } from './pages/CarnetViewPage'
 import { CarnetGraphPage } from './pages/CarnetGraphPage'
 import { PersonViewPage } from './pages/PersonViewPage'
+import { TrashPage } from './pages/TrashPage'
 import { CommandSearch } from './components/search/CommandSearch'
 import './pages/DossiersPage.css'
 
@@ -14,6 +15,7 @@ export default function App() {
       <CommandSearch />
       <Routes>
         <Route path="/" element={<DossiersPage />} />
+        <Route path="/trash" element={<TrashPage />} />
         <Route path="/dossier/:dossierId" element={<DossierPage />} />
         <Route path="/dossier/:dossierId/carnet/:carnetId" element={<CarnetViewPage />} />
         <Route path="/dossier/:dossierId/graph" element={<CarnetGraphPage />} />
