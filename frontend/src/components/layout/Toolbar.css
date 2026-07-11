@@ -111,18 +111,6 @@
 }
 .stat-sep { color: var(--border-default); }
 
-/* Language switcher */
-.lang-switcher {
-  gap: 5px;
-}
-.lang-label {
-  font-size: 11px;
-  font-weight: 700;
-  font-family: var(--font-mono);
-  letter-spacing: 0.05em;
-  color: var(--text-accent);
-}
-
 /* Connect mode button — pulsing accent when active */
 .connect-active {
   color: #818cf8 !important;

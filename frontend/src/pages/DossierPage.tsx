@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, ChevronRight, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { LanguageSwitcher } from '../components/layout/LanguageSwitcher'
 import { useInvestigationStore } from '../stores/investigationStore'
 import { carnetDescriptionKey, carnetIcon, graphIcon } from '../utils/carnetMeta'
 import { isDossierEmpty } from '../utils/dossierUtils'
@@ -44,15 +45,18 @@ export const DossierPage: React.FC = () => {
           <h1>{currentDossier?.name ?? t('dossier.title')}</h1>
           <p className="workspace-subtitle">{t('dossier.hubSubtitle')}</p>
         </div>
-        <button
-          type="button"
-          className="btn btn-ghost btn-danger dossier-delete-btn"
-          disabled={deleting}
-          onClick={handleDeleteDossier}
-        >
-          <Trash2 size={16} />
-          {t('dossier.deleteDossier')}
-        </button>
+        <div className="workspace-header-actions">
+          <LanguageSwitcher />
+          <button
+            type="button"
+            className="btn btn-ghost btn-danger dossier-delete-btn"
+            disabled={deleting}
+            onClick={handleDeleteDossier}
+          >
+            <Trash2 size={16} />
+            {t('dossier.deleteDossier')}
+          </button>
+        </div>
       </header>
 
       {empty && (

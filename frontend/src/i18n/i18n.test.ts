@@ -41,7 +41,10 @@ const ALLOW_IDENTICAL = new Set([
 
 const MUST_DIFFER = [
   'toolbar.save',
+  'toolbar.switchToFrench',
   'dossiers.subtitle',
+  'dossiers.trash',
+  'dossiers.newDossier',
   'trash.title',
   'canvas.emptyTitle',
   'commandSearch.placeholder',

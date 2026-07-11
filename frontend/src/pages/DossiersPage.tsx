@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FolderPlus, GitBranch, Share2, Trash2, Users } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { LanguageSwitcher } from '../components/layout/LanguageSwitcher'
 import { useInvestigationStore } from '../stores/investigationStore'
 import './DossiersPage.css'
 
@@ -29,10 +30,13 @@ export const DossiersPage: React.FC = () => {
           <h1>OSINTGraph</h1>
           <p className="workspace-subtitle">{t('dossiers.subtitle')}</p>
         </div>
-        <Link to="/trash" className="btn btn-ghost trash-link">
-          <Trash2 size={16} />
-          {t('dossiers.trash')}
-        </Link>
+        <div className="workspace-header-actions">
+          <LanguageSwitcher />
+          <Link to="/trash" className="btn btn-ghost trash-link">
+            <Trash2 size={16} />
+            {t('dossiers.trash')}
+          </Link>
+        </div>
       </header>
 
       {isLoading && <p className="workspace-loading">{t('dossiers.loading')}</p>}

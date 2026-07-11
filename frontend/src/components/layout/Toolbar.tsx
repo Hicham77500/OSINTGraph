@@ -2,10 +2,10 @@ import React, { useState } from 'react'
 import {
   GitGraph, Upload, Save, LayoutGrid,
   Undo, Redo, Search, ChevronLeft, ChevronRight,
-  Layers, Cpu, Globe, Link2
+  Layers, Cpu, Link2
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import i18n from '../../i18n'
+import { LanguageSwitcher } from './LanguageSwitcher'
 import { useGraphStore } from '../../graph/graphStore'
 import { ImportModal } from '../modals/ImportModal'
 import { apiClient } from '../../services/api'
@@ -24,9 +24,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   const { layoutType, setLayout, undo, redo, history, historyIndex,
     currentWorkspace, nodes, edges, connectMode, setConnectMode,
     setSaveStatus, saveStatus } = useGraphStore()
-  const { t, i18n: i18nInstance } = useTranslation()
-  const currentLang = i18nInstance.language.startsWith('fr') ? 'fr' : 'en'
-  const toggleLang = () => i18n.changeLanguage(currentLang === 'fr' ? 'en' : 'fr')
+  const { t } = useTranslation()
   const [showImport, setShowImport] = useState(false)
   const [saving, setSaving] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -149,15 +147,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
         <div className="toolbar-divider" />
 
-        {/* Language switcher */}
-        <button
-          className="btn btn-ghost toolbar-btn lang-switcher"
-          onClick={toggleLang}
-          data-tooltip={currentLang === 'fr' ? t('toolbar.switchToEnglish') : t('toolbar.switchToFrench')}
-        >
-          <Globe size={13} />
-          <span className="lang-label">{currentLang.toUpperCase()}</span>
-        </button>
+        <LanguageSwitcher className="toolbar-btn" />
 
         <div className="toolbar-divider" />
 
