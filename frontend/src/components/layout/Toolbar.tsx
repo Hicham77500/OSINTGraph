@@ -21,8 +21,9 @@ interface ToolbarProps {
 export const Toolbar: React.FC<ToolbarProps> = ({
   leftCollapsed, rightCollapsed, onToggleLeft, onToggleRight
 }) => {
-  const { layoutType, setLayout, undo, redo, clearGraph, history, historyIndex,
-    currentWorkspace, nodes, edges, connectMode, setConnectMode } = useGraphStore()
+  const { layoutType, setLayout, undo, redo, history, historyIndex,
+    currentWorkspace, nodes, edges, connectMode, setConnectMode,
+    setSaveStatus, saveStatus } = useGraphStore()
   const { t, i18n: i18nInstance } = useTranslation()
   const currentLang = i18nInstance.language.startsWith('fr') ? 'fr' : 'en'
   const toggleLang = () => i18n.changeLanguage(currentLang === 'fr' ? 'en' : 'fr')
@@ -32,13 +33,17 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
   const handleSave = async () => {
     setSaving(true)
-    try {
-      await apiClient.post(`/graph/${currentWorkspace}`, { nodes, edges })
-    } catch {/* fallback: save to localStorage */
+    setSaveStatus('saving')
+    const res = await apiClient.post(`/graph/${currentWorkspace}`, { nodes, edges })
+    if (res.ok) {
+      setSaveStatus('saved')
       localStorage.setItem(`osintgraph:${currentWorkspace}`, JSON.stringify({ nodes, edges }))
-    } finally {
-      setSaving(false)
+    } else {
+      setSaveStatus('error')
+      localStorage.setItem(`osintgraph:${currentWorkspace}`, JSON.stringify({ nodes, edges }))
     }
+    setSaving(false)
+    setTimeout(() => setSaveStatus('idle'), 2000)
   }
 
   const canUndo = historyIndex > 0
@@ -117,7 +122,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         <button className={`btn btn-ghost toolbar-btn ${saving ? 'loading' : ''}`}
           onClick={handleSave} data-tooltip={t('toolbar.saveTooltip')}>
           <Save size={14} className={saving ? 'loading-spin' : ''} />
-          <span>{t('toolbar.save')}</span>
+          <span>{saveStatus === 'saved' ? '✓' : saveStatus === 'error' ? '!' : t('toolbar.save')}</span>
         </button>
 
         <div className="toolbar-divider" />

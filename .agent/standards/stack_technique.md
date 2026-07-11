@@ -1,25 +1,47 @@
-# Stack Technique OsintGraph
+# Stack Technique OSINTGraph
 
-## Code Frontend
-- **Langage / Framework** : TypeScript, React 18
-- **Bundler** : Vite (Rapide, HMR via `npm run dev`)
-- **State** : Zustand (`graphStore.ts` pour NodeData/EdgeData).
-- **Graphing** : Cytoscape.js (`cytoscape-cola` & `cytoscape-dagre`). Éviter SVG inline si problématique, utiliser le Canvas HTML pour l'iconographie.
-- **Styling** : CSS natif (`.css`) avec Variables CSS (`:root`). Design imposé : UI translucide (*Dark Glassmorphism*).
+## Frontend
 
-## Wrapper Desktop
-- **Framework** : Electron
-- **Sécurité** : `nodeIntegration: false`, `contextIsolation: true`.
-- **Preload** : Obligatoire pour exposer `window.osint.api`.
+- TypeScript, React 18, Vite
+- Zustand (`graphStore.ts`, `investigationStore.ts`)
+- Cytoscape.js (`cytoscape-cola`, `cytoscape-dagre`)
+- CSS natif + variables (`index.css`), Dark Glassmorphism
+- React Router pour Investigation Workspace
 
-## Code Backend
-- **Langage** : Python 3.11+
-- **Serveur web** : FastAPI avec serveur Uvicorn (port par défaut 8000).
-- **Communication** : Socket.IO via `python-socketio` (namespace async) activé avec l'applicationASGI de FastAPI.
-- **Base de données** : SQLite local avec `aiosqlite` pour le logging et les workspaces.
-- **Orchestration Agent OS** : Gérée via le module `agent_os.py` pour chainer les transforms (Shodan, WHOIS, DNS).
+## Desktop
 
-## Conventions de Code
-- **TypeScript** : Noms de variables en `camelCase`, Interfaces en `PascalCase`. Typage strict (pas de `any`).
-- **Python** : Code formaté selon `PEP8`, variables en `snake_case`, classes en `PascalCase`. Type hints obligatoires (`def foo(bar: str) -> dict:`).
-- **Commentaires** : Explications des blocs complexes uniquement. Les signatures et variables doivent être auto-descriptives.
+- Electron, `nodeIntegration: false`, `contextIsolation: true`
+- Preload : `window.osint.api`
+
+## Backend
+
+- Python 3.11+, FastAPI, uvicorn
+- Entrypoint dev : `main:asgi_app` (Socket.IO + FastAPI)
+- Socket.IO via `python-socketio`
+- SQLite : blob legacy + schéma relationnel (`domain_client`)
+- Transforms : plugins dans `transforms/`
+
+### Planifié (non implémenté)
+
+- Neo4j client
+- Agent-OS (`agent_os.py`, `agents/`)
+- Celery + Redis
+
+## Conventions
+
+- **TypeScript** : `camelCase`, interfaces `PascalCase`, éviter `any`
+- **Python** : PEP8, `snake_case`, type hints obligatoires
+- **Commentaires** : blocs complexes uniquement
+
+## Variables d'environnement
+
+Voir `backend/.env.example` :
+
+- `CORS_ORIGINS`, `SHODAN_API_KEY`, `HIBP_API_KEY`
+- `SQLITE_PATH` (défaut: `osintgraph.db`)
+- `OSINTGRAPH_SESSION_SECRET` (auth locale)
+- `AI_PROVIDER`, `AI_API_KEY` *(optionnel, pour analyse IA)*
+
+## Neo4j *(planifié)*
+
+Variables `NEO4J_*` dans `.env.example` pour usage futur. Non requis en v1.

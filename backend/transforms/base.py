@@ -1,27 +1,52 @@
 """
-OsintGraph — Transform Base Class & Registry
+OSINTGraph — Transform Base Class & Registry
 """
 import importlib
+import logging
 import pkgutil
 from typing import Any
 
+logger = logging.getLogger("osintgraph.transforms")
+
+
+def build_observation(
+    platform: str,
+    content: dict[str, Any],
+    collection_method: str = "TRANSFORM",
+    confidence: float = 0.7,
+    status: str = "UNVERIFIED",
+    url: str | None = None,
+) -> dict[str, Any]:
+    return {
+        "source": {
+            "platform": platform,
+            "collection_method": collection_method,
+            "url": url,
+        },
+        "content": content,
+        "confidence": confidence,
+        "status": status,
+    }
+
 
 class Transform:
-    """Base class for all OsintGraph OSINT transforms."""
+    """Base class for all OSINTGraph OSINT transforms."""
     name: str = "base"
     display_name: str = "Base Transform"
     input_type: str = "*"
     output_type: str = "unknown"
     description: str = ""
+    platform: str = "transform"
 
-    async def run(self, value: str, options: dict[str, Any] = {}) -> dict[str, Any]:
+    async def run(self, value: str, options: dict[str, Any] | None = None) -> dict[str, Any]:
         """
         Execute the transform.
         Returns:
           {
-            "nodes": [{"type": str, "label": str, "properties": {...}}],
+            "nodes": [...],
             "edges": [],
-            "log": ["step 1", "step 2", ...]
+            "observations": [...],
+            "log": ["sanitized steps"]
           }
         """
         raise NotImplementedError

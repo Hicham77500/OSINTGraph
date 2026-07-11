@@ -43,8 +43,8 @@ async def run_transform(req: TransformRequest, request: Request):
 
     try:
         result = await transform.run(req.value, req.options)
+        result.setdefault("observations", [])
 
-        # Emit result via Socket.IO for real-time streaming
         await sio.emit("transform:result", {
             "transform": req.transform,
             "node_id": req.node_id,

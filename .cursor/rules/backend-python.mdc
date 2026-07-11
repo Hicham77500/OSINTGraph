@@ -1,0 +1,56 @@
+---
+description: Backend Python conventions for OSINTGraph FastAPI services
+globs: backend/**/*.py
+alwaysApply: false
+---
+
+# Backend Python
+
+## Structure
+
+- `routers/` — HTTP endpoints; thin handlers, logic in `services/`
+- `models/` — Pydantic schemas
+- `db/` — persistence (sqlite_client legacy, domain_client relational)
+- `transforms/` — one file per OSINT plugin via `@register`
+- `connectors/` — PlatformConnector implementations
+- `services/` — entity_resolution, audit, context_readiness
+- `middleware/` — auth, rate_limit
+
+## Conventions
+
+- Type hints on all public functions
+- `snake_case` functions/vars, `PascalCase` classes
+- Use `logging` module — never `print()`; redact PII in log messages
+- Async for I/O; `asyncio.to_thread` for sync OSINT libs
+
+## Transform return contract
+
+```python
+{
+  "nodes": [...],
+  "edges": [...],
+  "observations": [{
+    "source": {"platform": str, "collection_method": str, "url": str|None},
+    "content": dict,
+    "confidence": float,
+    "status": "UNVERIFIED|CONFIRMED|..."
+  }],
+  "log": ["sanitized step messages"]
+}
+```
+
+## API
+
+- Legacy: `/graph`, `/transforms`, `/workspaces`
+- Domain: `/api/v1/dossiers`, `/api/v1/entities`, etc.
+- Use proper HTTP status codes for new endpoints (404, 422, 429)
+
+## Security
+
+- Rate limit `/transforms/run`
+- Validate enums for entity/relation types on v1 API
+- Audit important mutations via `audit_events` table
+
+## Tests
+
+Add pytest in `backend/tests/` for new routers and services.

@@ -26,6 +26,10 @@ export interface GraphState {
   isLoading: boolean
   layoutType: 'force' | 'hierarchical' | 'grid'
   connectMode: boolean
+  graphDepth: 1 | 2 | 3
+  focusNodeId: string | null
+  relationFilter: string
+  saveStatus: 'idle' | 'saving' | 'saved' | 'error'
 
   // Actions
   addNode: (type: NodeType, label: string, properties?: Record<string, string>) => NodeData
@@ -48,6 +52,11 @@ export interface GraphState {
   setWorkspace: (name: string) => void
   setLayout: (layout: 'force' | 'hierarchical' | 'grid') => void
   setConnectMode: (v: boolean) => void
+  setGraphDepth: (depth: 1 | 2 | 3) => void
+  setFocusNodeId: (id: string | null) => void
+  setRelationFilter: (filter: string) => void
+  setSaveStatus: (status: 'idle' | 'saving' | 'saved' | 'error') => void
+  fetchGraph: (workspace?: string) => Promise<void>
 }
 
 export const useGraphStore = create<GraphState>((set, get) => ({
@@ -62,6 +71,10 @@ export const useGraphStore = create<GraphState>((set, get) => ({
   isLoading: false,
   layoutType: 'force',
   connectMode: false,
+  graphDepth: 1,
+  focusNodeId: null,
+  relationFilter: 'all',
+  saveStatus: 'idle' as const,
 
   addNode: (type, label, properties = {}) => {
     const node = createNode(type, label, properties)
@@ -171,4 +184,29 @@ export const useGraphStore = create<GraphState>((set, get) => ({
   setWorkspace: (name) => set({ currentWorkspace: name }),
   setLayout: (layout) => set({ layoutType: layout }),
   setConnectMode: (v) => set({ connectMode: v }),
+  setGraphDepth: (depth) => set({ graphDepth: depth }),
+  setFocusNodeId: (id) => set({ focusNodeId: id }),
+  setRelationFilter: (filter) => set({ relationFilter: filter }),
+  setSaveStatus: (status) => set({ saveStatus: status }),
+
+  fetchGraph: async (workspace) => {
+    const ws = workspace ?? get().currentWorkspace
+    set({ isLoading: true })
+    try {
+      const { apiClient } = await import('../services/api')
+      const res = await apiClient.get(`/graph/${ws}`)
+      if (res.ok && res.data) {
+        const data = res.data as { nodes: NodeData[]; edges: EdgeData[] }
+        get().loadGraph(data.nodes || [], data.edges || [])
+      }
+    } catch {
+      const cached = localStorage.getItem(`osintgraph:${ws}`)
+      if (cached) {
+        const data = JSON.parse(cached)
+        get().loadGraph(data.nodes || [], data.edges || [])
+      }
+    } finally {
+      set({ isLoading: false })
+    }
+  },
 }))

@@ -6,7 +6,7 @@ import cola from 'cytoscape-cola'
 // @ts-ignore
 import dagre from 'cytoscape-dagre'
 import { useGraphStore } from './graphStore'
-import { NODE_TYPE_CONFIG, EDGE_TYPE_CONFIG, NodeData, EdgeData, EdgeType } from './nodeTypes'
+import { NODE_TYPE_CONFIG, EDGE_TYPE_CONFIG, NodeData, EdgeData, EdgeType, NodeType } from './nodeTypes'
 import './GraphCanvas.css'
 
 cytoscape.use(cola)
@@ -14,6 +14,49 @@ cytoscape.use(dagre)
 
 interface GraphCanvasProps {
   onContextMenu?: (event: { x: number; y: number; nodeId?: string; edgeId?: string }) => void
+}
+
+function getVisibleGraph(
+  nodes: NodeData[],
+  edges: EdgeData[],
+  focusNodeId: string | null,
+  depth: number,
+  relationFilter: string,
+): { nodes: NodeData[]; edges: EdgeData[]; dimmedIds: Set<string> } {
+  let filteredEdges = relationFilter === 'all'
+    ? edges
+    : edges.filter(e => e.type === relationFilter)
+
+  if (!focusNodeId) {
+    return { nodes, edges: filteredEdges, dimmedIds: new Set() }
+  }
+
+  const visibleIds = new Set<string>([focusNodeId])
+  let frontier = [focusNodeId]
+  for (let d = 0; d < depth; d++) {
+    const next: string[] = []
+    for (const e of filteredEdges) {
+      if (frontier.includes(e.source) && !visibleIds.has(e.target)) {
+        visibleIds.add(e.target)
+        next.push(e.target)
+      }
+      if (frontier.includes(e.target) && !visibleIds.has(e.source)) {
+        visibleIds.add(e.source)
+        next.push(e.source)
+      }
+    }
+    frontier = next
+  }
+
+  filteredEdges = filteredEdges.filter(
+    e => visibleIds.has(e.source) && visibleIds.has(e.target),
+  )
+  const dimmedIds = new Set(nodes.filter(n => !visibleIds.has(n.id)).map(n => n.id))
+  return {
+    nodes: nodes.filter(n => visibleIds.has(n.id)),
+    edges: filteredEdges,
+    dimmedIds,
+  }
 }
 
 /** Render an SVG icon to a base64 Data URL for Cytoscape */
@@ -175,7 +218,13 @@ export const GraphCanvas: FC<GraphCanvasProps> = ({ onContextMenu }) => {
   const {
     nodes, edges, layoutType, selectNode, selectEdge,
     connectMode, setConnectMode, addEdge,
+    graphDepth, focusNodeId, relationFilter,
+    setGraphDepth, setFocusNodeId, setRelationFilter, selectedNodeId,
   } = useGraphStore()
+
+  const { nodes: visibleNodes, edges: visibleEdges } = getVisibleGraph(
+    nodes, edges, focusNodeId, graphDepth, relationFilter,
+  )
 
   // Cancel connect mode with Escape key
   useEffect(() => {
@@ -281,15 +330,15 @@ export const GraphCanvas: FC<GraphCanvasProps> = ({ onContextMenu }) => {
     const cy = cyRef.current
     if (!cy) return
 
-    const nodeIds = new Set(nodes.map((n: NodeData) => n.id))
-    const edgeIds = new Set(edges.map((e: EdgeData) => e.id))
+    const nodeIds = new Set(visibleNodes.map((n: NodeData) => n.id))
+    const edgeIds = new Set(visibleEdges.map((e: EdgeData) => e.id))
 
     // Remove stale elements
     cy.nodes().forEach(n => { if (!nodeIds.has(n.id())) n.remove() })
     cy.edges().forEach(e => { if (!edgeIds.has(e.id())) e.remove() })
 
     // Add / update nodes
-    nodes.forEach((n: NodeData) => {
+    visibleNodes.forEach((n: NodeData) => {
       const cfg = NODE_TYPE_CONFIG[n.type]
       const iconImage = getIconSvgUri(cfg.iconSvg, cfg.color)
       if (cy.getElementById(n.id).length === 0) {
@@ -314,7 +363,7 @@ export const GraphCanvas: FC<GraphCanvasProps> = ({ onContextMenu }) => {
     })
 
     // Add / update edges
-    edges.forEach((e: EdgeData) => {
+    visibleEdges.forEach((e: EdgeData) => {
       const edgeCfg = EDGE_TYPE_CONFIG[e.type as EdgeType]
       const translatedLabel = t(`edgeTypes.${e.type}` as any, { defaultValue: edgeCfg?.label ?? e.type })
       if (cy.getElementById(e.id).length === 0) {
@@ -335,12 +384,16 @@ export const GraphCanvas: FC<GraphCanvasProps> = ({ onContextMenu }) => {
     })
 
     // Re-run layout only when the number of nodes changes (not on metadata updates)
-    const nodeCountChanged = nodes.length !== prevNodeCountRef.current
-    prevNodeCountRef.current = nodes.length
-    if (nodes.length > 0 && nodeCountChanged) {
+    const nodeCountChanged = visibleNodes.length !== prevNodeCountRef.current
+    prevNodeCountRef.current = visibleNodes.length
+    if (visibleNodes.length > 0 && nodeCountChanged) {
       cy.layout(LAYOUT_OPTIONS[layoutType] ?? LAYOUT_OPTIONS.force).run()
     }
-  }, [nodes, edges, layoutType, i18n.language])
+
+    if (focusNodeId && cy.getElementById(focusNodeId).length) {
+      cy.animate({ center: { eles: cy.getElementById(focusNodeId) }, zoom: 1.2 }, { duration: 300 })
+    }
+  }, [visibleNodes, visibleEdges, layoutType, i18n.language, focusNodeId, graphDepth, relationFilter])
 
   // ── Re-layout on layout-type switch ───────────────
   useEffect(() => {
@@ -375,6 +428,46 @@ export const GraphCanvas: FC<GraphCanvasProps> = ({ onContextMenu }) => {
 
   return (
     <div className={`graph-canvas-wrapper${connectMode ? ' connecting-mode' : ''}`}>
+      <div className="graph-filters">
+        <select value={graphDepth} onChange={e => setGraphDepth(Number(e.target.value) as 1 | 2 | 3)}>
+          <option value={1}>Depth: 1 hop</option>
+          <option value={2}>Depth: 2 hops</option>
+          <option value={3}>Depth: 3 hops</option>
+        </select>
+        <select value={relationFilter} onChange={e => setRelationFilter(e.target.value)}>
+          <option value="all">All relations</option>
+          {(Object.keys(EDGE_TYPE_CONFIG) as EdgeType[]).map(t => (
+            <option key={t} value={t}>{EDGE_TYPE_CONFIG[t].label}</option>
+          ))}
+        </select>
+        <button
+          className="btn btn-ghost"
+          style={{ fontSize: '0.75rem', padding: '0.35rem 0.5rem' }}
+          onClick={() => setFocusNodeId(selectedNodeId)}
+          disabled={!selectedNodeId}
+        >
+          Focus node
+        </button>
+        {focusNodeId && (
+          <button
+            className="btn btn-ghost"
+            style={{ fontSize: '0.75rem', padding: '0.35rem 0.5rem' }}
+            onClick={() => setFocusNodeId(null)}
+          >
+            Clear focus
+          </button>
+        )}
+      </div>
+
+      <div className="graph-legend" aria-label="Graph legend">
+        {(Object.entries(NODE_TYPE_CONFIG) as [NodeType, typeof NODE_TYPE_CONFIG.person][]).slice(0, 4).map(([type, cfg]) => (
+          <span key={type} className="legend-item">
+            <span className="legend-dot" style={{ background: cfg.color }} />
+            {cfg.label}
+          </span>
+        ))}
+      </div>
+
       <div ref={containerRef} className="graph-canvas" />
 
       {/* Connect mode hint banner */}

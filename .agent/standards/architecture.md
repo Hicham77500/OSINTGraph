@@ -1,27 +1,64 @@
-# Architecture OsintGraph
+# Architecture OSINTGraph
 
-## Vue d'ensemble (Global Architecture)
-OsintGraph est une application Desktop modulaire hybride composée de :
-1. **Frontend (React + Vite)** : Single Page Application gérant l'UI/UX et le rendu du graphe.
-2. **Wrapper Desktop (Electron)** : Conteneur natif avec `contextBridge` strict pour la communication inter-processus.
-3. **Backend Orchestrateur (FastAPI + Agent-OS)** : Serveur local asynchrone orchestrant l'exécution des *Transforms* (plugins d'enrichissement OSINT) et la gestion des données.
+> État réel — juillet 2026. Sections marquées *(planifié)* ne sont pas encore implémentées.
+
+## Vue d'ensemble
+
+OSINTGraph est une application desktop modulaire :
+
+1. **Frontend (React + Vite)** — UI, graphe Cytoscape, Investigation Workspace
+2. **Electron** — conteneur natif, `contextBridge` strict (`window.osint.api`)
+3. **Backend (FastAPI)** — API REST, transforms OSINT, persistance SQLite
 
 ## 1. Frontend
-- **Gestion d'état (State Management)** : **Zustand** est le standard exclusif pour l'état global (`useGraphStore` pour le graphe, `useUIStore` pour l'interface). Interdiction des Contexts lourds ou de Redux. Prop-drilling strictement prohibé au-delà de 2 niveaux.
-- **Moteur de Graphe** : **Cytoscape.js**. 
-  - *Règle de style* : Les styles de nœuds doivent refléter le dictionnaire `NODE_TYPE_CONFIG` (couleurs, type). 
-  - *Performances* : Utilisation des headless layouts (`cola`, `dagre`) et de la mutabilité contrôlée (batch updates) dans Cytoscape, tout en gardant Zustand synchronisé.
-- **UI/UX** : Composants fonctionnels (`FC`). L'interface doit obéir au paradigme *Dark Glassmorphism* (fonds `rgba` translucides, bordures subtiles violet/bleu `var(--accent-primary)`).
 
-## 2. Backend & Agent-OS
-- **Architecture Modulaire** :
-  - `routers/` : Endpoints REST et WebSocket (FastAPI).
-  - `transforms/` : Scripts de collecte OSINT granulaires. Un fichier = un service/plugin (ex: `shodan_lookup.py`).
-  - `agents/` : Orchestrateurs complexes (pipelines Agent-OS).
-  - `db/` : Persistance.
-- **Temps Réel (WebSockets)** : Communication bidirectionnelle via **Socket.IO**. L'orchestrateur informe le frontend de chaque nœud trouvé en temps réel (`transform_progress`, `transform_result_node`).
-- **Persistance** : SQLite via `aiosqlite` pour le stockage local (workspaces, entités, relations).
+- **État global** : Zustand (`graphStore`, `investigationStore`). Pas de Redux.
+- **État UI** : actuellement dans `graphStore` (layout, connectMode). Split optionnel futur.
+- **Graphe** : Cytoscape.js, layouts `cola` / `dagre`, styles via `NODE_TYPE_CONFIG`
+- **UI** : Dark Glassmorphism, CSS variables (`index.css`)
+- **Routing** : React Router — dossiers → carnets grid → carnet view / person view / full graph
 
-## 3. Communication (IPC & Réseau)
-- **Localhost API** : Le frontend (port 5173 / Electron BrowserView) communique avec le backend (port 8000) via REST pour la configuration et Socket.IO pour les pipelines.
-- **Sécurité ContextBar** : Electron n'a PAS de `nodeIntegration`. L'accès natif se fait via `window.osint.api`.
+Voir `docs/PROJECT_CONTEXT.md` pour la carte des routes et le rôle de chaque carnet.
+
+## 2. Backend
+
+- `routers/` — endpoints legacy (`/graph`, `/transforms`, `/workspaces`) + `/api/v1/`
+- `transforms/` — plugins OSINT (`@register`, auto-discovery)
+- `connectors/` — PlatformConnector *(extensible)*
+- `db/` — `sqlite_client` (blob legacy) + `domain_client` (relationnel)
+- `services/` — entity_resolution, context_readiness, audit
+- `middleware/` — auth locale, rate limiting
+
+### *(Planifié)* Agent-OS
+
+Orchestration de pipelines transforms. Non implémenté. Transforms exécutés via REST.
+
+### *(Planifié)* Neo4j
+
+Graph DB optionnelle pour très grands graphes. SQLite relationnel utilisé en v1.
+
+## 3. Temps réel
+
+Socket.IO monté via `main:asgi_app`. Events :
+
+- `transform:start`
+- `transform:result`
+- `transform:error`
+
+Frontend peut s'abonner via `services/websocket.ts`.
+
+## 4. Persistance
+
+- **Legacy** : table `graphs(workspace_id, data JSON)`
+- **Domaine** : tables relationnelles (dossiers, carnets, entities, sources, observations, evidence, relations, hypotheses, audit_events)
+- **Migration** : dual-write ; `workspace_id` = alias `dossier_id`
+
+## 5. Communication
+
+- REST localhost:8000 (config + CRUD)
+- Socket.IO pour progression transforms
+- Electron IPC proxy vers backend
+
+## 6. Sécurité Electron
+
+`nodeIntegration: false`, `contextIsolation: true`, preload obligatoire.

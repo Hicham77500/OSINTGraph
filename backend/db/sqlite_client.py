@@ -8,9 +8,13 @@ import os
 DB_PATH = os.getenv("SQLITE_PATH", "osintgraph.db")
 
 
+def _db_path() -> str:
+    return os.getenv("SQLITE_PATH", "osintgraph.db")
+
+
 class SQLiteClient:
-    async def _get_db(self):
-        db = await aiosqlite.connect(DB_PATH)
+    async def _connect(self):
+        db = await aiosqlite.connect(_db_path())
         await db.execute("PRAGMA journal_mode=WAL")
         await db.execute("""
             CREATE TABLE IF NOT EXISTS graphs (
@@ -19,19 +23,22 @@ class SQLiteClient:
                 updated_at TEXT DEFAULT (datetime('now'))
             )
         """)
-        await db.commit()
         return db
 
     async def save_graph(self, workspace_id: str, data: dict):
-        async with await self._get_db() as db:
+        db = await self._connect()
+        try:
             await db.execute(
                 "INSERT OR REPLACE INTO graphs (workspace_id, data, updated_at) VALUES (?, ?, datetime('now'))",
                 (workspace_id, json.dumps(data))
             )
             await db.commit()
+        finally:
+            await db.close()
 
     async def load_graph(self, workspace_id: str) -> dict:
-        async with await self._get_db() as db:
+        db = await self._connect()
+        try:
             async with db.execute(
                 "SELECT data FROM graphs WHERE workspace_id = ?", (workspace_id,)
             ) as cursor:
@@ -39,6 +46,8 @@ class SQLiteClient:
                 if row:
                     return json.loads(row[0])
                 return {"nodes": [], "edges": []}
+        finally:
+            await db.close()
 
     async def add_node(self, workspace_id: str, node: dict):
         data = await self.load_graph(workspace_id)
@@ -59,15 +68,21 @@ class SQLiteClient:
         await self.save_graph(workspace_id, data)
 
     async def delete_workspace(self, workspace_id: str):
-        async with await self._get_db() as db:
+        db = await self._connect()
+        try:
             await db.execute("DELETE FROM graphs WHERE workspace_id = ?", (workspace_id,))
             await db.commit()
+        finally:
+            await db.close()
 
     async def list_workspaces(self) -> list[str]:
-        async with await self._get_db() as db:
+        db = await self._connect()
+        try:
             async with db.execute("SELECT workspace_id FROM graphs") as cursor:
                 rows = await cursor.fetchall()
                 return [r[0] for r in rows]
+        finally:
+            await db.close()
 
 
 sqlite_client = SQLiteClient()

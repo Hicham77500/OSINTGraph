@@ -1,0 +1,41 @@
+---
+description: OSINTGraph core context — stack, architecture, conventions, migration principles
+alwaysApply: true
+---
+
+# OSINTGraph — Core
+
+## Product
+
+OSINT investigation platform with relational graph analysis. Works only on legally accessible open sources or analyst-provided data.
+
+## Stack
+
+- Frontend: React 18 + TS + Vite + Zustand + Cytoscape + Electron
+- Backend: FastAPI + SQLite + Socket.IO (`main:asgi_app`)
+- Entry: `AGENTS.md`, `.agent/specs/001-domain-model.md`
+
+## Domain hierarchy
+
+`Dossier → Carnet → Entité → Source → Observation → Evidence → Relation → Hypothesis`
+
+Legacy `workspace_id` maps to `dossier_id` during migration. Dual-write blob + relational tables until stable.
+
+## Code rules
+
+- Minimal diffs; no big-bang refactors
+- Reuse existing components (`MainLayout`, `graphStore`, transform plugins)
+- Every OSINT datum needs provenance: source, collectedAt, collectionMethod, confidence, status
+- Confidence statuses: CONFIRMED, LIKELY, POSSIBLE, UNVERIFIED, CONTRADICTED
+- AI output is always a hypothesis until analyst confirms
+
+## Do not
+
+- Add Neo4j/Celery without explicit spec
+- Bypass platform auth or scrape private data
+- Present AI claims as facts
+- Log PII (emails, phones, tokens) in backend logs
+
+## Planned (not built)
+
+Neo4j, Agent-OS orchestrator, Celery queue — document as planned only.

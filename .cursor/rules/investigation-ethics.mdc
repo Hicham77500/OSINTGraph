@@ -1,0 +1,42 @@
+---
+description: Legal and ethical boundaries for OSINTGraph development
+alwaysApply: true
+---
+
+# Investigation Ethics
+
+OSINTGraph handles potentially sensitive personal data. All development must respect these boundaries.
+
+## Allowed
+
+- Public profiles and pages
+- Data voluntarily entered by the analyst
+- Official APIs with proper credentials
+- Manual observation with documented source
+- Import from analyst-owned exports (CSV, JSON)
+
+## Forbidden — never implement
+
+- Authentication bypass or session theft
+- Access to private or locked accounts
+- Credential stuffing or password attacks
+- Platform protection bypass (CAPTCHA farms, anti-bot evasion)
+- Automated stalking or harassment tooling
+- Deanonymization presented as certainty without public evidence
+
+## Data handling
+
+- Preserve uncertainty: use confidence scores and status labels
+- Distinguish observation (fact seen) from hypothesis (interpretation)
+- AI suggestions require analyst Confirm / Reject / Mark for review
+- Entity resolution creates Merge Suggestions only — never auto-merge persons
+
+## Connector capabilities
+
+Display acquisition method clearly: MANUAL, PUBLIC_SEARCH, OFFICIAL_API, IMPORT.
+
+Do not simulate capabilities that do not exist legally or technically.
+
+## Logging
+
+Never log emails, phone numbers, session tokens, or raw API keys.
