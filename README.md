@@ -16,7 +16,15 @@
 
 ## Aperçu / Preview
 
-> *En attente des nouvelles captures d'écran...*
+> *Note : Les captures d'écran ci-dessous reflètent la nouvelle interface "Matte" avec la sauvegarde automatique.*
+
+### Liste des dossiers (Statistiques)
+
+![Liste des dossiers](docs/screenshots/dossiers-list.png)
+
+### Hub d'investigation (Carnets)
+
+![Hub d'investigation](docs/screenshots/dossier-hub.png)
 
 ## Fonctionnalités / Features
 
