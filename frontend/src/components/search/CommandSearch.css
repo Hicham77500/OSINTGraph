@@ -1,7 +1,7 @@
 .command-search-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.65);
+  background: rgba(0, 0, 0, 0.6);
   z-index: 2000;
   display: flex;
   align-items: flex-start;
@@ -61,7 +61,7 @@
 }
 
 .command-search-results li:hover {
-  background: var(--bg-secondary);
+  background: var(--bg-hover);
 }
 
 .command-search-results li.empty {
@@ -85,6 +85,6 @@
   border-radius: 4px;
 }
 
-.match-exact { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
-.match-normalized { background: rgba(99, 102, 241, 0.2); color: #6366f1; }
-.match-potential { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+.match-exact { background: rgba(63, 155, 96, 0.15); color: var(--color-success); }
+.match-normalized { background: var(--accent-glow); color: var(--accent-primary); }
+.match-potential { background: rgba(217, 140, 33, 0.15); color: var(--color-warning); }

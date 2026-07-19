@@ -21,11 +21,13 @@
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: var(--bg-secondary);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--accent-primary);
+  box-shadow: var(--shadow-sm);
 }
 
 .person-meta h1 {
@@ -52,11 +54,11 @@
   border: 1px solid var(--border-subtle);
 }
 
-.badge-confirmed { border-color: #22c55e; color: #22c55e; }
-.badge-likely { border-color: #6366f1; color: #6366f1; }
-.badge-possible { border-color: #f59e0b; color: #f59e0b; }
-.badge-unverified { border-color: #94a3b8; color: #94a3b8; }
-.badge-contradicted { border-color: #ef4444; color: #ef4444; }
+.badge-confirmed { border-color: var(--color-success); color: var(--color-success); }
+.badge-likely { border-color: var(--color-info); color: var(--color-info); }
+.badge-possible { border-color: var(--color-warning); color: var(--color-warning); }
+.badge-unverified { border-color: var(--text-muted); color: var(--text-muted); }
+.badge-contradicted { border-color: var(--color-danger); color: var(--color-danger); }
 
 .person-tabs {
   display: flex;
@@ -81,7 +83,7 @@
 .person-tab.active {
   border-color: var(--accent-primary);
   color: var(--accent-primary);
-  background: rgba(99, 102, 241, 0.1);
+  background: var(--accent-glow);
 }
 
 .person-content {
@@ -132,13 +134,13 @@
 }
 
 .readiness.ready {
-  border: 1px solid #22c55e;
-  background: rgba(34, 197, 94, 0.08);
+  border: 1px solid var(--color-success);
+  background: rgba(63, 155, 96, 0.08);
 }
 
 .readiness.not-ready {
-  border: 1px solid #f59e0b;
-  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid var(--color-warning);
+  background: rgba(217, 140, 33, 0.08);
 }
 
 .ai-claim {

@@ -12,6 +12,8 @@ const fr: Translations = {
     layoutGrid:       'Disposition grille',
     import:           'Importer',
     importTooltip:    'Importer CSV / JSON',
+    export:           'Exporter',
+    exportTooltip:    'Exporter le graphe',
     save:             'Sauvegarder',
     saveTooltip:      'Sauvegarder le graphe',
     searchPlaceholder:'Rechercher des nœuds…',
@@ -111,6 +113,15 @@ const fr: Translations = {
     ignore:         '— ignorer —',
     importButton:   'Importer',
     cancel:         'Annuler',
+  },
+
+  // ── Export Modal ─────────────────────────────────────────
+  exportModal: {
+    title:          'Exporter des données',
+    description:    'Choisissez un format pour exporter le graphe actuel :',
+    json:           'JSON (État complet du graphe)',
+    csv:            'CSV (Nœuds)',
+    markdown:       'Markdown (Rapport lisible)',
   },
 
   // ── Graph Canvas ─────────────────────────────────────────

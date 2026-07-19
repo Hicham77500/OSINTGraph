@@ -10,6 +10,8 @@ const en = {
     layoutGrid:       'Grid layout',
     import:           'Import',
     importTooltip:    'Import CSV / JSON',
+    export:           'Export',
+    exportTooltip:    'Export graph',
     save:             'Save',
     saveTooltip:      'Save graph',
     searchPlaceholder:'Search nodes…',
@@ -109,6 +111,15 @@ const en = {
     ignore:         '— ignore —',
     importButton:   'Import',
     cancel:         'Cancel',
+  },
+
+  // ── Export Modal ─────────────────────────────────────────
+  exportModal: {
+    title:          'Export Data',
+    description:    'Choose a format to export the current graph:',
+    json:           'JSON (Full graph state)',
+    csv:            'CSV (Nodes)',
+    markdown:       'Markdown (Readable report)',
   },
 
   // ── Graph Canvas ─────────────────────────────────────────

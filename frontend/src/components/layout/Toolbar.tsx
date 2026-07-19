@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
-  GitGraph, Upload, Save, LayoutGrid,
+  GitGraph, Upload, Download, Save, LayoutGrid,
   Undo, Redo, Search, ChevronLeft, ChevronRight,
   Layers, Cpu, Link2
 } from 'lucide-react'
@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next'
 import { LanguageSwitcher } from './LanguageSwitcher'
 import { useGraphStore } from '../../graph/graphStore'
 import { ImportModal } from '../modals/ImportModal'
+import { ExportModal } from '../modals/ExportModal'
 import { apiClient } from '../../services/api'
 import './Toolbar.css'
 
@@ -26,23 +27,48 @@ export const Toolbar: React.FC<ToolbarProps> = ({
     setSaveStatus, saveStatus } = useGraphStore()
   const { t } = useTranslation()
   const [showImport, setShowImport] = useState(false)
+  const [showExport, setShowExport] = useState(false)
   const [saving, setSaving] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const lastSavedRef = useRef(JSON.stringify({ nodes, edges }))
 
-  const handleSave = async () => {
-    setSaving(true)
+  const handleSave = async (isAutoSave = false) => {
+    const currentData = JSON.stringify({ nodes, edges })
+    if (isAutoSave && currentData === lastSavedRef.current) return
+
+    if (!isAutoSave) setSaving(true)
     setSaveStatus('saving')
+    
     const res = await apiClient.post(`/graph/${currentWorkspace}`, { nodes, edges })
     if (res.ok) {
       setSaveStatus('saved')
-      localStorage.setItem(`osintgraph:${currentWorkspace}`, JSON.stringify({ nodes, edges }))
+      localStorage.setItem(`osintgraph:${currentWorkspace}`, currentData)
+      lastSavedRef.current = currentData
     } else {
       setSaveStatus('error')
-      localStorage.setItem(`osintgraph:${currentWorkspace}`, JSON.stringify({ nodes, edges }))
+      localStorage.setItem(`osintgraph:${currentWorkspace}`, currentData)
+      lastSavedRef.current = currentData
     }
-    setSaving(false)
-    setTimeout(() => setSaveStatus('idle'), 2000)
+    
+    if (!isAutoSave) setSaving(false)
+    setTimeout(() => {
+      useGraphStore.getState().setSaveStatus('idle')
+    }, 2000)
   }
+
+  // Auto-save effect
+  useEffect(() => {
+    // If workspace changed, reset our last saved ref to current (which is probably loading)
+    // to avoid cross-workspace save triggers.
+    const currentData = JSON.stringify({ nodes, edges })
+    if (currentData === lastSavedRef.current) return
+
+    const timer = setTimeout(() => {
+      handleSave(true)
+    }, 3000)
+
+    return () => clearTimeout(timer)
+  }, [nodes, edges, currentWorkspace])
 
   const canUndo = historyIndex > 0
   const canRedo = historyIndex < history.length - 1
@@ -117,8 +143,14 @@ export const Toolbar: React.FC<ToolbarProps> = ({
           <span>{t('toolbar.import')}</span>
         </button>
 
+        <button className="btn btn-ghost toolbar-btn" onClick={() => setShowExport(true)}
+          data-tooltip={t('toolbar.exportTooltip')}>
+          <Download size={14} />
+          <span>{t('toolbar.export')}</span>
+        </button>
+
         <button className={`btn btn-ghost toolbar-btn ${saving ? 'loading' : ''}`}
-          onClick={handleSave} data-tooltip={t('toolbar.saveTooltip')}>
+          onClick={() => handleSave(false)} data-tooltip={t('toolbar.saveTooltip')}>
           <Save size={14} className={saving ? 'loading-spin' : ''} />
           <span>{saveStatus === 'saved' ? '✓' : saveStatus === 'error' ? '!' : t('toolbar.save')}</span>
         </button>
@@ -159,6 +191,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
       </div>
 
       {showImport && <ImportModal onClose={() => setShowImport(false)} />}
+      {showExport && <ExportModal onClose={() => setShowExport(false)} />}
     </>
   )
 }

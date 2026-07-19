@@ -157,15 +157,18 @@
   justify-content: space-between;
   padding: 1rem 1.25rem;
   border-radius: var(--radius-lg);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
   text-decoration: none;
   color: inherit;
-  transition: border-color 0.15s, transform 0.15s;
+  transition: all 0.15s;
+  box-shadow: var(--shadow-sm);
 }
 
 .entity-card:hover {
   border-color: var(--accent-primary);
   transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .entity-card-static {
@@ -207,11 +210,11 @@
   color: var(--text-secondary);
 }
 
-.badge-confirmed { color: #4ade80; }
-.badge-likely { color: #60a5fa; }
-.badge-possible { color: #fbbf24; }
+.badge-confirmed { color: var(--color-success); }
+.badge-likely { color: var(--color-info); }
+.badge-possible { color: var(--color-warning); }
 .badge-unverified { color: var(--text-muted); }
-.badge-contradicted { color: #f87171; }
+.badge-contradicted { color: var(--color-danger); }
 
 .carnet-empty {
   color: var(--text-muted);
@@ -236,8 +239,8 @@
   gap: 1rem;
   padding: 0.75rem 1rem;
   border-radius: var(--radius-md);
-  border: 1px solid var(--border-subtle);
-  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
 }
 
 .timeline-date {
@@ -258,7 +261,9 @@
 .note-item {
   padding: 1rem;
   border-radius: var(--radius-lg);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-sm);
 }
 
 .note-item-header {

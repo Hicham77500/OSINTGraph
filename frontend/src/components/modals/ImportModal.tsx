@@ -26,6 +26,11 @@ export const ImportModal: React.FC<ImportModalProps> = ({ onClose }) => {
       if (f.name.endsWith('.json')) {
         try {
           const json = JSON.parse(text)
+          if (json.nodes && Array.isArray(json.nodes)) {
+            useGraphStore.getState().mergeNodes(json.nodes, json.edges || [])
+            onClose()
+            return
+          }
           const arr = Array.isArray(json) ? json : [json]
           const rows = arr.map(obj => Object.values(obj).map(String))
           const headers = arr.length > 0 ? Object.keys(arr[0]) : []

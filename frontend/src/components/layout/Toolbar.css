@@ -113,13 +113,12 @@
 
 /* Connect mode button — pulsing accent when active */
 .connect-active {
-  color: #818cf8 !important;
-  background: rgba(99,102,241,0.18) !important;
-  border-color: rgba(99,102,241,0.45) !important;
+  color: var(--accent-primary) !important;
+  background: var(--accent-glow) !important;
+  border-color: var(--accent-primary) !important;
   animation: connect-pulse 1.8s ease-in-out infinite;
 }
 @keyframes connect-pulse {
-  0%, 100% { box-shadow: 0 0 0 0   rgba(99,102,241,0.35); }
-  50%       { box-shadow: 0 0 0 5px rgba(99,102,241,0);    }
+  0%, 100% { box-shadow: 0 0 0 0   var(--accent-glow); }
+  50%       { box-shadow: 0 0 0 4px rgba(0,0,0,0);    }
 }
-
