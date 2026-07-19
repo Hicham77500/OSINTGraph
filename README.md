@@ -16,19 +16,7 @@
 
 ## Aperçu / Preview
 
-> *Note : Les captures d'écran ci-dessous reflètent la nouvelle interface "Matte" du 19/07.*
-
-### Hub d'investigation
-
-![Hub dossier](docs/screenshots/dossier-hub.png)
-
-### Carnet Notes
-
-![Notes](docs/screenshots/notes-carnet.png)
-
-### Graphe relationnel & Transformations (Plugin Sherlock)
-
-![Graphe et Sherlock](docs/screenshots/sherlock-transform.png)
+> *En attente des nouvelles captures d'écran...*
 
 ## Fonctionnalités / Features
 
