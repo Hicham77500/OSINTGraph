@@ -6,7 +6,17 @@
 
 **EN** — OSINTGraph structures investigations into **dossiers** and **carnets**, links people, accounts, and artifacts in a **relational graph**, and tracks every datum with **provenance** and confidence levels. Open sources and analyst-provided data only.
 
+## Nouveautés (Mise à jour v2.0 - Juillet 2026)
+
+- 🔌 **Architecture Plugins Dynamiques** : Les "transforms" (Shodan, Sherlock, etc.) sont désormais de véritables plugins découpés avec des manifestes `plugin.json` permettant une auto-découverte.
+- 🧬 **Registres d'entités dynamiques** : Le typage du graphe est désormais extensible. Nouveaux types ajoutés : `PHONE`, `LOCATION`, `SOCIAL_ACCOUNT`.
+- 🔑 **API Manager** : Un système intégré gère désormais les clés et quotas d'API des différents fournisseurs de façon centralisée.
+- 🎨 **Refonte graphique** : Nouvelle interface "Matte & Vintage" professionnelle, éliminant le surplus de *glassmorphism* pour une meilleure lisibilité. Typographie IBM Plex Mono pour les données techniques.
+- 💾 **Sauvegarde automatique** : Vos graphes et investigations sont désormais sauvegardés en temps réel sans action requise.
+
 ## Aperçu / Preview
+
+> *Note : Les captures d'écran ci-dessous reflètent la nouvelle interface "Matte" du 19/07.*
 
 ### Hub d'investigation
 
@@ -16,9 +26,9 @@
 
 ![Notes](docs/screenshots/notes-carnet.png)
 
-### Graphe relationnel
+### Graphe relationnel & Transformations (Plugin Sherlock)
 
-![Graphe](docs/screenshots/graph-canvas.png)
+![Graphe et Sherlock](docs/screenshots/sherlock-transform.png)
 
 ## Fonctionnalités / Features
 
@@ -29,6 +39,8 @@
 | **Graphe** | Canvas Cytoscape, transforms OSINT, navigation relationnelle |
 | **Provenance** | Source, observation, evidence, confiance (CONFIRMED → CONTRADICTED) |
 | **Notes** | Saisie datée, édition et suppression dans les carnets |
+| **Import / Export** | Transfert de données (JSON/CSV) depuis/vers le graphe |
+| **Auto-save** | Sauvegarde transparente et continue de l'investigation |
 | **Corbeille** | Dossiers supprimés — restauration ou suppression définitive |
 
 ## Stack
@@ -111,22 +123,25 @@ OSINTGraph/
 
 **Contexte projet** — [`AGENTS.md`](AGENTS.md) (guide agents, routing, conventions) · [`docs/PROJECT_CONTEXT.md`](docs/PROJECT_CONTEXT.md) (UX investigation, carnets, navigation)
 
-## Entity Types (legacy graph)
+## Entity Types (Registry dynamique)
 
-`Person` · `Email` · `Domain` · `IP` · `Username` · `Organization`
+L'architecture est passée d'Enums rigides à un `EntityTypeRegistry` dynamique permettant l'ajout via plugins.
+Entités par défaut : `PERSON` · `EMAIL` · `DOMAIN` · `IP` · `USERNAME` · `ORGANIZATION` · `PHONE` · `LOCATION` · `SOCIAL_ACCOUNT`
 
-Domain model (v1): see [`.agent/specs/001-domain-model.md`](.agent/specs/001-domain-model.md)
+Domain model (v2) extensible.
 
 ## Built-in Transforms
 
-| Transform | Input | Output |
-|-----------|-------|--------|
-| DNS Lookup | Domain | IP |
-| Whois Lookup | Domain | Organization |
-| HIBP Lookup | Email | Domain (breach) |
-| Shodan Lookup | IP | Organization |
-| Sherlock Lookup | Username | Username |
-| Holehe Lookup | Email | Username |
+| Transform | Input | Output | Fournisseur |
+|-----------|-------|--------|-------------|
+| DNS Lookup | Domain | IP | - |
+| Whois Lookup | Domain | Organization | - |
+| HIBP Lookup | Email | Domain (breach) | - |
+| Shodan Lookup | IP, Domain | Organization, Location, Port | shodan |
+| Sherlock Lookup | Username | Social Account | - |
+| IP Geolocation | IP | Location, Organization | - |
+| Phone Lookup | Phone | Location, Organization | - |
+| Holehe Lookup | Email | Username | - |
 
 ## Agent context
 
