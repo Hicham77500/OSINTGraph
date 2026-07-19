@@ -26,6 +26,10 @@
 
 ![Hub d'investigation](docs/screenshots/dossier-hub.png)
 
+### Graphe & Transformations
+
+![Analyse Graphe](docs/screenshots/sherlock-transform.png)
+
 ## Fonctionnalités / Features
 
 | Module | Description |
