@@ -49,6 +49,9 @@ const fr: Translations = {
     ip:           { label: 'Adresse IP',       description: 'Adresse IPv4 ou IPv6' },
     username:     { label: "Nom d'utilisateur", description: "Un pseudonyme ou handle sur une plateforme" },
     organization: { label: 'Organisation',     description: 'Une entreprise, un groupe ou une institution' },
+    phone:        { label: 'Téléphone',        description: 'Un numéro de téléphone' },
+    location:     { label: 'Localisation',     description: 'Une position géographique' },
+    social_account: { label: 'Compte Social',  description: 'Un compte sur un réseau social' },
   },
 
   // ── Edge Types ───────────────────────────────────────────

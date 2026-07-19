@@ -1,0 +1,13 @@
+{
+    "name": "Sherlock Lookup",
+    "version": "1.0.0",
+    "author": "OSINTGraph Team",
+    "category": "Social",
+    "license": "MIT",
+    "description": "Recherche un pseudo sur 378+ réseaux sociaux (sherlock-project).",
+    "permissions": ["internet"],
+    "providers": [],
+    "input_types": ["USERNAME"],
+    "output_types": ["SOCIAL_ACCOUNT"],
+    "entrypoint": "plugin.py"
+}

@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest'
 import en from './locales/en'
 import fr from './locales/fr'
 
-type TranslationTree = Record<string, string | TranslationTree>
+interface TranslationTree {
+  [key: string]: string | TranslationTree
+}
 
 function collectLeafPaths(obj: TranslationTree, prefix = ''): string[] {
   const paths: string[] = []

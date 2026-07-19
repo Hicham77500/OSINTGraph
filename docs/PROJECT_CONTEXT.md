@@ -62,6 +62,7 @@ The carnet grid is **kept** as secondary navigation under investigation axes. Ea
 **Dossier trash:** `DELETE /api/v1/dossiers/:id` soft-deletes (`deleted_at`); `GET /api/v1/dossiers/trash`, `POST /api/v1/dossiers/:id/restore`, `DELETE /api/v1/dossiers/:id/permanent`.
 
 Entities are loaded via `GET /api/v1/dossiers/:id/entities?carnet_id=:carnetId`. Client-side filters apply `notebook_type` → allowed `entity_type` values.
+Entity Types are now dynamic and managed by the backend `EntityTypeRegistry`. Default types include `PERSON`, `EMAIL`, `DOMAIN`, `IP`, `USERNAME`, `ORGANIZATION`, `PHONE`, `LOCATION`, `SOCIAL_ACCOUNT`.
 
 ## Routing map
 
@@ -79,6 +80,7 @@ Entities are loaded via `GET /api/v1/dossiers/:id/entities?carnet_id=:carnetId`.
 - `fetchCarnets(dossierId)` — carnet metadata including `notebook_type`
 - `fetchEntities(dossierId, carnetId)` — entities scoped to carnet
 - Observations for timeline/notes: `GET /api/v1/entities/:id/observations` per entity in carnet
+- Transforms (Plugins): `GET /transforms` returns a dynamic list of available plugins parsed from `plugin.json` manifests.
 
 ## UI conventions
 

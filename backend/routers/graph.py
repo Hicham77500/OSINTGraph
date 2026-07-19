@@ -6,6 +6,9 @@ from fastapi import APIRouter, Request, HTTPException
 from pydantic import BaseModel
 from typing import Any
 from db.sqlite_client import sqlite_client
+from db.domain_client import DomainClient
+
+domain_client = DomainClient()
 
 router = APIRouter()
 
@@ -40,6 +43,13 @@ async def get_graph(workspace_id: str):
 @router.post("/{workspace_id}")
 async def save_graph(workspace_id: str, data: GraphData):
     await sqlite_client.save_graph(workspace_id, data.model_dump())
+    
+    # Synchronize graph elements with relational DB for Dossier Hub stats
+    try:
+        await domain_client.sync_workspace_to_dossier(workspace_id, data.model_dump())
+    except Exception as e:
+        print(f"Failed to sync workspace to dossier: {e}")
+        
     return {"status": "saved", "nodes": len(data.nodes), "edges": len(data.edges)}
 
 

@@ -1,0 +1,13 @@
+{
+    "name": "Phone Lookup",
+    "version": "1.0.0",
+    "author": "OSINTGraph Team",
+    "category": "Person",
+    "license": "MIT",
+    "description": "Analyse un numéro de téléphone pour extraire l'opérateur et la localisation.",
+    "permissions": [],
+    "providers": [],
+    "input_types": ["PHONE"],
+    "output_types": ["LOCATION", "ORGANIZATION"],
+    "entrypoint": "plugin.py"
+}

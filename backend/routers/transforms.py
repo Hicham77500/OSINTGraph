@@ -1,13 +1,16 @@
 """
-OsintGraph — Transforms Router
+OsintGraph — Plugins Router
 """
-from fastapi import APIRouter, Request, BackgroundTasks
+import logging
+from fastapi import APIRouter, Request
 from pydantic import BaseModel
 from typing import Any
-from transforms.base import list_transforms, get_transform, autodiscover
 
-autodiscover()
+from plugins.registry import PluginRegistry
+from plugins.base import PluginContext
+from services.api_manager import api_manager
 
+logger = logging.getLogger("osintgraph.router.plugins")
 router = APIRouter()
 
 
@@ -19,18 +22,40 @@ class TransformRequest(BaseModel):
     options: dict[str, Any] = {}
 
 
+# Mock Entity class for PluginContext
+class DummyEntity:
+    def __init__(self, label: str):
+        self.label = label
+
+
 @router.get("")
 async def get_transforms():
-    """List all available transforms."""
-    return list_transforms()
+    """List all available plugins (transforms)."""
+    # PluginRegistry parses manifest which returns a dict
+    # the frontend expects a list of dicts.
+    manifests = PluginRegistry.get_all_manifests()
+    # Format them for the frontend
+    result = []
+    for m in manifests:
+        result.append({
+            "id": m.get("id"),
+            "name": m.get("name"),
+            "description": m.get("description"),
+            "category": m.get("category"),
+            "input_types": m.get("input_types", []),
+            "output_types": m.get("output_types", []),
+            "permissions": m.get("permissions", []),
+            "providers": m.get("providers", []),
+        })
+    return result
 
 
 @router.post("/run")
 async def run_transform(req: TransformRequest, request: Request):
-    """Execute a transform and return results. Also emits via Socket.IO."""
-    transform = get_transform(req.transform)
-    if not transform:
-        return {"ok": False, "error": f"Transform '{req.transform}' not found"}
+    """Execute a plugin transform and return results."""
+    plugin = PluginRegistry.get_plugin_instance(req.transform)
+    if not plugin:
+        return {"ok": False, "error": f"Plugin '{req.transform}' not found"}
 
     sio = request.app.state.sio
 
@@ -42,7 +67,14 @@ async def run_transform(req: TransformRequest, request: Request):
     })
 
     try:
-        result = await transform.run(req.value, req.options)
+        context = PluginContext(
+            entity=DummyEntity(req.value),  # Simple entity wrapper
+            api_manager=api_manager,
+            logger=logger,
+            config=req.options
+        )
+        
+        result = await plugin.run(context)
         result.setdefault("observations", [])
 
         await sio.emit("transform:result", {
@@ -58,6 +90,7 @@ async def run_transform(req: TransformRequest, request: Request):
             **result,
         }
     except Exception as e:
+        logger.error(f"Error running plugin {req.transform}: {e}")
         await sio.emit("transform:error", {
             "transform": req.transform,
             "node_id": req.node_id,

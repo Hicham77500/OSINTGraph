@@ -18,15 +18,8 @@ class ShodanLookup(Transform):
         api_key = os.getenv("SHODAN_API_KEY", "")
 
         if not api_key:
-            log.append("[Shodan] Warning: no SHODAN_API_KEY — using demo data")
-            demo_ports = [80, 443, 22]
-            for port in demo_ports:
-                nodes.append({
-                    "type": "organization",
-                    "label": f"{value}:{port}",
-                    "properties": {"port": str(port), "ip": value, "source": "shodan_demo"},
-                })
-            return {"nodes": nodes, "edges": [], "log": log}
+            log.append("[Shodan] Error: no SHODAN_API_KEY configured in environment")
+            return {"nodes": [], "edges": [], "log": log}
 
         try:
             import shodan

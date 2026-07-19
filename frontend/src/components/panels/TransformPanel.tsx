@@ -23,11 +23,12 @@ function resolveEdgeType(transformName: string, outputType: string): EdgeType {
 }
 
 interface Transform {
+  id: string
   name: string
-  display_name: string
-  input_type: string
-  output_type: string
   description: string
+  category: string
+  input_types: string[]
+  output_types: string[]
 }
 
 interface ResultNode {
@@ -58,29 +59,24 @@ export const TransformPanel: React.FC<TransformPanelProps> = ({ node }) => {
     apiClient.get('/transforms').then(res => {
       if (res.ok && res.data) {
         const compatible = (res.data as Transform[]).filter(
-          t => t.input_type === node.type || t.input_type === '*'
+          t => t.input_types && (t.input_types.includes('*') || t.input_types.some(type => type.toLowerCase() === node.type.toLowerCase()))
         )
         setTransforms(compatible)
       }
-    }).catch(() => {
-      // Fallback mock transforms
-      setTransforms([
-        { name: 'dns_lookup', display_name: 'DNS Lookup', input_type: 'domain', output_type: 'ip', description: 'Resolve domain to IPs' },
-        { name: 'whois_lookup', display_name: 'Whois Lookup', input_type: 'domain', output_type: 'organization', description: 'Whois registration data' },
-        { name: 'hibp_lookup', display_name: 'HaveIBeenPwned', input_type: 'email', output_type: 'breach', description: 'Check breach databases' },
-        { name: 'shodan_lookup', display_name: 'Shodan Lookup', input_type: 'ip', output_type: 'service', description: 'Port & service discovery' },
-      ].filter(t => t.input_type === node.type))
+    }).catch((err) => {
+      console.error(err)
+      setTransforms([])
     })
   }, [node.type])
 
   const runTransform = async (transform: Transform) => {
-    setRunning(transform.name)
-    setLogs([t('transforms.starting', { name: transform.display_name })])
+    setRunning(transform.id)
+    setLogs([t('transforms.starting', { name: transform.name })])
     setResults(null)
 
     try {
       const res = await apiClient.post('/transforms/run', {
-        transform: transform.name,
+        transform: transform.id,
         input_type: node.type,
         value: node.label,
         node_id: node.id,
@@ -92,9 +88,9 @@ export const TransformPanel: React.FC<TransformPanelProps> = ({ node }) => {
         setLogs(prev => [...prev, ...(data.log ?? []), t('transforms.done', { count: data.nodes.length })])
 
         // Build node + edge objects, then merge atomically (single history entry)
-        const edgeType = resolveEdgeType(transform.name, transform.output_type)
+        const edgeType = resolveEdgeType(transform.id, transform.output_types[0]?.toLowerCase() || 'linked_to')
         const newNodeObjects: NodeData[] = data.nodes.map(n =>
-          createNode(n.type as NodeType, n.label, n.properties ?? {})
+          createNode(n.type.toLowerCase() as NodeType, n.label, n.properties ?? {})
         )
         const newEdgeObjects: EdgeData[] = newNodeObjects.map(n =>
           createEdge(node.id, n.id, edgeType)
@@ -106,7 +102,7 @@ export const TransformPanel: React.FC<TransformPanelProps> = ({ node }) => {
           transformHistory: [
             ...(node.transformHistory ?? []),
             {
-              transformName: transform.display_name,
+              transformName: transform.name,
               ranAt: new Date().toISOString(),
               resultCount: data.nodes.length,
               status: 'success',
@@ -120,7 +116,7 @@ export const TransformPanel: React.FC<TransformPanelProps> = ({ node }) => {
         transformHistory: [
           ...(node.transformHistory ?? []),
           {
-            transformName: transform.display_name,
+            transformName: transform.name,
             ranAt: new Date().toISOString(),
             resultCount: 0,
             status: 'error',
@@ -142,30 +138,25 @@ export const TransformPanel: React.FC<TransformPanelProps> = ({ node }) => {
       )}
 
       <div className="transform-list">
-        {transforms.map(tf => {
-          const catalogKey = `transforms.catalog.${tf.name}`
-          const displayName = t(`${catalogKey}.display_name`, { defaultValue: tf.display_name })
-          const description = t(`${catalogKey}.description`, { defaultValue: tf.description })
-          return (
-          <div key={tf.name} className="transform-item">
+        {transforms.map(tf => (
+          <div key={tf.id} className="transform-item">
             <div className="transform-info">
-              <div className="transform-name">{displayName}</div>
-              <div className="transform-desc">{description}</div>
+              <div className="transform-name">{tf.name}</div>
+              <div className="transform-desc">{tf.description}</div>
             </div>
             <button
-              className={`btn btn-primary transform-run-btn ${running === tf.name ? 'loading' : ''}`}
+              className={`btn btn-primary transform-run-btn ${running === tf.id ? 'loading' : ''}`}
               onClick={() => runTransform(tf)}
               disabled={running !== null}
             >
-              {running === tf.name
+              {running === tf.id
                 ? <Loader size={12} className="loading-spin" />
                 : <Play size={12} />
               }
               {t('transforms.run')}
             </button>
           </div>
-          )
-        })}
+        ))}
       </div>
 
       {/* Execution log */}

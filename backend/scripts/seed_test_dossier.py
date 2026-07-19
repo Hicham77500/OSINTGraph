@@ -31,7 +31,7 @@ from models.domain import (
     ConfidenceStatus,
     DossierCreate,
     EntityCreate,
-    EntityType,
+    EntityUpdate,
     RelationCreate,
     RelationType,
     new_id,
@@ -43,15 +43,16 @@ SEED_ACTOR = "demo-seed"
 
 
 def _entity_type_to_node_type(entity_type: str) -> str:
-    mapping = {
-        EntityType.PERSON.value: "person",
-        EntityType.ORGANIZATION.value: "organization",
-        EntityType.USERNAME.value: "username",
-        EntityType.SOCIAL_ACCOUNT.value: "username",
-        EntityType.EMAIL.value: "email",
-        EntityType.DOMAIN.value: "domain",
+    etype_map = {
+        "PERSON": "person",
+        "ORGANIZATION": "organization",
+        "USERNAME": "username",
+        "SOCIAL_ACCOUNT": "username",
+        "EMAIL": "email",
+        "DOMAIN": "domain",
+        "CUSTOM": "person",
     }
-    return mapping.get(entity_type, "username")
+    return etype_map.get(entity_type, "username")
 
 
 def _relation_to_edge_type(relation_type: str) -> str:
@@ -196,7 +197,7 @@ async def seed(force: bool) -> dict:
     marker = await domain_client.create_entity(
         dossier_id,
         EntityCreate(
-            entity_type=EntityType.CUSTOM,
+            entity_type="CUSTOM",
             label=MARKER_LABEL,
             carnet_id=c_notes,
             properties={"hidden": True, "demo_seed": True},
@@ -242,7 +243,7 @@ async def seed(force: bool) -> dict:
         ent = await domain_client.create_entity(
             dossier_id,
             EntityCreate(
-                entity_type=EntityType.PERSON,
+                entity_type="PERSON",
                 label=spec["label"],
                 carnet_id=c_personnes,
                 properties=spec["props"],
@@ -274,7 +275,7 @@ async def seed(force: bool) -> dict:
         ent = await domain_client.create_entity(
             dossier_id,
             EntityCreate(
-                entity_type=EntityType.ORGANIZATION,
+                entity_type="ORGANIZATION",
                 label=spec["label"],
                 carnet_id=c_entreprises,
                 properties=spec["props"],
@@ -289,7 +290,7 @@ async def seed(force: bool) -> dict:
     social_spec = [
         {
             "label": "@camille.osint",
-            "etype": EntityType.SOCIAL_ACCOUNT,
+            "etype": "SOCIAL_ACCOUNT",
             "props": {
                 "platform": "Instagram",
                 "handle": "camille.osint",
@@ -300,7 +301,7 @@ async def seed(force: bool) -> dict:
         },
         {
             "label": "@lmoreau_dev",
-            "etype": EntityType.USERNAME,
+            "etype": "USERNAME",
             "props": {
                 "platform": "X",
                 "handle": "lmoreau_dev",
@@ -311,7 +312,7 @@ async def seed(force: bool) -> dict:
         },
         {
             "label": "@ines.lyon",
-            "etype": EntityType.SOCIAL_ACCOUNT,
+            "etype": "SOCIAL_ACCOUNT",
             "props": {
                 "platform": "TikTok",
                 "handle": "ines.lyon",
@@ -322,7 +323,7 @@ async def seed(force: bool) -> dict:
         },
         {
             "label": "novatech-lyon",
-            "etype": EntityType.SOCIAL_ACCOUNT,
+            "etype": "SOCIAL_ACCOUNT",
             "props": {
                 "platform": "LinkedIn",
                 "handle": "novatech-lyon",
@@ -394,7 +395,7 @@ async def seed(force: bool) -> dict:
         await domain_client.create_entity(
             dossier_id,
             EntityCreate(
-                entity_type=EntityType.CUSTOM,
+                entity_type="CUSTOM",
                 label=note["title"],
                 carnet_id=c_notes,
                 properties={"title": note["title"], "content": note["content"]},
@@ -452,7 +453,7 @@ async def seed(force: bool) -> dict:
         ent = await domain_client.create_entity(
             dossier_id,
             EntityCreate(
-                entity_type=EntityType.EVENT,
+                entity_type="EVENT",
                 label=event["label"],
                 carnet_id=c_chrono,
                 properties={"kind": "timeline_marker"},
@@ -522,7 +523,7 @@ async def seed(force: bool) -> dict:
 
     nodes = []
     for e in seed_entities:
-        if e.entity_type == EntityType.EVENT.value:
+        if e.entity_type == "EVENT":
             continue
         nodes.append(
             {

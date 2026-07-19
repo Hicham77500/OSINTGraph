@@ -18,12 +18,12 @@ from models.domain import (
     DossierOut,
     EntityCreate,
     EntityOut,
-    EntityType,
     EntityUpdate,
     RelationCreate,
     RelationOut,
     new_id,
 )
+from registry.entity_types import EntityTypeRegistry
 from db.sqlite_client import sqlite_client
 
 logger = logging.getLogger("osintgraph.db")
@@ -145,6 +145,16 @@ CREATE TABLE IF NOT EXISTS audit_events (
     timestamp TEXT DEFAULT (datetime('now'))
 );
 
+CREATE TABLE IF NOT EXISTS api_providers (
+    id TEXT PRIMARY KEY,
+    name TEXT UNIQUE NOT NULL,
+    api_key TEXT,
+    status TEXT DEFAULT 'ACTIVE',
+    daily_limit INTEGER DEFAULT -1,
+    remaining_quota INTEGER DEFAULT -1,
+    last_used TEXT
+);
+
 CREATE INDEX IF NOT EXISTS idx_entities_dossier ON entities(dossier_id);
 CREATE INDEX IF NOT EXISTS idx_entities_label ON entities(label);
 CREATE INDEX IF NOT EXISTS idx_relations_dossier ON relations(dossier_id);
@@ -162,12 +172,12 @@ DEFAULT_CARNETS = [
 ]
 
 LEGACY_TYPE_MAP = {
-    "person": EntityType.PERSON,
-    "email": EntityType.EMAIL,
-    "domain": EntityType.DOMAIN,
-    "ip": EntityType.CUSTOM,
-    "username": EntityType.USERNAME,
-    "organization": EntityType.ORGANIZATION,
+    "person": "PERSON",
+    "email": "EMAIL",
+    "domain": "DOMAIN",
+    "ip": "IP",
+    "username": "USERNAME",
+    "organization": "ORGANIZATION",
 }
 
 
@@ -229,7 +239,7 @@ class DomainClient:
         node_id_map: dict[str, str] = {}
 
         for node in graph.get("nodes", []):
-            etype = LEGACY_TYPE_MAP.get(node.get("type", "person"), EntityType.CUSTOM)
+            etype = LEGACY_TYPE_MAP.get(node.get("type", "person"), "CUSTOM")
             entity = await self.create_entity(
                 dossier_id,
                 EntityCreate(entity_type=etype, label=node.get("label", "unknown"), carnet_id=default_carnet),
@@ -264,6 +274,65 @@ class DomainClient:
                     actor="system",
                 )
         logger.info("Migrated workspace %s to dossier %s", workspace_id, dossier_id)
+
+    async def sync_workspace_to_dossier(self, workspace_id: str, graph: dict) -> None:
+        """Called when the frontend saves the graph to synchronize the relational DB."""
+        async with self._session() as db:
+            async with db.execute("SELECT id FROM dossiers WHERE id = ? OR workspace_id = ?", (workspace_id, workspace_id)) as cur:
+                row = await cur.fetchone()
+                if not row:
+                    return
+                dossier_id = row[0]
+                
+        carnets = await self.list_carnets(dossier_id)
+        default_carnet = carnets[0].id if carnets else None
+        
+        async with self._session() as db:
+            # Upsert nodes
+            for node in graph.get("nodes", []):
+                etype = node.get("type", "custom").upper()
+                label = node.get("label", "unknown")
+                props = node.get("properties", {})
+                
+                async with db.execute("SELECT id FROM entities WHERE id = ?", (node["id"],)) as cur:
+                    exists = await cur.fetchone()
+                    
+                if exists:
+                    await db.execute(
+                        "UPDATE entities SET label = ?, properties = ?, updated_at = datetime('now') WHERE id = ?",
+                        (label, json.dumps(props), node["id"])
+                    )
+                else:
+                    await db.execute(
+                        """INSERT INTO entities (id, dossier_id, carnet_id, entity_type, label, properties)
+                           VALUES (?, ?, ?, ?, ?, ?)""",
+                        (node["id"], dossier_id, default_carnet, etype, label, json.dumps(props))
+                    )
+            
+            # Upsert edges
+            from models.domain import RelationType
+            for edge in graph.get("edges", []):
+                async with db.execute("SELECT id FROM relations WHERE id = ?", (edge["id"],)) as cur:
+                    exists = await cur.fetchone()
+                
+                if not exists:
+                    rtype = RelationType.LINKED_TO
+                    if edge.get("type") == "resolves_to":
+                        rtype = RelationType.RESOLVES_TO
+                    elif edge.get("type") == "owns":
+                        rtype = RelationType.OWNS
+                    elif edge.get("type") == "uses":
+                        rtype = RelationType.USES
+                        
+                    async with db.execute("SELECT id FROM entities WHERE id IN (?, ?)", (edge["source"], edge["target"])) as cur:
+                        found = await cur.fetchall()
+                        if len(found) == 2:
+                            await db.execute(
+                                """INSERT INTO relations (id, dossier_id, source_entity_id, target_entity_id, relation_type)
+                                   VALUES (?, ?, ?, ?, ?)""",
+                                (edge["id"], dossier_id, edge["source"], edge["target"], rtype.value)
+                            )
+            await db.commit()
 
     async def create_dossier(
         self, data: DossierCreate, workspace_id: str | None = None, actor: str = "system"
@@ -446,7 +515,7 @@ class DomainClient:
                     eid,
                     dossier_id,
                     data.carnet_id,
-                    data.entity_type.value,
+                    data.entity_type,
                     data.label,
                     json.dumps(data.properties),
                     data.confidence,

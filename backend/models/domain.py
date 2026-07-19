@@ -29,23 +29,6 @@ class CollectionMethod(str, Enum):
     TRANSFORM = "TRANSFORM"
 
 
-class EntityType(str, Enum):
-    PERSON = "PERSON"
-    ORGANIZATION = "ORGANIZATION"
-    ALIAS = "ALIAS"
-    USERNAME = "USERNAME"
-    SOCIAL_ACCOUNT = "SOCIAL_ACCOUNT"
-    EMAIL = "EMAIL"
-    PHONE = "PHONE"
-    DOMAIN = "DOMAIN"
-    WEBSITE = "WEBSITE"
-    LOCATION = "LOCATION"
-    EVENT = "EVENT"
-    DOCUMENT = "DOCUMENT"
-    MEDIA = "MEDIA"
-    CUSTOM = "CUSTOM"
-
-
 class RelationType(str, Enum):
     USES = "USES"
     KNOWS = "KNOWS"
@@ -106,7 +89,7 @@ class CarnetOut(BaseModel):
 
 
 class EntityCreate(BaseModel):
-    entity_type: EntityType
+    entity_type: str
     label: str
     carnet_id: str | None = None
     properties: dict[str, Any] = Field(default_factory=dict)

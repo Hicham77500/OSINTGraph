@@ -177,6 +177,7 @@
   border-radius: var(--radius-sm);
   border-left: 3px solid var(--border-default);
   background: var(--bg-elevated);
+  word-break: break-word;
 }
 .history-item.status-success { border-left-color: var(--color-success); }
 .history-item.status-error { border-left-color: var(--color-danger); }

@@ -1,0 +1,15 @@
+{
+    "name": "Shodan Lookup",
+    "version": "1.0.0",
+    "author": "OSINTGraph Team",
+    "category": "Infrastructure",
+    "license": "MIT",
+    "description": "Recherche les ports ouverts et les services exposés d'une IP sur Shodan.",
+    "permissions": ["internet"],
+    "providers": [
+        {"name": "shodan", "required": true}
+    ],
+    "input_types": ["IP", "DOMAIN"],
+    "output_types": ["ORGANIZATION", "LOCATION", "PORT"],
+    "entrypoint": "plugin.py"
+}

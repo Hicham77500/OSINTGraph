@@ -9,6 +9,9 @@ export type NodeType =
   | 'ip'
   | 'username'
   | 'organization'
+  | 'phone'
+  | 'location'
+  | 'social_account'
 
 export type EdgeType = 
   | 'owns'
@@ -112,6 +115,30 @@ export const NODE_TYPE_CONFIG: Record<NodeType, NodeTypeConfig> = {
     label: 'Organization',
     description: 'A company, group, or institution',
   },
+  phone: {
+    color: '#10b981',
+    bgColor: 'rgba(16,185,129,0.15)',
+    borderColor: 'rgba(16,185,129,0.6)',
+    iconSvg: '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>',
+    label: 'Phone',
+    description: 'A telephone number',
+  },
+  location: {
+    color: '#f43f5e',
+    bgColor: 'rgba(244,63,94,0.15)',
+    borderColor: 'rgba(244,63,94,0.6)',
+    iconSvg: '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',
+    label: 'Location',
+    description: 'A geographic location',
+  },
+  social_account: {
+    color: '#d946ef',
+    bgColor: 'rgba(217,70,239,0.15)',
+    borderColor: 'rgba(217,70,239,0.6)',
+    iconSvg: '<rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>',
+    label: 'Social Account',
+    description: 'An account on a social network',
+  },
 }
 
 export const EDGE_TYPE_CONFIG: Record<EdgeType, { color: string; label: string }> = {
@@ -121,7 +148,7 @@ export const EDGE_TYPE_CONFIG: Record<EdgeType, { color: string; label: string }
   uses: { color: '#22c55e', label: 'Uses' },
 }
 
-export const ALL_NODE_TYPES: NodeType[] = ['person', 'email', 'domain', 'ip', 'username', 'organization']
+export const ALL_NODE_TYPES: NodeType[] = ['person', 'email', 'domain', 'ip', 'username', 'organization', 'phone', 'location', 'social_account']
 export const ALL_EDGE_TYPES: EdgeType[] = ['owns', 'linked_to', 'resolves_to', 'uses']
 
 // ---- Factory ----

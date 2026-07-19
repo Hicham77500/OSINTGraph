@@ -1,0 +1,13 @@
+{
+    "name": "IP Geolocation",
+    "version": "1.0.0",
+    "author": "OSINTGraph Team",
+    "category": "Network",
+    "license": "MIT",
+    "description": "Géolocalise une adresse IP (ville, région, pays, ASN) via un GeoProvider.",
+    "permissions": ["internet"],
+    "providers": [],
+    "input_types": ["IP"],
+    "output_types": ["LOCATION", "ORGANIZATION"],
+    "entrypoint": "plugin.py"
+}

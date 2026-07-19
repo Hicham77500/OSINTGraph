@@ -47,6 +47,9 @@ const en = {
     ip:           { label: 'IP Address',   description: 'IPv4 or IPv6 address' },
     username:     { label: 'Username',     description: 'A username or handle on a platform' },
     organization: { label: 'Organization', description: 'A company, group, or institution' },
+    phone:        { label: 'Phone',        description: 'A telephone number' },
+    location:     { label: 'Location',     description: 'A geographic location' },
+    social_account: { label: 'Social Account', description: 'An account on a social network' },
   },
 
   // ── Edge Types ───────────────────────────────────────────
@@ -295,7 +298,7 @@ const en = {
       insufficientData: 'Insufficient data for reliable analysis.',
     },
   },
-} as const
+}
 
 export default en
 export type Translations = typeof en
