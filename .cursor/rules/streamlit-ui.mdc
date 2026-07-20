@@ -1,0 +1,33 @@
+---
+description: Streamlit UI conventions for OSINTGraph
+globs: streamlit/**/*.py,streamlit_app.py
+alwaysApply: false
+---
+
+# Streamlit UI
+
+## Structure
+
+- `streamlit_app.py` — entry point, routing, search sidebar
+- `streamlit/views/` — page renderers (dossiers, carnet, graph, person, trash)
+- `streamlit/services/backend.py` — direct imports from `backend/` (no HTTP)
+
+## Navigation
+
+Use `st.session_state.page` values: `dossiers`, `trash`, `dossier`, `carnet`, `graph`, `person`.
+
+Store context IDs: `dossier_id`, `carnet_id`, `entity_id`.
+
+## Conventions
+
+- French UI text by default
+- Dark theme via `.streamlit/config.toml`
+- Graph visualization: PyVis + `st.components.v1.html`
+- Provenance badges on entity cards (confidence, status)
+- AI analysis always labeled as hypothesis
+
+## Do not
+
+- Call external APIs without provenance in transform results
+- Auto-merge entities — suggestions only
+- Log PII in Streamlit debug output

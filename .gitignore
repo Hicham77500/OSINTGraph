@@ -11,9 +11,11 @@ venv/
 .DS_Store
 Thumbs.db
 *.log
-frontend/out/
-frontend/.vite/
+data/
 backend/.env
+
+# Legacy frontend (removed)
+frontend/
 
 # Local SQLite databases
 *.db

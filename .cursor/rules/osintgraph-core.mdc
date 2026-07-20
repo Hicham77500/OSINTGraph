@@ -11,8 +11,8 @@ OSINT investigation platform with relational graph analysis. Works only on legal
 
 ## Stack
 
-- Frontend: React 18 + TS + Vite + Zustand + Cytoscape + Electron
-- Backend: FastAPI + SQLite + Socket.IO (`main:asgi_app`)
+- UI: Streamlit (`streamlit_app.py` + `streamlit/views/`)
+- Backend: FastAPI + SQLite + plugins (`backend/`)
 - Entry: `AGENTS.md`, `.agent/specs/001-domain-model.md`
 
 ## Domain hierarchy
@@ -24,7 +24,7 @@ Legacy `workspace_id` maps to `dossier_id` during migration. Dual-write blob + r
 ## Code rules
 
 - Minimal diffs; no big-bang refactors
-- Reuse existing components (`MainLayout`, `graphStore`, transform plugins)
+- Reuse existing backend services (`domain_client`, plugins, transforms)
 - Every OSINT datum needs provenance: source, collectedAt, collectionMethod, confidence, status
 - Confidence statuses: CONFIRMED, LIKELY, POSSIBLE, UNVERIFIED, CONTRADICTED
 - AI output is always a hypothesis until analyst confirms
