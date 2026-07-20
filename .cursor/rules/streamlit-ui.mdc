@@ -1,6 +1,6 @@
 ---
 description: Streamlit UI conventions for OSINTGraph
-globs: streamlit/**/*.py,streamlit_app.py
+globs: ui/**/*.py,streamlit_app.py
 alwaysApply: false
 ---
 
@@ -9,8 +9,8 @@ alwaysApply: false
 ## Structure
 
 - `streamlit_app.py` — entry point, routing, search sidebar
-- `streamlit/views/` — page renderers (dossiers, carnet, graph, person, trash)
-- `streamlit/services/backend.py` — direct imports from `backend/` (no HTTP)
+- `ui/views/` — page renderers (dossiers, carnet, graph, person, trash)
+- `ui/services/backend.py` — direct imports from `backend/` (no HTTP)
 
 ## Navigation
 

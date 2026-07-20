@@ -66,7 +66,7 @@ cd backend && python scripts/seed_test_dossier.py
 ```
 OSINTGraph/
   streamlit_app.py        Point d'entrée Streamlit
-  streamlit/
+  ui/
     services/             Bridge backend (domain_client, plugins)
     views/                Pages UI (dossiers, graphe, carnets, person)
   backend/                Moteur FastAPI + domaine + plugins OSINT

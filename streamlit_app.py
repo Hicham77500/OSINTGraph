@@ -11,13 +11,13 @@ if str(ROOT) not in sys.path:
 
 import streamlit as st
 
-from streamlit.services.backend import ensure_backend, global_search
-from streamlit.views.carnet import render_carnet
-from streamlit.views.dossier_hub import render_dossier_hub
-from streamlit.views.dossiers import render_dossiers
-from streamlit.views.graph import render_graph
-from streamlit.views.person import render_person
-from streamlit.views.trash import render_trash
+from ui.services.backend import ensure_backend, global_search
+from ui.views.carnet import render_carnet
+from ui.views.dossier_hub import render_dossier_hub
+from ui.views.dossiers import render_dossiers
+from ui.views.graph import render_graph
+from ui.views.person import render_person
+from ui.views.trash import render_trash
 
 st.set_page_config(
     page_title="OSINTGraph",

@@ -8,8 +8,8 @@ import streamlit as st
 from pyvis.network import Network
 import streamlit.components.v1 as components
 
-from streamlit.services import backend as api
-from streamlit.services.export_utils import export_csv, export_json, export_markdown, parse_import_json
+from ui.services import backend as api
+from ui.services.export_utils import export_csv, export_json, export_markdown, parse_import_json
 
 NODE_COLORS = {
     "PERSON": "#4a9eff",

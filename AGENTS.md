@@ -8,7 +8,7 @@ OSINTGraph est une plateforme d'investigation OSINT orientée **analyse relation
 
 ## Stack (état juillet 2026)
 
-- **UI** : Streamlit (Python) — `streamlit_app.py` + `streamlit/views/`
+- **UI** : Streamlit (Python) — `streamlit_app.py` + `ui/views/`
 - **Backend** : FastAPI, Python 3.11+, SQLite (relationnel + blob legacy)
 - **Graphe** : PyVis (visualisation dans Streamlit)
 - **OSINT** : plugins `backend/plugins/` + connecteurs `connectors/`
@@ -19,7 +19,7 @@ OSINTGraph est une plateforme d'investigation OSINT orientée **analyse relation
 
 ```
 streamlit_app.py          Point d'entrée UI
-streamlit/
+ui/
   services/backend.py     Bridge direct vers domain_client, plugins
   views/                  dossiers, carnet, graph, person, trash
 

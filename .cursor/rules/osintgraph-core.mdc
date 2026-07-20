@@ -11,7 +11,7 @@ OSINT investigation platform with relational graph analysis. Works only on legal
 
 ## Stack
 
-- UI: Streamlit (`streamlit_app.py` + `streamlit/views/`)
+- UI: Streamlit (`streamlit_app.py` + `ui/views/`)
 - Backend: FastAPI + SQLite + plugins (`backend/`)
 - Entry: `AGENTS.md`, `.agent/specs/001-domain-model.md`
 

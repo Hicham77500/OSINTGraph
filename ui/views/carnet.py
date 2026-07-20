@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import streamlit as st
 
-from streamlit.services import backend as api
+from ui.services import backend as api
 
 NOTEBOOK_ENTITY_TYPES: dict[str, list[str]] = {
     "personnes": ["PERSON"],
