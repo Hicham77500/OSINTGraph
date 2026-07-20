@@ -8,31 +8,39 @@ OSINTGraph est une plateforme d'investigation OSINT orientée **analyse relation
 
 ## Stack (état juillet 2026)
 
-- **Frontend** : React 18, TypeScript, Vite, Zustand, Cytoscape, Electron
+- **Frontend (référence)** : React 18, TypeScript, Vite, Zustand, Cytoscape, Electron — thème Matte & Vintage
+- **Cloud (optionnel)** : Streamlit (`streamlit_app.py` + `ui/`) sur Streamlit Community Cloud
 - **Backend** : FastAPI, Python 3.11+, SQLite (relationnel + blob legacy)
 - **Realtime** : Socket.IO (entrypoint `main:asgi_app`)
-- **OSINT** : plugins `transforms/` + connecteurs `connectors/` (extensible)
+- **OSINT** : plugins `backend/plugins/` + connecteurs `connectors/` (extensible)
 
 **Planifié, non implémenté** : Neo4j, Agent-OS orchestrateur, Celery.
 
 ## Architecture
 
 ```
-frontend/src/
-  pages/          Investigation Workspace, Person View
-  graph/          Cytoscape + graphStore
-  components/     Layout, panels, modals, search
-  services/       api.ts, websocket.ts
-  types/          Modèles domaine partagés
+frontend/src/           UI principale (React + Cytoscape) — NE PAS SUPPRIMER
+  pages/                Investigation Workspace, Person View
+  graph/                Cytoscape + graphStore
+  components/           Layout, panels, modals, search
+  services/             api.ts, websocket.ts
+
+streamlit_app.py        Entry point déploiement cloud
+ui/                     Vues Streamlit (dossiers, graphe, carnets…) — cloud uniquement
+  services/backend.py   Imports directs backend (sans HTTP)
 
 backend/
-  routers/        REST legacy + api/v1/
-  transforms/     Plugins OSINT (@register)
-  connectors/     PlatformConnector (MANUAL, PUBLIC_SEARCH, OFFICIAL_API, IMPORT)
-  db/             sqlite_client (legacy) + domain_client (relationnel)
-  models/         Pydantic domain models
-  services/       entity_resolution, context_readiness, audit
-  middleware/     auth, rate_limit
+  routers/              REST legacy + api/v1/
+  plugins/              Transforms OSINT (plugin.json + plugin.py)
+  connectors/           PlatformConnector
+  db/                   sqlite_client (legacy) + domain_client (relationnel)
+  models/               Pydantic domain models
+  services/             entity_resolution, context_readiness, audit
+  middleware/           auth, rate_limit
+
+deploy/
+  streamlit-cloud.md    Guide déploiement cloud
+requirements.txt        Dépendances Streamlit Cloud (racine)
 ```
 
 ## Hiérarchie métier
@@ -62,7 +70,8 @@ Une hypothèse IA n'est **jamais** un fait. Toujours conserver provenance et niv
 |------|-------|
 | État frontend | Zustand ; pas de Redux |
 | Graphe | Cytoscape + `NODE_TYPE_CONFIG` |
-| UI | Dark Glassmorphism, CSS variables |
+| UI React | Thème Matte & Vintage, CSS variables, Cytoscape |
+| UI Streamlit (`ui/`) | Cloud uniquement ; package `ui/` (pas `streamlit/` — conflit de module) |
 | Electron | `contextIsolation: true`, pas de `nodeIntegration` |
 | Backend Python | PEP8, type hints, `snake_case` |
 | TypeScript | `camelCase`, éviter `any` |
@@ -85,7 +94,8 @@ Une hypothèse IA n'est **jamais** un fait. Toujours conserver provenance et niv
 | `.cursor/rules/osintgraph-core.mdc` | Stack, architecture, conventions |
 | `.cursor/rules/investigation-ethics.mdc` | Limites légales et éthiques |
 | `.cursor/rules/backend-python.mdc` | Conventions backend |
-| `.cursor/rules/frontend-react.mdc` | Conventions frontend |
+| `.cursor/rules/frontend-react.mdc` | Conventions frontend React |
+| `.cursor/rules/streamlit-ui.mdc` | Conventions UI cloud Streamlit |
 | `.cursor/skills/` | Skills projet (transforms, provenance, éthique) |
 | `docs/AUDIT-2026-07.md` | Diagnostic initial |
 
@@ -112,8 +122,19 @@ cd backend && .venv/bin/pytest
 cd frontend && npm test
 ```
 
+## Déploiement
+
+| Mode | Commande | UI |
+|------|----------|-----|
+| **Local (complet)** | `npm run dev` | React Matte & Vintage + Cytoscape |
+| **Cloud** | Streamlit Cloud → `streamlit_app.py` | Streamlit (`ui/`) |
+| **Preview cloud local** | `npm run dev:streamlit` | Streamlit |
+
+Guide : [`deploy/streamlit-cloud.md`](deploy/streamlit-cloud.md)
+
 ## Démarrage dev
 
 ```bash
-npm run dev   # backend (asgi_app) + frontend Vite
+npm run dev              # React + API (UI complète)
+npm run dev:streamlit    # Preview déploiement Streamlit
 ```

@@ -11,6 +11,7 @@
     "dev:stop": "lsof -ti :8000,:5173 2>/dev/null | xargs kill -9 2>/dev/null || (lsof -ti :8000 | xargs kill -9 2>/dev/null; lsof -ti :5173 | xargs kill -9 2>/dev/null; true)",
     "dev:frontend": "cd frontend && npm run dev",
     "dev:backend": "cd backend && (.venv\\Scripts\\python -m uvicorn main:asgi_app --reload --port 8000 2>nul || .venv/bin/python -m uvicorn main:asgi_app --reload --port 8000 || python -m uvicorn main:asgi_app --reload --port 8000)",
+    "dev:streamlit": "streamlit run streamlit_app.py",
     "build": "cd frontend && npm run build"
   },
   "devDependencies": {

@@ -1,0 +1,27 @@
+---
+description: Streamlit cloud deployment UI (ui/ package)
+globs: ui/**/*.py,streamlit_app.py
+alwaysApply: false
+---
+
+# Streamlit UI (cloud)
+
+## Scope
+
+Package `ui/` = interface Streamlit pour le **déploiement cloud** uniquement.  
+L'UI principale (Matte & Vintage) reste dans `frontend/` (React + Cytoscape).
+
+## Structure
+
+- `streamlit_app.py` — entry point Streamlit Cloud
+- `ui/views/` — pages (dossiers, carnet, graph, person, trash)
+- `ui/services/backend.py` — imports directs backend (pas HTTP)
+
+## Navigation
+
+`st.session_state.page` : `dossiers`, `trash`, `dossier`, `carnet`, `graph`, `person`
+
+## Do not
+
+- Renommer `ui/` en `streamlit/` (conflit avec le package streamlit)
+- Supprimer `frontend/` — c'est l'UI de référence

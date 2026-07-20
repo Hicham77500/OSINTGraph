@@ -5,8 +5,16 @@
 - TypeScript, React 18, Vite
 - Zustand (`graphStore.ts`, `investigationStore.ts`)
 - Cytoscape.js (`cytoscape-cola`, `cytoscape-dagre`)
-- CSS natif + variables (`index.css`), Dark Glassmorphism
+- CSS natif + variables (`index.css`), thème **Matte & Vintage**
 - React Router pour Investigation Workspace
+
+## Cloud (Streamlit)
+
+- Entry : `streamlit_app.py` (racine)
+- Vues : package `ui/` (imports directs backend, pas HTTP)
+- Dépendances cloud : `requirements.txt` (racine)
+- Secrets : `.streamlit/secrets.toml` (local) ou Streamlit Cloud admin
+- **Ne pas renommer** `ui/` en `streamlit/` (conflit avec le package pip)
 
 ## Desktop
 
@@ -38,7 +46,7 @@
 Voir `backend/.env.example` :
 
 - `CORS_ORIGINS`, `SHODAN_API_KEY`, `HIBP_API_KEY`
-- `SQLITE_PATH` (défaut: `osintgraph.db`)
+- `SQLITE_PATH` (défaut: `osintgraph.db` ; recommandé local : `data/osintgraph.db`)
 - `OSINTGRAPH_SESSION_SECRET` (auth locale)
 - `AI_PROVIDER`, `AI_API_KEY` *(optionnel, pour analyse IA)*
 

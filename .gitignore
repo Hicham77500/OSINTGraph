@@ -11,9 +11,13 @@ venv/
 .DS_Store
 Thumbs.db
 *.log
+data/
+backend/.env
+.streamlit/secrets.toml
+
+# Legacy frontend paths (gitignored if removed locally)
 frontend/out/
 frontend/.vite/
-backend/.env
 
 # Local SQLite databases
 *.db

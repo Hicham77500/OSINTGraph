@@ -52,17 +52,19 @@
 
 *Planifié : Neo4j, Agent-OS orchestrator*
 
-## Déploiement NAS (Docker)
+## Déploiement (Streamlit Cloud)
 
-Stack Docker (`api` + `web` nginx) avec SQLite sur volume persistant — adapté UGREEN DXP2800, Tailscale, accès self-hosted.
+Hébergement cloud via Streamlit Community Cloud — backend Python intégré.
 
 ```bash
-cp .env.docker.example .env   # éditer secrets
-docker compose up -d --build
-# → http://<nas-ip>:8080
+# Cloud : pousser sur GitHub, configurer sur share.streamlit.io
+# Main file : streamlit_app.py
 ```
 
-Guide complet : [`deploy/nas-ugreen.md`](deploy/nas-ugreen.md)
+Guide complet : [`deploy/streamlit-cloud.md`](deploy/streamlit-cloud.md)
+
+> **UI locale complète** (Matte & Vintage, Cytoscape) : `npm run dev` → http://localhost:5173  
+> Streamlit Cloud sert l'accès cloud ; le frontend React reste dans `frontend/` pour le dev et Electron.
 
 ## Quickstart
 
@@ -105,20 +107,12 @@ cd frontend && npm run electron:dev
 
 ```
 OSINTGraph/
-  frontend/           Electron + React UI
-    src/pages/        Investigation Workspace
-    src/graph/        Cytoscape + stores
-    src/components/   Layout, panels, search
-    src/services/     API + WebSocket
-  backend/            FastAPI server
-    routers/          Legacy + api/v1
-    transforms/       OSINT plugins
-    connectors/       Platform connectors
-    db/               SQLite (legacy blob + domain)
-    services/         Entity resolution, AI readiness, audit
-  .agent/standards/   Conventions projet
-  .cursor/rules/      Règles Cursor
-  docs/               Documentation
+  frontend/           React + Electron UI (Matte & Vintage) — dev local
+  streamlit_app.py    Entry point Streamlit Cloud
+  ui/                 Vues Streamlit (déploiement cloud)
+  backend/            FastAPI + plugins OSINT + SQLite
+  deploy/             Guides déploiement (streamlit-cloud.md)
+  requirements.txt    Dépendances Streamlit Cloud (racine)
 ```
 
 **Contexte projet** — [`AGENTS.md`](AGENTS.md) (guide agents, routing, conventions) · [`docs/PROJECT_CONTEXT.md`](docs/PROJECT_CONTEXT.md) (UX investigation, carnets, navigation)

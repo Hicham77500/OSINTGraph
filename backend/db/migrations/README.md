@@ -4,7 +4,7 @@ OSINTGraph uses **inline migrations** in `domain_client._migrate_schema()` rathe
 
 ## Why
 
-- Single SQLite file on a NAS volume (phase 1)
+- Single SQLite file (local : `data/osintgraph.db` ou `SQLITE_PATH` ; Streamlit Cloud : éphémère)
 - Small, additive changes (e.g. `ALTER TABLE … ADD COLUMN`)
 - `init_schema()` runs on every startup via FastAPI lifespan
 

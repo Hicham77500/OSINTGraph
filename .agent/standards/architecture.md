@@ -15,7 +15,7 @@ OSINTGraph est une application desktop modulaire :
 - **État global** : Zustand (`graphStore`, `investigationStore`). Pas de Redux.
 - **État UI** : actuellement dans `graphStore` (layout, connectMode). Split optionnel futur.
 - **Graphe** : Cytoscape.js, layouts `cola` / `dagre`, styles via `NODE_TYPE_CONFIG`
-- **UI** : Dark Glassmorphism, CSS variables (`index.css`)
+- **UI** : thème Matte & Vintage, CSS variables (`index.css`)
 - **Routing** : React Router — dossiers → carnets grid → carnet view / person view / full graph
 
 Voir `docs/PROJECT_CONTEXT.md` pour la carte des routes et le rôle de chaque carnet.
@@ -62,3 +62,15 @@ Frontend peut s'abonner via `services/websocket.ts`.
 ## 6. Sécurité Electron
 
 `nodeIntegration: false`, `contextIsolation: true`, preload obligatoire.
+
+## 7. Déploiement
+
+| Mode | Commande / cible | UI |
+|------|------------------|-----|
+| Dev local | `npm run dev` | React + Cytoscape (référence) |
+| Cloud | Streamlit Community Cloud → `streamlit_app.py` | Streamlit (`ui/`) |
+| Preview cloud | `npm run dev:streamlit` | Streamlit local |
+
+- Guide : `deploy/streamlit-cloud.md`
+- **Remplacé (juillet 2026)** : stack Docker/NAS (`docker-compose.yml`, nginx) → Streamlit Cloud
+- L'UI React dans `frontend/` reste la référence visuelle ; Streamlit est un accès cloud complémentaire

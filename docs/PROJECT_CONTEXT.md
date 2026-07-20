@@ -84,6 +84,18 @@ Entity Types are now dynamic and managed by the backend `EntityTypeRegistry`. De
 
 ## UI conventions
 
-- Dark Glassmorphism (`DossiersPage.css`, `CarnetViewPage.css`)
+- Thème **Matte & Vintage** (`index.css`, `DossiersPage.css`, `CarnetViewPage.css`) — IBM Plex Mono pour les données techniques
 - i18n keys under `dossier.*` and `carnetView.*` in `en.ts` / `fr.ts`
 - Provenance badges on entity cards: `status`, confidence %
+
+## Déploiement (juillet 2026)
+
+| Environnement | Entry | UI |
+|---------------|-------|-----|
+| **Dev local (référence)** | `npm run dev` | React + Cytoscape — http://localhost:5173 |
+| **Cloud** | Streamlit Cloud → `streamlit_app.py` | Streamlit (`ui/`) — accès distant simplifié |
+| **Preview Streamlit local** | `npm run dev:streamlit` | http://localhost:8501 |
+
+> **Important** : l'UI React (Matte & Vintage) dans `frontend/` est l'interface principale. Ne pas la supprimer lors d'un déploiement Streamlit — les deux coexistent. Voir [`deploy/streamlit-cloud.md`](../deploy/streamlit-cloud.md).
+
+Persistance SQLite : `SQLITE_PATH` (local : `data/osintgraph.db` ou `backend/osintgraph.db` ; Streamlit Cloud : éphémère par défaut).

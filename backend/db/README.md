@@ -1,6 +1,6 @@
 # OSINTGraph — Persistence (SQLite)
 
-Single SQLite file, dual persistence layers. Path controlled by `SQLITE_PATH` (default `osintgraph.db`; Docker: `/data/osintgraph.db`).
+Single SQLite file, dual persistence layers. Path controlled by `SQLITE_PATH` (default `osintgraph.db`; local Streamlit: `data/osintgraph.db`).
 
 ## Layers
 
@@ -15,7 +15,7 @@ Both clients read `SQLITE_PATH` and share the **same file**. WAL mode and foreig
 
 `main.py` lifespan:
 
-1. Creates parent directory of `SQLITE_PATH` if missing (Docker volume `/data`)
+1. Creates parent directory of `SQLITE_PATH` if missing
 2. `domain_client.init_schema()` — `CREATE TABLE IF NOT EXISTS` + inline migrations
 3. `domain_client.ensure_default_dossier()` — default dossier + blob→entity migration when needed
 
@@ -25,15 +25,10 @@ Incremental changes live in `domain_client._migrate_schema()` (not separate SQL 
 
 ## Backup
 
-Stop containers (or ensure no writes), then copy the database file:
+Copy the database file when the app is not writing:
 
 ```bash
-docker compose exec api cp /data/osintgraph.db /data/osintgraph.db.bak
-# or copy the named volume from the host
+cp data/osintgraph.db data/osintgraph.db.bak
 ```
 
-WAL mode may produce companion files (`-wal`, `-shm`). For a consistent backup, stop the `api` service first or use SQLite `.backup`.
-
-## Docker volume
-
-`docker-compose.yml` mounts `osintgraph_data` at `/data`. All investigation data persists across image rebuilds.
+WAL mode may produce companion files (`-wal`, `-shm`). For a consistent backup, stop the app first or use SQLite `.backup`.
