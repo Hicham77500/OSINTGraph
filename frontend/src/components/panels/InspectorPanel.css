@@ -1,0 +1,187 @@
+.inspector-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.inspector-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--text-muted);
+}
+.inspector-empty-icon { font-size: 40px; opacity: 0.4; }
+.inspector-empty p { font-size: 12px; }
+
+.inspector-node-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+.inspector-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.inspector-node-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.inspector-node-type {
+  font-size: 11px;
+  font-weight: 500;
+  margin-top: 1px;
+}
+
+.icon-btn {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+}
+
+/* Confidence bar */
+.confidence-bar-wrapper {
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.confidence-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+.confidence-bar {
+  height: 4px;
+  background: var(--bg-overlay);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.confidence-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-success), var(--accent-primary));
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+
+/* Tabs */
+.inspector-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 0 8px;
+}
+.inspector-tab {
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  border-bottom: 2px solid transparent;
+  transition: all var(--transition-fast);
+  margin-bottom: -1px;
+}
+.inspector-tab:hover { color: var(--text-secondary); }
+.inspector-tab.active { color: var(--text-accent); border-bottom-color: var(--accent-primary); }
+
+/* Content */
+.inspector-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+/* Properties */
+.props-list { padding: 0 16px; }
+.prop-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.prop-row:last-child { border-bottom: none; }
+.prop-key {
+  font-size: 11px;
+  color: var(--text-muted);
+  min-width: 80px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-top: 1px;
+}
+.prop-val {
+  font-size: 12px;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  word-break: break-all;
+}
+.prop-val-copy {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.prop-val-copy:hover { color: var(--text-accent); }
+
+.tag-list { display: flex; flex-wrap: wrap; gap: 4px; }
+.tag {
+  background: var(--bg-overlay);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+  padding: 1px 6px;
+  border-radius: 99px;
+  font-size: 10px;
+}
+
+/* Edge inspector */
+.edge-summary { padding: 12px 16px; }
+.edge-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.edge-nodes {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+.edge-node { color: var(--text-secondary); }
+.edge-arrow { color: var(--text-muted); }
+
+/* History */
+.history-list { padding: 0 12px; display: flex; flex-direction: column; gap: 4px; }
+.history-item {
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--border-default);
+  background: var(--bg-elevated);
+  word-break: break-word;
+}
+.history-item.status-success { border-left-color: var(--color-success); }
+.history-item.status-error { border-left-color: var(--color-danger); }
+.history-item.status-running { border-left-color: var(--accent-primary); }
+.history-transform { font-size: 12px; font-weight: 500; color: var(--text-primary); }
+.history-meta { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+.history-error { font-size: 11px; color: var(--color-danger); margin-top: 4px; }

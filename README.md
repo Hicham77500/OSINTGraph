@@ -1,103 +1,162 @@
 # OSINTGraph
 
-> Plateforme OSINT / Graph Intelligence — Maltego-inspired
+> Desktop OSINT / Graph Intelligence Application — Maltego-inspired
 
 **FR** — OSINTGraph organise vos investigations en **dossiers** et **carnets**, relie personnes, comptes et artefacts dans un **graphe relationnel**, et trace chaque fait avec **provenance** et niveaux de confiance. Sources ouvertes et données fournies par l'analyste uniquement.
 
 **EN** — OSINTGraph structures investigations into **dossiers** and **carnets**, links people, accounts, and artifacts in a **relational graph**, and tracks every datum with **provenance** and confidence levels. Open sources and analyst-provided data only.
 
-## Fonctionnalités
+## Nouveautés (Mise à jour v2.0 - Juillet 2026)
+
+- 🔌 **Architecture Plugins Dynamiques** : Les "transforms" (Shodan, Sherlock, etc.) sont désormais de véritables plugins découpés avec des manifestes `plugin.json` permettant une auto-découverte.
+- 🧬 **Registres d'entités dynamiques** : Le typage du graphe est désormais extensible. Nouveaux types ajoutés : `PHONE`, `LOCATION`, `SOCIAL_ACCOUNT`.
+- 🔑 **API Manager** : Un système intégré gère désormais les clés et quotas d'API des différents fournisseurs de façon centralisée.
+- 🎨 **Refonte graphique** : Nouvelle interface "Matte & Vintage" professionnelle, éliminant le surplus de *glassmorphism* pour une meilleure lisibilité. Typographie IBM Plex Mono pour les données techniques.
+- 💾 **Sauvegarde automatique** : Vos graphes et investigations sont désormais sauvegardés en temps réel sans action requise.
+
+## Aperçu / Preview
+
+> *Note : Les captures d'écran ci-dessous reflètent la nouvelle interface "Matte" avec la sauvegarde automatique.*
+
+### Liste des dossiers (Statistiques)
+
+![Liste des dossiers](docs/screenshots/dossiers-list.png)
+
+### Hub d'investigation (Carnets)
+
+![Hub d'investigation](docs/screenshots/dossier-hub.png)
+
+### Graphe & Transformations
+
+![Analyse Graphe](docs/screenshots/sherlock-transform.png)
+
+## Fonctionnalités / Features
 
 | Module | Description |
 |--------|-------------|
-| **Dossiers** | Investigations isolées avec statistiques |
-| **Carnets** | Notes, chronologie, listes typées |
-| **Graphe** | Visualisation interactive (PyVis), transforms OSINT |
-| **Provenance** | Source, observation, confiance (CONFIRMED → CONTRADICTED) |
-| **Import / Export** | JSON, CSV, Markdown |
-| **Corbeille** | Restauration ou suppression définitive |
-| **Recherche** | Recherche globale cross-dossiers |
+| **Dossiers** | Investigations isolées avec métadonnées et accès rapide aux carnets |
+| **Carnets** | Notes, chronologie, listes — typés selon le besoin d'investigation |
+| **Graphe** | Canvas Cytoscape, transforms OSINT, navigation relationnelle |
+| **Provenance** | Source, observation, evidence, confiance (CONFIRMED → CONTRADICTED) |
+| **Notes** | Saisie datée, édition et suppression dans les carnets |
+| **Import / Export** | Transfert de données (JSON/CSV) depuis/vers le graphe |
+| **Auto-save** | Sauvegarde transparente et continue de l'investigation |
+| **Corbeille** | Dossiers supprimés — restauration ou suppression définitive |
 
 ## Stack
 
-- **UI** : Streamlit (Python)
-- **Backend** : FastAPI + Python 3.11 + asyncio + SQLite (import direct)
-- **Graphe** : PyVis (visualisation interactive)
-- **OSINT** : plugins `backend/plugins/` (Sherlock, Shodan, etc.)
+- **Frontend**: Electron + React 18 + TypeScript + Vite + Cytoscape.js
+- **Backend**: FastAPI + Python 3.11 + asyncio + SQLite
+- **Realtime**: Socket.IO (via `main:asgi_app`)
+- **Domain API**: `/api/v1/` (dossiers, carnets, entités, provenance)
 
 *Planifié : Neo4j, Agent-OS orchestrator*
 
-## Quickstart local
+## Déploiement NAS (Docker)
 
-### Prérequis
+Stack Docker (`api` + `web` nginx) avec SQLite sur volume persistant — adapté UGREEN DXP2800, Tailscale, accès self-hosted.
 
+```bash
+cp .env.docker.example .env   # éditer secrets
+docker compose up -d --build
+# → http://<nas-ip>:8080
+```
+
+Guide complet : [`deploy/nas-ugreen.md`](deploy/nas-ugreen.md)
+
+## Quickstart
+
+### Prerequisites
+
+- Node.js 20+
 - Python 3.11+
 
-### Installation
+### All-in-one (recommended)
 
 ```bash
-python -m venv .venv
+npm install
+cd backend && python -m venv .venv
 source .venv/bin/activate   # macOS/Linux
+# .venv\Scripts\activate    # Windows
 pip install -r requirements.txt
-cp backend/.env.example backend/.env   # optionnel — clés API
-streamlit run streamlit_app.py
+cp .env.example .env
+cd .. && npm run dev
 ```
 
-→ http://localhost:8501
+- Frontend: http://localhost:5173/
+- Backend: http://127.0.0.1:8000
+- Health: http://127.0.0.1:8000/health
 
-### Données de démo
+### Données de démo / Demo data
+
+Pour peupler un dossier de test (carnets, entités, graphe) :
 
 ```bash
-cd backend && python scripts/seed_test_dossier.py
+cd backend && .venv/bin/python scripts/seed_test_dossier.py
 ```
 
-## Déploiement Streamlit Cloud
+### Electron desktop
 
-1. Pousser le dépôt sur GitHub
-2. [share.streamlit.io](https://share.streamlit.io) → New app
-3. **Main file** : `streamlit_app.py`
-4. **Requirements** : `requirements.txt` (racine)
-5. Secrets (optionnel) : `SHODAN_API_KEY`, `HIBP_API_KEY`, `SQLITE_PATH`
-
-> La base SQLite est éphémère sur Streamlit Cloud (redémarrage = reset). Pour la persistance, monter un volume ou utiliser un hébergement self-hosted.
+```bash
+cd frontend && npm run electron:dev
+```
 
 ## Architecture
 
 ```
 OSINTGraph/
-  streamlit_app.py        Point d'entrée Streamlit
-  ui/
-    services/             Bridge backend (domain_client, plugins)
-    views/                Pages UI (dossiers, graphe, carnets, person)
-  backend/                Moteur FastAPI + domaine + plugins OSINT
-    routers/              API REST (legacy, optionnel)
-    plugins/              Transforms OSINT
-    db/                   SQLite (relationnel + blob graphe)
-    services/             Entity resolution, AI readiness, audit
-  data/                   Base SQLite locale (gitignored)
+  frontend/           Electron + React UI
+    src/pages/        Investigation Workspace
+    src/graph/        Cytoscape + stores
+    src/components/   Layout, panels, search
+    src/services/     API + WebSocket
+  backend/            FastAPI server
+    routers/          Legacy + api/v1
+    transforms/       OSINT plugins
+    connectors/       Platform connectors
+    db/               SQLite (legacy blob + domain)
+    services/         Entity resolution, AI readiness, audit
+  .agent/standards/   Conventions projet
+  .cursor/rules/      Règles Cursor
+  docs/               Documentation
 ```
 
-**Contexte** — [`AGENTS.md`](AGENTS.md) · [`docs/PROJECT_CONTEXT.md`](docs/PROJECT_CONTEXT.md)
+**Contexte projet** — [`AGENTS.md`](AGENTS.md) (guide agents, routing, conventions) · [`docs/PROJECT_CONTEXT.md`](docs/PROJECT_CONTEXT.md) (UX investigation, carnets, navigation)
+
+## Entity Types (Registry dynamique)
+
+L'architecture est passée d'Enums rigides à un `EntityTypeRegistry` dynamique permettant l'ajout via plugins.
+Entités par défaut : `PERSON` · `EMAIL` · `DOMAIN` · `IP` · `USERNAME` · `ORGANIZATION` · `PHONE` · `LOCATION` · `SOCIAL_ACCOUNT`
+
+Domain model (v2) extensible.
 
 ## Built-in Transforms
 
-| Transform | Input | Output |
-|-----------|-------|--------|
-| DNS Lookup | Domain | IP |
-| Whois Lookup | Domain | Organization |
-| HIBP Lookup | Email | Domain (breach) |
-| Shodan Lookup | IP, Domain | Organization, Location, Port |
-| Sherlock Lookup | Username | Social Account |
-| IP Geolocation | IP | Location |
-| Phone Lookup | Phone | Location |
-| Holehe Lookup | Email | Username |
+| Transform | Input | Output | Fournisseur |
+|-----------|-------|--------|-------------|
+| DNS Lookup | Domain | IP | - |
+| Whois Lookup | Domain | Organization | - |
+| HIBP Lookup | Email | Domain (breach) | - |
+| Shodan Lookup | IP, Domain | Organization, Location, Port | shodan |
+| Sherlock Lookup | Username | Social Account | - |
+| IP Geolocation | IP | Location, Organization | - |
+| Phone Lookup | Phone | Location, Organization | - |
+| Holehe Lookup | Email | Username | - |
+
+## Agent context
+
+See [`AGENTS.md`](AGENTS.md) for AI agent guidelines.
 
 ## Tests
 
 ```bash
 cd backend && .venv/bin/pytest
+cd frontend && npm test
 ```
 
-## Agent context
+## Security audit
 
-See [`AGENTS.md`](AGENTS.md) for AI agent guidelines.
+```bash
+cd backend && .venv/bin/pip-audit
+npm audit
+```

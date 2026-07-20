@@ -1,0 +1,254 @@
+/* ====================================================
+   OsintGraph — Global Stylesheet
+   Professional intelligence theme: minimal, matte, vintage accents
+   ==================================================== */
+
+/* --- CSS Custom Properties --- */
+:root {
+  /* Core palette - Warm anthracite / dark brown */
+  --bg-base:       #141312;
+  --bg-surface:    #1d1b1a;
+  --bg-elevated:   #252322;
+  --bg-overlay:    #2d2a28;
+  --bg-hover:      #33302e;
+  --bg-active:     #3a3634;
+
+  /* Accent — Discreet gold / ivory */
+  --accent-primary:   #c6a87c;
+  --accent-secondary: #a89984;
+  --accent-glow:      rgba(198, 168, 124, 0.15);
+  --accent-glow-lg:   rgba(198, 168, 124, 0.08);
+
+  /* Status colors (muted slightly for professional look) */
+  --color-success: #3f9b60;
+  --color-warning: #d98c21;
+  --color-danger:  #cc4a4a;
+  --color-info:    #3b8fb8;
+
+  /* Text - Warm ivory */
+  --text-primary:   #f4f0ec;
+  --text-secondary: #a19d98;
+  --text-muted:     #73706c;
+  --text-accent:    #d5cca3;
+
+  /* Borders - Thin and subtle */
+  --border-subtle:  rgba(255, 255, 255, 0.04);
+  --border-default: rgba(255, 255, 255, 0.08);
+  --border-accent:  rgba(198, 168, 124, 0.30);
+
+  /* Entity node colors (Preserved for graph legibility) */
+  --node-person:   #6366f1;
+  --node-email:    #22c55e;
+  --node-domain:   #f59e0b;
+  --node-ip:       #ef4444;
+  --node-username: #8b5cf6;
+  --node-org:      #38bdf8;
+
+  /* Spacing */
+  --sidebar-left:  260px;
+  --sidebar-right: 340px;
+  --toolbar-h:     52px;
+
+  /* Radius - Linear inspired, sharp and clean */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+
+  /* Typography */
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+
+  /* Shadows - Light and subtle for depth without glow */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 0 1px var(--border-subtle);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--border-subtle);
+
+  /* Transitions */
+  --transition-fast: 100ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-mid:  200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* --- Reset --- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--font-sans);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-size: 13px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- Scrollbar --- */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg-hover); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--bg-active); }
+
+/* --- Button base --- */
+button {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+  outline: none;
+}
+
+/* --- Utility classes --- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  transition: all var(--transition-fast);
+  border: 1px solid transparent;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  background: var(--text-primary);
+  color: var(--bg-base);
+  border-color: transparent;
+  box-shadow: var(--shadow-sm);
+}
+.btn-primary:hover { 
+  background: #ffffff; 
+  box-shadow: var(--shadow-md); 
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+}
+.btn-ghost:hover { 
+  background: var(--bg-hover); 
+  color: var(--text-primary); 
+}
+
+.btn-danger {
+  background: transparent;
+  color: var(--color-danger);
+  border: 1px solid transparent;
+}
+.btn-danger:hover { 
+  background: rgba(204, 74, 74, 0.1); 
+  border-color: rgba(204, 74, 74, 0.2);
+}
+
+/* --- Card / Surfaces (Matte instead of Glass) --- */
+.glass, .card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.panel {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-md);
+  border-radius: var(--radius-lg);
+}
+
+/* --- Tag --- */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-hover);
+  border: 1px solid var(--border-default);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--text-secondary);
+}
+
+.tag-mono {
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+/* --- Divider --- */
+.divider {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 8px 0;
+  width: 100%;
+}
+
+/* --- Focus ring --- */
+*:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: -1px;
+}
+
+/* --- Animations --- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(2px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.fade-in { animation: fadeIn 150ms ease forwards; }
+.loading-spin { animation: spin 1s linear infinite; }
+
+/* --- Tooltip --- */
+[data-tooltip] { position: relative; }
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--text-primary);
+  color: var(--bg-base);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  max-width: 240px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  z-index: 9999;
+  box-shadow: var(--shadow-md);
+}
+[data-tooltip]:hover::after { opacity: 1; }
+
+/* --- Input --- */
+input, textarea, select {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  background: var(--bg-base);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  width: 100%;
+  outline: none;
+  transition: all var(--transition-fast);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+}
+input:focus, textarea:focus {
+  border-color: var(--accent-primary);
+  background: var(--bg-surface);
+  box-shadow: 0 0 0 1px var(--accent-primary);
+}
+input::placeholder { color: var(--text-muted); }
+

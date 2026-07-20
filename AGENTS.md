@@ -8,29 +8,31 @@ OSINTGraph est une plateforme d'investigation OSINT orientée **analyse relation
 
 ## Stack (état juillet 2026)
 
-- **UI** : Streamlit (Python) — `streamlit_app.py` + `ui/views/`
+- **Frontend** : React 18, TypeScript, Vite, Zustand, Cytoscape, Electron
 - **Backend** : FastAPI, Python 3.11+, SQLite (relationnel + blob legacy)
-- **Graphe** : PyVis (visualisation dans Streamlit)
-- **OSINT** : plugins `backend/plugins/` + connecteurs `connectors/`
+- **Realtime** : Socket.IO (entrypoint `main:asgi_app`)
+- **OSINT** : plugins `transforms/` + connecteurs `connectors/` (extensible)
 
 **Planifié, non implémenté** : Neo4j, Agent-OS orchestrateur, Celery.
 
 ## Architecture
 
 ```
-streamlit_app.py          Point d'entrée UI
-ui/
-  services/backend.py     Bridge direct vers domain_client, plugins
-  views/                  dossiers, carnet, graph, person, trash
+frontend/src/
+  pages/          Investigation Workspace, Person View
+  graph/          Cytoscape + graphStore
+  components/     Layout, panels, modals, search
+  services/       api.ts, websocket.ts
+  types/          Modèles domaine partagés
 
 backend/
-  routers/                REST legacy + api/v1/ (optionnel, tests)
-  plugins/                Transforms OSINT (plugin.json + plugin.py)
-  connectors/             PlatformConnector
-  db/                     sqlite_client (legacy) + domain_client (relationnel)
-  models/                 Pydantic domain models
-  services/               entity_resolution, context_readiness, audit
-  middleware/             auth, rate_limit
+  routers/        REST legacy + api/v1/
+  transforms/     Plugins OSINT (@register)
+  connectors/     PlatformConnector (MANUAL, PUBLIC_SEARCH, OFFICIAL_API, IMPORT)
+  db/             sqlite_client (legacy) + domain_client (relationnel)
+  models/         Pydantic domain models
+  services/       entity_resolution, context_readiness, audit
+  middleware/     auth, rate_limit
 ```
 
 ## Hiérarchie métier
@@ -58,48 +60,60 @@ Une hypothèse IA n'est **jamais** un fait. Toujours conserver provenance et niv
 
 | Zone | Règle |
 |------|-------|
-| UI | Streamlit ; navigation via `st.session_state.page` |
-| Graphe | PyVis + sauvegarde via `sqlite_client` |
+| État frontend | Zustand ; pas de Redux |
+| Graphe | Cytoscape + `NODE_TYPE_CONFIG` |
+| UI | Dark Glassmorphism, CSS variables |
+| Electron | `contextIsolation: true`, pas de `nodeIntegration` |
 | Backend Python | PEP8, type hints, `snake_case` |
-| Transforms | 1 plugin = 1 dossier avec `plugin.json` ; provenance obligatoire |
-| Texte UI | Français par défaut dans les vues Streamlit |
-
-## Navigation UI (Streamlit)
-
-| `session_state.page` | Vue |
-|----------------------|-----|
-| `dossiers` | Liste des investigations |
-| `trash` | Corbeille |
-| `dossier` | Hub carnets |
-| `carnet` | Entités / notes / chronologie |
-| `graph` | Graphe + transforms |
-| `person` | Fiche entité |
+| TypeScript | `camelCase`, éviter `any` |
+| Transforms | 1 fichier = 1 plugin ; provenance obligatoire dans le retour |
+| i18n | `en.ts` + `fr.ts` pour tout texte UI |
 
 ## Ordre d'exécution recommandé
 
 1. Lire `.agent/standards/` et cette page
 2. Inspecter l'existant avant modification
-3. Modifications limitées, testables, compatibles
-4. Documenter décisions dans `.agent/specs/` si impact architectural
+3. Réutiliser composants et patterns existants
+4. Modifications limitées, testables, compatibles
+5. Documenter décisions dans `.agent/specs/` si impact architectural
 
 ## Fichiers de contexte
 
 | Fichier | Rôle |
 |---------|------|
-| `docs/PROJECT_CONTEXT.md` | UX investigation, carnets |
-| `.cursor/rules/osintgraph-core.mdc` | Stack, architecture |
-| `.cursor/rules/investigation-ethics.mdc` | Limites légales |
+| `docs/PROJECT_CONTEXT.md` | UX investigation, carnets, routing map |
+| `.cursor/rules/osintgraph-core.mdc` | Stack, architecture, conventions |
+| `.cursor/rules/investigation-ethics.mdc` | Limites légales et éthiques |
 | `.cursor/rules/backend-python.mdc` | Conventions backend |
+| `.cursor/rules/frontend-react.mdc` | Conventions frontend |
+| `.cursor/skills/` | Skills projet (transforms, provenance, éthique) |
+| `docs/AUDIT-2026-07.md` | Diagnostic initial |
 
-## Démarrage dev
+## Routing (frontend)
 
-```bash
-pip install -r requirements.txt
-streamlit run streamlit_app.py
-```
+| Route | Vue | Usage |
+|-------|-----|-------|
+| `/` | Dossiers | Liste des investigations |
+| `/trash` | TrashPage | Corbeille — dossiers supprimés (restauration / suppression définitive) |
+| `/dossier/:id` | Dossier | Grille des carnets |
+| `/dossier/:id/carnet/:cid` | CarnetViewPage | Liste / chronologie / notes selon `notebook_type` |
+| `/dossier/:id/graph` | CarnetGraphPage | Graphe legacy Cytoscape |
+| `/dossier/:id/person/:eid` | PersonViewPage | Fiche personne |
+
+Détails : [`docs/PROJECT_CONTEXT.md`](docs/PROJECT_CONTEXT.md).
 
 ## Tests
 
 ```bash
+# Backend
 cd backend && .venv/bin/pytest
+
+# Frontend
+cd frontend && npm test
+```
+
+## Démarrage dev
+
+```bash
+npm run dev   # backend (asgi_app) + frontend Vite
 ```
