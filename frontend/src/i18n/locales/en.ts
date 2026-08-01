@@ -83,6 +83,8 @@ const en = {
     noTransforms: 'No transforms available for {{type}}',
     run:          'Run',
     starting:     '[▶] {{name}} — starting…',
+    started:      '[▶] {{name}} — running…',
+    progress:     '{{pct}}% complete',
     done:         '✓ {{count}} result(s) found',
     error:        '✗ Error: {{message}}',
     catalog: {
@@ -92,6 +94,8 @@ const en = {
       shodan_lookup: { display_name: 'Shodan Lookup',  description: 'Discover open ports and services on an IP via Shodan' },
       sherlock_lookup: { display_name: 'Sherlock — Social Profiles', description: 'Search username across 378+ social networks (sherlock-project)' },
       holehe_lookup:   { display_name: 'Holehe — Email Accounts',   description: 'Find accounts registered with this email across 120+ services' },
+      maigret_lookup:  { display_name: 'Maigret — Username Dossier', description: 'Build a comprehensive dossier from 3000+ sites (maigret)' },
+      spiderfoot_scan: { display_name: 'SpiderFoot — OSINT Scan',    description: 'Multi-source passive recon via SpiderFoot (200+ modules)' },
     },
   },
 

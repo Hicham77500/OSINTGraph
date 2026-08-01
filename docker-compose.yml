@@ -1,0 +1,66 @@
+# OSINTGraph — Docker Compose (React UI + FastAPI + optional SpiderFoot)
+#
+# Quick start:
+#   cp .env.example .env
+#   docker compose up --build
+#
+# With SpiderFoot (passive modules via spiderfoot_scan plugin):
+#   docker compose --profile spiderfoot up --build
+
+services:
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: osintgraph-api
+    restart: unless-stopped
+    ports:
+      - "${API_PORT:-8000}:8000"
+    volumes:
+      - osintgraph-data:/app/data
+    environment:
+      SQLITE_PATH: /app/data/osintgraph.db
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8080,http://localhost}
+      SPIDERFOOT_URL: ${SPIDERFOOT_URL:-http://spiderfoot:5001}
+      OSINTGRAPH_AUTH_DISABLED: ${OSINTGRAPH_AUTH_DISABLED:-true}
+      OSINTGRAPH_SESSION_SECRET: ${OSINTGRAPH_SESSION_SECRET:-change-me-in-production}
+      TRANSFORM_RATE_LIMIT: ${TRANSFORM_RATE_LIMIT:-30}
+      SHODAN_API_KEY: ${SHODAN_API_KEY:-}
+      HIBP_API_KEY: ${HIBP_API_KEY:-}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE: ${VITE_API_BASE:-}
+    container_name: osintgraph-frontend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-8080}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+
+  spiderfoot:
+    build:
+      context: ./deploy/spiderfoot
+      dockerfile: Dockerfile
+    container_name: osintgraph-spiderfoot
+    restart: unless-stopped
+    profiles:
+      - spiderfoot
+    ports:
+      - "${SPIDERFOOT_PORT:-5001}:5001"
+    volumes:
+      - spiderfoot-data:/var/lib/spiderfoot
+
+volumes:
+  osintgraph-data:
+  spiderfoot-data:

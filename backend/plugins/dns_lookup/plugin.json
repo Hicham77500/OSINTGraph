@@ -1,0 +1,14 @@
+{
+    "id": "dns_lookup",
+    "name": "DNS Lookup",
+    "version": "1.0.0",
+    "author": "OSINTGraph Team",
+    "category": "Network",
+    "license": "MIT",
+    "description": "Résout un domaine vers ses adresses IP via DNS (A/AAAA).",
+    "permissions": ["internet"],
+    "providers": [],
+    "input_types": ["DOMAIN"],
+    "output_types": ["IP"],
+    "entrypoint": "plugin.py"
+}

@@ -1,0 +1,14 @@
+{
+    "id": "maigret_lookup",
+    "name": "Maigret — Username Dossier",
+    "version": "1.0.0",
+    "author": "OSINTGraph Team",
+    "category": "Social",
+    "license": "MIT",
+    "description": "Dossier complet sur un pseudo via 3000+ sites (maigret, inspiré knwldgbox).",
+    "permissions": ["internet"],
+    "providers": [],
+    "input_types": ["USERNAME"],
+    "output_types": ["SOCIAL_ACCOUNT"],
+    "entrypoint": "plugin.py"
+}

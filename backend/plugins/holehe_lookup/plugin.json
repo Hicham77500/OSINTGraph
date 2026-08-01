@@ -1,0 +1,14 @@
+{
+    "id": "holehe_lookup",
+    "name": "Holehe — Email Accounts",
+    "version": "1.0.0",
+    "author": "OSINTGraph Team",
+    "category": "Social",
+    "license": "MIT",
+    "description": "Trouve les comptes enregistrés avec cet e-mail sur 120+ services (holehe).",
+    "permissions": ["internet"],
+    "providers": [],
+    "input_types": ["EMAIL"],
+    "output_types": ["SOCIAL_ACCOUNT", "USERNAME"],
+    "entrypoint": "plugin.py"
+}

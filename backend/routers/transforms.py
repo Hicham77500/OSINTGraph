@@ -1,6 +1,7 @@
 """
 OsintGraph — Plugins Router
 """
+import asyncio
 import logging
 from fastapi import APIRouter, Request
 from pydantic import BaseModel
@@ -58,11 +59,25 @@ async def run_transform(req: TransformRequest, request: Request):
         return {"ok": False, "error": f"Plugin '{req.transform}' not found"}
 
     sio = request.app.state.sio
+    event_base = {
+        "transform": req.transform,
+        "node_id": req.node_id,
+    }
+
+    async def emit_log(message: str, current: int = 0, total: int = 0) -> None:
+        payload = {**event_base, "message": message}
+        if current or total:
+            payload["current"] = current
+            payload["total"] = total
+            await sio.emit("transform:progress", payload)
+        await sio.emit("transform:log", payload)
+
+    def progress_callback(current: int, total: int, message: str) -> None:
+        asyncio.get_running_loop().create_task(emit_log(message, current, total))
 
     # Emit start event
     await sio.emit("transform:start", {
-        "transform": req.transform,
-        "node_id": req.node_id,
+        **event_base,
         "value": req.value,
     })
 
@@ -71,7 +86,8 @@ async def run_transform(req: TransformRequest, request: Request):
             entity=DummyEntity(req.value),  # Simple entity wrapper
             api_manager=api_manager,
             logger=logger,
-            config=req.options
+            config=req.options,
+            progress_callback=progress_callback,
         )
         
         result = await plugin.run(context)

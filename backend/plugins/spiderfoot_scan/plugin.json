@@ -1,0 +1,14 @@
+{
+    "id": "spiderfoot_scan",
+    "name": "SpiderFoot — OSINT Scan",
+    "version": "1.0.0",
+    "author": "OSINTGraph Team",
+    "category": "Recon",
+    "license": "MIT",
+    "description": "Scan OSINT multi-sources via SpiderFoot (200+ modules, mode passif par défaut).",
+    "permissions": ["internet"],
+    "providers": ["spiderfoot"],
+    "input_types": ["DOMAIN", "IP", "EMAIL", "USERNAME", "PHONE", "PERSON"],
+    "output_types": ["IP", "DOMAIN", "EMAIL", "USERNAME", "ORGANIZATION", "SOCIAL_ACCOUNT", "LOCATION"],
+    "entrypoint": "plugin.py"
+}

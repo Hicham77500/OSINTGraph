@@ -85,6 +85,8 @@ const fr: Translations = {
     noTransforms: 'Aucune transformation disponible pour {{type}}',
     run:          'Lancer',
     starting:     '[▶] {{name}} — démarrage…',
+    started:      '[▶] {{name}} — en cours…',
+    progress:     '{{pct}}% terminé',
     done:         '✓ {{count}} résultat(s) trouvé(s)',
     error:        '✗ Erreur : {{message}}',
     catalog: {
@@ -94,6 +96,8 @@ const fr: Translations = {
       shodan_lookup: { display_name: 'Lookup Shodan',   description: "Découvrir les ports et services ouverts d'une IP via Shodan" },
       sherlock_lookup: { display_name: 'Sherlock — Profils sociaux', description: 'Rechercher le pseudo sur 378+ réseaux sociaux (sherlock-project)' },
       holehe_lookup:   { display_name: 'Holehe — Comptes e-mail',   description: "Trouver les comptes enregistrés avec cet e-mail (120+ services)" },
+      maigret_lookup:  { display_name: 'Maigret — Dossier pseudo', description: 'Dossier complet sur un pseudo via 3000+ sites (maigret)' },
+      spiderfoot_scan: { display_name: 'SpiderFoot — Scan OSINT',    description: 'Recon passif multi-sources via SpiderFoot (200+ modules)' },
     },
   },
 

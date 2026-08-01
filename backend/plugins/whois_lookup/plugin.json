@@ -1,0 +1,14 @@
+{
+    "id": "whois_lookup",
+    "name": "Whois Lookup",
+    "version": "1.0.0",
+    "author": "OSINTGraph Team",
+    "category": "Network",
+    "license": "MIT",
+    "description": "Récupère les données d'enregistrement Whois d'un domaine.",
+    "permissions": ["internet"],
+    "providers": [],
+    "input_types": ["DOMAIN"],
+    "output_types": ["PERSON", "ORGANIZATION", "EMAIL"],
+    "entrypoint": "plugin.py"
+}

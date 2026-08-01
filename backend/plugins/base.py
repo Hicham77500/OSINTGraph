@@ -21,6 +21,11 @@ class PluginContext:
     def log(self, msg: str, level: int = logging.INFO):
         self.logger.log(level, msg)
 
+    def report_progress(self, message: str, current: int = 0, total: int = 0) -> None:
+        """Stream a progress/log line to the transform WebSocket channel."""
+        if self.progress_callback:
+            self.progress_callback(current, total, message)
+
 
 class TransformPlugin:
     """
