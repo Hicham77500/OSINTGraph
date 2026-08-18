@@ -1,0 +1,14 @@
+{
+    "id": "death_search",
+    "name": "Recherche décès INSEE",
+    "version": "1.0.0",
+    "author": "OSINTGraph Team",
+    "category": "Person",
+    "license": "MIT",
+    "description": "Recherche dans le fichier public des personnes décédées en France (INSEE / data.gouv.fr, depuis 1970).",
+    "permissions": ["internet"],
+    "providers": ["insee", "data.gouv.fr"],
+    "input_types": ["PERSON"],
+    "output_types": ["PERSON", "LOCATION"],
+    "entrypoint": "plugin.py"
+}

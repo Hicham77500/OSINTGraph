@@ -22,6 +22,7 @@ holehe>=1.6.1
 
 # Entity types
 phonenumbers>=8.13.0
+duckdb>=1.1.0
 
 # Streamlit UI
 streamlit>=1.40.0

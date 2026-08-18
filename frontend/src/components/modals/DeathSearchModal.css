@@ -1,0 +1,215 @@
+.death-search-modal {
+  max-width: 720px;
+  width: min(96vw, 720px);
+}
+
+.death-search-intro {
+  color: var(--text-muted, #94a3b8);
+  font-size: 0.9rem;
+  margin: 0 0 1rem;
+  line-height: 1.5;
+}
+
+.death-search-privacy {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  color: #86efac;
+  font-size: 0.82rem;
+  margin-bottom: 1rem;
+}
+
+.death-search-privacy-backend {
+  background: rgba(234, 179, 8, 0.1);
+  border-color: rgba(234, 179, 8, 0.25);
+  color: #fde68a;
+}
+
+.death-search-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.death-search-form .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.death-search-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  color: var(--text-muted, #94a3b8);
+}
+
+.death-search-form input {
+  padding: 0.5rem 0.65rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.2);
+  color: inherit;
+  font-size: 0.9rem;
+}
+
+.death-search-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.death-search-empty {
+  color: var(--text-muted, #94a3b8);
+  font-size: 0.9rem;
+}
+
+.death-search-count {
+  font-size: 0.85rem;
+  color: var(--text-muted, #94a3b8);
+  margin: 0 0 0.5rem;
+}
+
+.death-search-table-wrap {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.death-search-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.death-search-table th,
+.death-search-table td {
+  padding: 0.55rem 0.65rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.death-search-table th {
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--text-muted, #94a3b8);
+  font-weight: 500;
+}
+
+.death-search-prenoms {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--text-muted, #94a3b8);
+  margin-top: 0.15rem;
+}
+
+.death-search-disclaimer {
+  margin-top: 0.75rem;
+  font-size: 0.78rem;
+  color: var(--text-muted, #94a3b8);
+  line-height: 1.45;
+}
+
+.death-search-log {
+  margin-top: 0.75rem;
+  font-size: 0.78rem;
+}
+
+.death-search-log pre {
+  margin-top: 0.35rem;
+  padding: 0.5rem;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 6px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  color: var(--text-muted, #94a3b8);
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 560px) {
+  .death-search-form .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.act-request-cell {
+  min-width: 11rem;
+}
+
+.act-request-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.act-request-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.72rem;
+  padding: 0.25rem 0.4rem;
+  white-space: nowrap;
+}
+
+.act-request-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.act-request-link {
+  text-decoration: none;
+}
+
+.act-request-confirm {
+  margin-top: 0.5rem;
+  padding: 0.6rem;
+  border-radius: 6px;
+  background: rgba(234, 179, 8, 0.08);
+  border: 1px solid rgba(234, 179, 8, 0.2);
+}
+
+.act-request-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: #fde68a;
+  margin: 0 0 0.5rem;
+}
+
+.act-request-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+}
+
+.act-request-confirm-actions {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.btn-xs {
+  font-size: 0.75rem;
+  padding: 0.3rem 0.55rem;
+}

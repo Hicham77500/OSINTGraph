@@ -20,6 +20,7 @@ const TRANSFORM_EDGE_TYPE: Record<string, EdgeType> = {
   maigret_lookup:   'owns',
   spiderfoot_scan:  'linked_to',
   sherlock_lookup:  'owns',
+  death_search:     'linked_to',
 }
 
 function resolveEdgeType(transformName: string, outputType: string): EdgeType {

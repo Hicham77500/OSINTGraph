@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import {
-  ArrowLeft, User, Share2, GitBranch, Clock, FileSearch, Sparkles,
+  ArrowLeft, User, Share2, GitBranch, Clock, FileSearch, Sparkles, Search,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { apiClient } from '../services/api'
+import { DeathSearchModal } from '../components/modals/DeathSearchModal'
 import type { AIAnalysis, ContextReadiness, Entity, Observation, Relation } from '../types/domain'
 import './PersonViewPage.css'
 
@@ -19,6 +20,7 @@ export const PersonViewPage: React.FC = () => {
   const [readiness, setReadiness] = useState<ContextReadiness | null>(null)
   const [analysis, setAnalysis] = useState<AIAnalysis | null>(null)
   const [tab, setTab] = useState<Tab>('overview')
+  const [deathSearchOpen, setDeathSearchOpen] = useState(false)
 
   useEffect(() => {
     if (!entityId) return
@@ -100,6 +102,9 @@ export const PersonViewPage: React.FC = () => {
             <p>{t('personView.overview.identity', { label: entity.label, type: entity.entity_type })}</p>
             <p>{t('personView.overview.properties', { props: JSON.stringify(entity.properties) })}</p>
             <p>{t('personView.overview.keyObservations', { count: observations.length })}</p>
+            <button className="btn btn-primary" onClick={() => setDeathSearchOpen(true)}>
+              <Search size={14} /> {t('personView.overview.deathSearch')}
+            </button>
           </div>
         )}
 
@@ -200,6 +205,13 @@ export const PersonViewPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {deathSearchOpen && (
+        <DeathSearchModal
+          onClose={() => setDeathSearchOpen(false)}
+          initialLastName={entity.label}
+        />
+      )}
     </div>
   )
 }

@@ -20,6 +20,7 @@ EXPECTED_PLUGINS = {
     "whois_lookup",
     "maigret_lookup",
     "spiderfoot_scan",
+    "death_search",
 }
 
 
