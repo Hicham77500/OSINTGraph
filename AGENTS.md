@@ -91,6 +91,7 @@ Une hypothèse IA n'est **jamais** un fait. Toujours conserver provenance et niv
 | Fichier | Rôle |
 |---------|------|
 | `docs/PROJECT_CONTEXT.md` | UX investigation, carnets, routing map |
+| `docs/DEATH_SEARCH.md` | Recherche décès INSEE, config Parquet, demande d'actes |
 | `.cursor/rules/osintgraph-core.mdc` | Stack, architecture, conventions |
 | `.cursor/rules/investigation-ethics.mdc` | Limites légales et éthiques |
 | `.cursor/rules/backend-python.mdc` | Conventions backend |
@@ -108,9 +109,10 @@ Une hypothèse IA n'est **jamais** un fait. Toujours conserver provenance et niv
 | `/dossier/:id` | Dossier | Grille des carnets |
 | `/dossier/:id/carnet/:cid` | CarnetViewPage | Liste / chronologie / notes selon `notebook_type` |
 | `/dossier/:id/graph` | CarnetGraphPage | Graphe legacy Cytoscape |
-| `/dossier/:id/person/:eid` | PersonViewPage | Fiche personne |
+| `/dossier/:id/person/:eid` | PersonViewPage | Fiche personne (+ recherche décès INSEE) |
 
-Détails : [`docs/PROJECT_CONTEXT.md`](docs/PROJECT_CONTEXT.md).
+Détails : [`docs/PROJECT_CONTEXT.md`](docs/PROJECT_CONTEXT.md).  
+Recherche décès : [`docs/DEATH_SEARCH.md`](docs/DEATH_SEARCH.md).
 
 ## Tests
 

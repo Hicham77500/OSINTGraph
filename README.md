@@ -40,6 +40,7 @@
 | **Provenance** | Source, observation, evidence, confiance (CONFIRMED → CONTRADICTED) |
 | **Notes** | Saisie datée, édition et suppression dans les carnets |
 | **Import / Export** | Transfert de données (JSON/CSV) depuis/vers le graphe |
+| **Recherche décès INSEE** | Fichier public des décès en France (depuis 1970) — graphe, fiche personne, mode local optionnel |
 | **Auto-save** | Sauvegarde transparente et continue de l'investigation |
 | **Corbeille** | Dossiers supprimés — restauration ou suppression définitive |
 
@@ -136,6 +137,23 @@ Domain model (v2) extensible.
 | IP Geolocation | IP | Location, Organization | - |
 | Phone Lookup | Phone | Location, Organization | - |
 | Holehe Lookup | Email | Username | - |
+| Maigret Lookup | Username | Social Account | - |
+| SpiderFoot Scan | Domain, IP, Email, Username, Phone, Person | Multi-types | spiderfoot |
+| **Death Search (INSEE)** | Person | Person, Location | data.gouv.fr / DuckDB |
+
+Guide détaillé recherche décès : [`docs/DEATH_SEARCH.md`](docs/DEATH_SEARCH.md)
+
+### Configuration recherche décès (optionnel)
+
+```bash
+# Backend — fichier Parquet local ou dossier parts/ partitionné
+DEATH_RECORDS_PATH=/chemin/vers/parts
+
+# Frontend — recherche 100 % locale (DuckDB-WASM, voir arbre-local)
+VITE_DEATH_RECORDS_BASE_URL=https://pub-xxxxx.r2.dev/parts
+```
+
+Voir [`docs/DEATH_SEARCH.md`](docs/DEATH_SEARCH.md) pour le pipeline de préparation des données.
 
 ## Agent context
 

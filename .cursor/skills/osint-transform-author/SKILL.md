@@ -1,24 +1,28 @@
 ---
 name: osint-transform-author
-description: Author OSINT transform plugins for OSINTGraph backend with mandatory provenance in return payload. Use when adding or modifying transforms in backend/transforms/.
+description: Author OSINT transform plugins for OSINTGraph backend with mandatory provenance in return payload. Use when adding or modifying transforms in backend/plugins/.
 ---
 
 # OSINT Transform Author
 
 ## When to use
 
-Adding or modifying a transform in `backend/transforms/`.
+Adding or modifying a transform plugin in `backend/plugins/`.
 
 ## Reference
 
-Read `backend/transforms/ADDING_TRANSFORMS.md` and `backend/transforms/base.py`.
+- `backend/plugins/base.py` — `TransformPlugin`, `PluginContext`
+- `backend/plugins/death_search/` — example with DuckDB + observations
+- `backend/transforms/ADDING_TRANSFORMS.md` — guide (plugins = production)
+- `docs/DEATH_SEARCH.md` — death records plugin specifics
 
 ## Steps
 
-1. Create `backend/transforms/my_transform.py`
-2. Subclass `Transform`, set `name`, `display_name`, `input_type`, `output_type`, `description`
-3. Decorate with `@register`
-4. Implement `async def run(self, value, options) -> dict`
+1. Create `backend/plugins/my_plugin/plugin.json`
+2. Create `backend/plugins/my_plugin/plugin.py`
+3. Subclass `TransformPlugin`, implement `async def run(self, context: PluginContext) -> dict`
+4. Add plugin id to `backend/tests/test_plugins.py` (`EXPECTED_PLUGINS`)
+5. Add i18n under `transforms.catalog.my_plugin` in `en.ts` / `fr.ts`
 
 ## Required return shape
 
@@ -28,27 +32,26 @@ Read `backend/transforms/ADDING_TRANSFORMS.md` and `backend/transforms/base.py`.
     "edges": [],
     "observations": [{
         "source": {
-            "platform": "dns",  # or shodan, manual, etc.
-            "collection_method": "TRANSFORM",  # MANUAL|PUBLIC_SEARCH|OFFICIAL_API|IMPORT|TRANSFORM
-            "url": None,
+            "platform": str,
+            "collection_method": "MANUAL|PUBLIC_SEARCH|OFFICIAL_API|IMPORT|TRANSFORM",
+            "url": str | None,
         },
-        "content": {"field": "ip", "value": "1.2.3.4"},
-        "confidence": 0.9,
+        "content": dict,
+        "confidence": float,
         "status": "UNVERIFIED",
     }],
-    "log": ["[MY_TRANSFORM] Step without PII"],
+    "log": ["[MY_PLUGIN] Step without PII"],
 }
 ```
 
 ## Rules
 
 - Catch errors internally; append to `log`, do not leak stack traces with user input
-- Never log emails, phones, or tokens in `log`
-- Use `asyncio.to_thread` for sync libraries
-- Add i18n entries in `frontend/src/i18n/locales/en.ts` and `fr.ts` under `transforms.catalog`
-- Do not return fake data when API key missing — return empty nodes + clear log message
-- Register compatible `input_type` with existing NodeType union or extend via domain entity types
+- Never log emails, phones, names, or tokens in `log`
+- Use `asyncio.to_thread` for sync OSINT libs (DuckDB, subprocess, etc.)
+- Do not return fake data when config missing — empty nodes + clear log message
+- Register compatible `input_types` with domain entity types in manifest
 
 ## Test
 
-Add pytest in `backend/tests/test_transforms.py` asserting registry includes new transform.
+Add pytest in `backend/tests/` for plugin logic; ensure `test_plugins.py` includes the new id.

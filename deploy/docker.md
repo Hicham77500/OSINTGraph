@@ -70,6 +70,9 @@ docker compose --profile spiderfoot up --build
 | `CORS_ORIGINS` | Origines autorisées pour CORS et Socket.IO |
 | `SHODAN_API_KEY` | Clé Shodan pour `shodan_lookup` |
 | `HIBP_API_KEY` | Clé HIBP pour `hibp_lookup` |
+| `DEATH_RECORDS_PATH` | Chemin Parquet local ou dossier `parts/` pour `death_search` (backend) |
+| `DEATH_RECORDS_BASE_URL` | URL CDN Parquet partitionné (backend, HTTP Range) |
+| `VITE_DEATH_RECORDS_BASE_URL` | Idem pour recherche DuckDB-WASM côté navigateur |
 | `OSINTGRAPH_AUTH_DISABLED` | `true` en local ; `false` en production si auth activée |
 | `OSINTGRAPH_SESSION_SECRET` | Secret de session — **à changer en production** |
 
@@ -109,6 +112,16 @@ votre-domaine.fr {
 | Transforms sans log live | Vérifier la connexion WS dans les DevTools (onglet Network → WS) |
 | SpiderFoot injoignable | Lancer avec `--profile spiderfoot` ; tester `curl http://localhost:5001/scanlist` |
 | Maigret / Holehe absents | Reconstruire l'image API : `docker compose build --no-cache api` |
+| Recherche décès : données non configurées | Monter un volume Parquet et définir `DEATH_RECORDS_PATH` — voir [`docs/DEATH_SEARCH.md`](../docs/DEATH_SEARCH.md) |
+
+## Recherche décès INSEE
+
+Le plugin `death_search` nécessite les fichiers Parquet INSEE (non inclus dans l'image). Options :
+
+1. **Volume Docker** : monter `parts/` et `DEATH_RECORDS_PATH=/data/parts`
+2. **CDN** : `DEATH_RECORDS_BASE_URL` ou `VITE_DEATH_RECORDS_BASE_URL` (mode navigateur)
+
+Guide complet : [`docs/DEATH_SEARCH.md`](../docs/DEATH_SEARCH.md)
 
 ## Fichiers créés
 

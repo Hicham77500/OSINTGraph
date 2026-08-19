@@ -39,7 +39,7 @@ The **Graphe complet** card is visually primary (hero, distinct `GitGraph` icon)
 | **Dossier (hub)** | Orienting within an investigation; graph hero + carnet axes |
 | **Full graph** | Primary relational workspace — transforms, linking, exploration |
 | **Carnet view** | Working within one axis — browse persons, accounts, timeline, notes |
-| **Person view** | Deep dive on a single person: identities, social, relations, evidence, AI |
+| **Person view** | Deep dive on a single person: identities, social, relations, evidence, AI, **death records search (INSEE)** |
 
 The carnet grid is **kept** as secondary navigation under investigation axes. Each default dossier gets typed carnets (Personnes, Réseaux sociaux, etc.). Breadcrumbs on carnet views: `Mes dossiers > Dossier > Carnet`.
 
@@ -81,6 +81,7 @@ Entity Types are now dynamic and managed by the backend `EntityTypeRegistry`. De
 - `fetchEntities(dossierId, carnetId)` — entities scoped to carnet
 - Observations for timeline/notes: `GET /api/v1/entities/:id/observations` per entity in carnet
 - Transforms (Plugins): `GET /transforms` returns a dynamic list of available plugins parsed from `plugin.json` manifests.
+- Death records: `POST /transforms/run` with `transform: death_search`, or modal UI on Person view — see [`DEATH_SEARCH.md`](DEATH_SEARCH.md).
 
 ## UI conventions
 

@@ -1,76 +1,115 @@
-# Ajouter un nouveau Transform
+# Ajouter un nouveau Transform (plugin)
 
-## Pattern minimal (copier-coller)
+> **Production** : les transforms actifs sont des **plugins** dans `backend/plugins/<id>/` (`plugin.json` + `plugin.py`).  
+> Le dossier `backend/transforms/` est legacy (tests uniquement). Référence : plugin `death_search`.
+
+## Structure plugin (recommandé)
+
+```
+backend/plugins/mon_plugin/
+  plugin.json    # manifest (input_types, output_types, …)
+  plugin.py      # class MonPlugin(TransformPlugin)
+```
+
+Exemple de manifest :
+
+```json
+{
+  "id": "mon_plugin",
+  "name": "Mon Plugin",
+  "category": "Network",
+  "description": "Ce que ça fait",
+  "input_types": ["DOMAIN"],
+  "output_types": ["IP"],
+  "entrypoint": "plugin.py"
+}
+```
+
+## Pattern minimal (`plugin.py`)
 
 ```python
-# backend/transforms/mon_outil.py
-"""Mon Outil — Description courte"""
+from plugins.base import PluginContext, TransformPlugin
+from plugins.helpers import build_observation
+
+class MonPlugin(TransformPlugin):
+    async def run(self, context: PluginContext) -> dict:
+        value = context.entity.label.strip()
+        log = [f"[MonPlugin] Starting…"]
+        nodes, edges, observations = [], [], []
+
+        # --- logique ---
+        nodes.append({
+            "type": "IP",
+            "label": "1.2.3.4",
+            "properties": {"source": "mon_plugin"},
+        })
+        observations.append(build_observation(
+            "mon_plugin",
+            {"field": "ip", "value": "1.2.3.4"},
+            collection_method="PUBLIC_SEARCH",
+            confidence=0.7,
+            status="UNVERIFIED",
+        ))
+        log.append("[MonPlugin] Done")
+
+        return {"nodes": nodes, "edges": edges, "observations": observations, "log": log}
+```
+
+Enregistrement : automatique via `PluginRegistry` au démarrage. Ajouter l'id dans `backend/tests/test_plugins.py` (`EXPECTED_PLUGINS`).
+
+---
+
+## Legacy (`backend/transforms/` — ne pas étendre)
+
+```python
+# backend/transforms/mon_outil.py — OBSOLÈTE pour l'API /transforms
 from transforms.base import Transform, register
 
-@register                          # ← obligatoire : auto-découverte
+@register
 class MonOutil(Transform):
-    name         = "mon_outil"     # ← clé unique, snake_case
-    display_name = "Mon Outil"     # ← affiché dans le panel
-    input_type   = "domain"        # ← type de nœud accepté en entrée
-                                   #   valeurs: person | email | domain | ip | username | organization
-    output_type  = "ip"            # ← type de nœud produit en sortie
-    description  = "Ce que ça fait"
-
-    async def run(self, value: str, options: dict = {}) -> dict:
-        nodes = []
-        edges = []
-        log   = [f"[MonOutil] Démarrage pour {value}..."]
-
-        # --- ta logique ici ---
-        nodes.append({
-            "type":  "ip",               # NodeType
-            "label": "1.2.3.4",          # valeur affichée sur le canvas
-            "properties": {              # métadonnées libres
-                "source": "mon_outil",
-                "detail": "...",
-            },
-        })
-        log.append("[MonOutil] Done — 1 résultat")
-        # ----------------------
-
-        return {"nodes": nodes, "edges": edges, "log": log}
+    ...
 ```
-
-Crée le fichier → sauvegarde → le backend l'auto-découvre au prochain démarrage. **Aucun autre fichier à modifier** (sauf les traductions ci-dessous).
 
 ---
 
-## Ajouter les traductions
+## Traductions i18n
 
-Dans `frontend/src/i18n/locales/en.ts` et `fr.ts`, dans le bloc `transforms.catalog` :
+Dans `frontend/src/i18n/locales/en.ts` et `fr.ts`, bloc `transforms.catalog` :
 
 ```ts
-// en.ts
-mon_outil: { display_name: 'My Tool', description: 'What it does' },
-
-// fr.ts
-mon_outil: { display_name: 'Mon Outil', description: 'Ce que ça fait' },
+mon_plugin: { display_name: 'My Plugin', description: 'What it does' },
 ```
 
----
-
-## Exemples de librairies OSINT à intégrer
-
-| Librairie            | pip install              | input_type    | Ce qu'elle retourne                         |
-|----------------------|--------------------------|---------------|---------------------------------------------|
-| `maigret`            | `maigret`                | `username`    | Profils + infos biographiques               |
-| `theHarvester`       | `theHarvester`           | `domain`      | Sous-domaines, emails, IPs, employés        |
-| `ipinfo`             | `ipinfo`                 | `ip`          | Géolocalisation, ASN, organisation          |
-| `phonenumbers`       | `phonenumbers`           | `username`    | Validation + portabilité d'un numéro        |
-| `socialscan`         | `socialscan`             | `email`/`username` | Disponibilité sur réseaux sociaux     |
-| `ghunt` (cli)        | subprocess               | `email`       | Profil Google complet                       |
+Optionnel : `TransformPanel.tsx` → `TRANSFORM_EDGE_TYPE.mon_plugin`.
 
 ---
 
-## Librairies avec API key (à configurer dans `.env`)
+## Exemples de plugins existants
+
+| Plugin | Input | Fournisseur |
+|--------|-------|-------------|
+| `dns_lookup` | DOMAIN | - |
+| `sherlock_lookup` | USERNAME | sherlock-project |
+| `maigret_lookup` | USERNAME | maigret |
+| `spiderfoot_scan` | PERSON, DOMAIN, … | SpiderFoot |
+| `death_search` | PERSON | INSEE / data.gouv.fr — voir [`docs/DEATH_SEARCH.md`](../../docs/DEATH_SEARCH.md) |
+
+---
+
+## Librairies avec API key (`.env`)
 
 ```
 SHODAN_API_KEY=xxx
 HIBP_API_KEY=xxx
+DEATH_RECORDS_PATH=/chemin/vers/parts
 ```
-Puis dans ton transform : `import os; key = os.getenv("SHODAN_API_KEY")`
+
+Puis dans le plugin : `os.getenv("SHODAN_API_KEY")` ou `context.config`.
+
+---
+
+## Tests
+
+```bash
+cd backend && PYTHONPATH=. pytest tests/test_plugins.py tests/test_<plugin>.py -q
+```
