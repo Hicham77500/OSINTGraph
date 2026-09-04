@@ -8,6 +8,15 @@
 
 **Nouveau ?** → [`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md) · **Contribuer / fork** → [`CONTRIBUTING.md`](CONTRIBUTING.md)
 
+## Mise à jour — Septembre 2026
+
+- 🔍 **Recherche décès INSEE** — plugin `death_search`, modal fiche personne, demande d'actes encadrée ([`docs/DEATH_SEARCH.md`](docs/DEATH_SEARCH.md))
+- 🔌 **10 plugins OSINT** — Sherlock, Maigret, Holehe, Shodan, DNS, WHOIS, SpiderFoot, etc. avec streaming WebSocket en temps réel
+- 🐳 **Docker production** — déploiement React + API via `docker compose` ([`deploy/docker.md`](deploy/docker.md))
+- ☁️ **UI Streamlit cloud** — accès distant simplifié + onboarding et bouton « Charger la démo » ([`deploy/streamlit-cloud.md`](deploy/streamlit-cloud.md))
+- 📚 **Documentation revue** — guide [`GETTING_STARTED`](docs/GETTING_STARTED.md), workflow fork [`CONTRIBUTING.md`](CONTRIBUTING.md), captures README restaurées
+- ⚙️ **Setup simplifié** — scripts `setup.ps1` / `setup.sh`, `npm run setup`, arrêt dev cross-platform (`dev:stop`)
+
 ## Aperçu / Preview
 
 > *Les captures ci-dessous montrent l'interface **Matte & Vintage** (React) avec sauvegarde automatique.*
