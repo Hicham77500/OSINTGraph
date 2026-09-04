@@ -8,6 +8,22 @@
 
 **Nouveau ?** → [`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md) · **Contribuer / fork** → [`CONTRIBUTING.md`](CONTRIBUTING.md)
 
+## Aperçu / Preview
+
+> *Les captures ci-dessous montrent l'interface **Matte & Vintage** (React) avec sauvegarde automatique.*
+
+### Liste des dossiers (statistiques)
+
+![Liste des dossiers](docs/screenshots/dossiers-list.png)
+
+### Hub d'investigation (carnets)
+
+![Hub d'investigation](docs/screenshots/dossier-hub.png)
+
+### Graphe & transformations
+
+![Analyse graphe — transform Sherlock](docs/screenshots/sherlock-transform.png)
+
 ## Modes d'utilisation
 
 | Mode | Commande | Interface |
