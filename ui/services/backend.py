@@ -4,6 +4,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
+import subprocess
 import sys
 from pathlib import Path
 from typing import Any
@@ -247,3 +248,29 @@ def get_merge_suggestions(dossier_id: str):
     ensure_backend()
     run_async(entity_resolution.find_duplicates(dossier_id))
     return run_async(entity_resolution.list_suggestions(dossier_id))
+
+
+def seed_demo_dossier(force: bool = False) -> tuple[str, bool]:
+    """Exécute le script de seed démo. Retourne (message, succès)."""
+    ensure_backend()
+    script = _BACKEND / "scripts" / "seed_test_dossier.py"
+    if not script.exists():
+        return "Script de démo introuvable.", False
+
+    cmd = [sys.executable, str(script)]
+    if force:
+        cmd.append("--force")
+
+    result = subprocess.run(
+        cmd,
+        cwd=str(_BACKEND),
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    output = (result.stdout or result.stderr or "").strip()
+    if result.returncode == 0:
+        if "skipped" in output.lower():
+            return "Dossier TEST déjà présent — ouvrez-le dans la liste.", True
+        return output.split("\n")[0] or "Dossier de démo chargé.", True
+    return output or "Échec du chargement de la démo.", False

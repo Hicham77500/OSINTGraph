@@ -19,7 +19,9 @@ OSINT investigation platform with relational graph analysis. Works only on legal
 ## Déploiement
 
 - **Local** : `npm run dev` → React :5173 + API :8000
+- **Docker** : `docker compose up --build` → React :8080 (voir `deploy/docker.md`)
 - **Cloud** : Streamlit Cloud → `streamlit_app.py` (voir `deploy/streamlit-cloud.md`)
+- **Setup** : `scripts/setup.ps1` (Windows) / `scripts/setup.sh` (Unix)
 - **Ne pas supprimer** `frontend/` lors d'un déploiement Streamlit
 
 ## Domain hierarchy

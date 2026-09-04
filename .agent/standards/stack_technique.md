@@ -27,7 +27,7 @@
 - Entrypoint dev : `main:asgi_app` (Socket.IO + FastAPI)
 - Socket.IO via `python-socketio`
 - SQLite : blob legacy + schéma relationnel (`domain_client`)
-- Transforms : plugins dans `transforms/`
+- Transforms : plugins dans `backend/plugins/` (`plugin.json` + `plugin.py`) ; `transforms/` = legacy
 
 ### Planifié (non implémenté)
 

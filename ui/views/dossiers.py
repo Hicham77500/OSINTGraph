@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import streamlit as st
 
+from ui.components.onboarding import render_first_run_panel
 from ui.services import backend as api
 
 
@@ -10,15 +11,13 @@ def render_dossiers() -> None:
     st.title("OSINTGraph")
     st.caption("Investigations OSINT — sources ouvertes et données analyste uniquement")
 
-    col1, col2 = st.columns([3, 1])
-    with col2:
-        if st.button("🗑️ Corbeille", use_container_width=True):
-            st.session_state.page = "trash"
-            st.rerun()
-
     dossiers = api.list_dossiers()
 
-    with st.expander("➕ Nouveau dossier", expanded=False):
+    if not dossiers:
+        render_first_run_panel(on_seed_demo=api.seed_demo_dossier)
+        st.divider()
+
+    with st.expander("➕ Nouveau dossier", expanded=not dossiers):
         name = st.text_input("Nom du dossier", key="new_dossier_name")
         desc = st.text_area("Description (optionnel)", key="new_dossier_desc")
         if st.button("Créer", type="primary"):
@@ -29,8 +28,8 @@ def render_dossiers() -> None:
             else:
                 st.warning("Le nom est requis")
 
+    dossiers = api.list_dossiers()
     if not dossiers:
-        st.info("Aucun dossier. Créez votre première investigation ci-dessus.")
         return
 
     for d in dossiers:

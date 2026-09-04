@@ -39,8 +39,15 @@ backend/
   middleware/           auth, rate_limit
 
 deploy/
+  docker.md             Déploiement Docker (React + API + SpiderFoot optionnel)
   streamlit-cloud.md    Guide déploiement cloud
+docs/
+  GETTING_STARTED.md    Guide utilisateur (modes, setup, fork)
+  PROJECT_CONTEXT.md    UX investigation, carnets, routing
+  DEATH_SEARCH.md       Recherche décès INSEE
+CONTRIBUTING.md         Fork workflow, conventions PR
 requirements.txt        Dépendances Streamlit Cloud (racine)
+scripts/                setup.ps1 / setup.sh
 ```
 
 ## Hiérarchie métier
@@ -129,14 +136,20 @@ cd frontend && npm test
 | Mode | Commande | UI |
 |------|----------|-----|
 | **Local (complet)** | `npm run dev` | React Matte & Vintage + Cytoscape |
+| **Docker (prod)** | `docker compose up --build` | React nginx :8080 + API :8000 |
 | **Cloud** | Streamlit Cloud → `streamlit_app.py` | Streamlit (`ui/`) |
 | **Preview cloud local** | `npm run dev:streamlit` | Streamlit |
 
-Guide : [`deploy/streamlit-cloud.md`](deploy/streamlit-cloud.md)
+Guides : [`deploy/docker.md`](deploy/docker.md) · [`deploy/streamlit-cloud.md`](deploy/streamlit-cloud.md) · [`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md)
+
+## Fork / contribution
+
+Les contributeurs travaillent depuis un **fork GitHub** — voir [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## Démarrage dev
 
 ```bash
+./scripts/setup.sh       # ou .\scripts\setup.ps1 (Windows)
 npm run dev              # React + API (UI complète)
 npm run dev:streamlit    # Preview déploiement Streamlit
 ```

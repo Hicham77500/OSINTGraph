@@ -19,6 +19,7 @@ pytest-asyncio>=0.24.0
 # OSINT community tools
 sherlock-project>=0.16.0
 holehe>=1.6.1
+maigret>=0.4.4
 
 # Entity types
 phonenumbers>=8.13.0
