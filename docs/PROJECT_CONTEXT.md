@@ -89,14 +89,27 @@ Entity Types are now dynamic and managed by the backend `EntityTypeRegistry`. De
 - i18n keys under `dossier.*` and `carnetView.*` in `en.ts` / `fr.ts`
 - Provenance badges on entity cards: `status`, confidence %
 
-## Déploiement (juillet 2026)
+## Déploiement
 
 | Environnement | Entry | UI |
 |---------------|-------|-----|
 | **Dev local (référence)** | `npm run dev` | React + Cytoscape — http://localhost:5173 |
+| **Docker prod** | `docker compose up --build` | React nginx :8080 + API :8000 |
 | **Cloud** | Streamlit Cloud → `streamlit_app.py` | Streamlit (`ui/`) — accès distant simplifié |
 | **Preview Streamlit local** | `npm run dev:streamlit` | http://localhost:8501 |
 
-> **Important** : l'UI React (Matte & Vintage) dans `frontend/` est l'interface principale. Ne pas la supprimer lors d'un déploiement Streamlit — les deux coexistent. Voir [`deploy/streamlit-cloud.md`](../deploy/streamlit-cloud.md).
+> **Important** : l'UI React (Matte & Vintage) dans `frontend/` est l'interface principale. Ne pas la supprimer lors d'un déploiement Streamlit — les deux coexistent. Voir [`deploy/streamlit-cloud.md`](../deploy/streamlit-cloud.md) et [`deploy/docker.md`](../deploy/docker.md).
 
-Persistance SQLite : `SQLITE_PATH` (local : `data/osintgraph.db` ou `backend/osintgraph.db` ; Streamlit Cloud : éphémère par défaut).
+## UI Streamlit (cloud / preview)
+
+Navigation par `st.session_state.page` (pas d'URLs profondes). Parité partielle avec React :
+
+| Fonctionnalité | React | Streamlit |
+|----------------|-------|-----------|
+| Graphe Cytoscape | Oui | PyVis (`ui/views/graph.py`) |
+| Onboarding dossier vide | Bandeau 3 étapes | Bandeau équivalent (`ui/components/onboarding.py`) |
+| Recherche décès INSEE | Modal Person view | Non (React uniquement) |
+| Données démo | Script seed manuel | Bouton « Charger la démo » sur accueil |
+| i18n en/fr | Oui | FR par défaut |
+
+Persistance SQLite : aligner `SQLITE_PATH` entre modes — défaut Streamlit : `data/osintgraph.db` ; backend dev : `backend/osintgraph.db` si non configuré.

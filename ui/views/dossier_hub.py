@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import streamlit as st
 
+from ui.components.onboarding import render_empty_dossier_onboarding
 from ui.services import backend as api
 
 NOTEBOOK_LABELS = {
@@ -43,6 +44,15 @@ def render_dossier_hub() -> None:
     st.caption(
         f"👤 {stats.get('persons', 0)} · 🔗 {stats.get('accounts', 0)} · ↔ {stats.get('relations', 0)}"
     )
+
+    is_empty = (
+        stats.get("persons", 0) == 0
+        and stats.get("accounts", 0) == 0
+        and stats.get("relations", 0) == 0
+    )
+    if is_empty:
+        render_empty_dossier_onboarding(open_graph_key=f"onboarding_graph_{dossier_id}")
+        st.divider()
 
     col_del, col_graph = st.columns([1, 3])
     with col_del:

@@ -23,7 +23,8 @@ Voir `docs/PROJECT_CONTEXT.md` pour la carte des routes et le rôle de chaque ca
 ## 2. Backend
 
 - `routers/` — endpoints legacy (`/graph`, `/transforms`, `/workspaces`) + `/api/v1/`
-- `transforms/` — plugins OSINT (`@register`, auto-discovery)
+- `plugins/` — transforms OSINT (production, `plugin.json` + auto-discovery)
+- `transforms/` — legacy (`@register`), migration vers `plugins/`
 - `connectors/` — PlatformConnector *(extensible)*
 - `db/` — `sqlite_client` (blob legacy) + `domain_client` (relationnel)
 - `services/` — entity_resolution, context_readiness, audit
@@ -68,9 +69,10 @@ Frontend peut s'abonner via `services/websocket.ts`.
 | Mode | Commande / cible | UI |
 |------|------------------|-----|
 | Dev local | `npm run dev` | React + Cytoscape (référence) |
+| Docker prod | `docker compose up --build` | React nginx :8080 + API :8000 |
 | Cloud | Streamlit Community Cloud → `streamlit_app.py` | Streamlit (`ui/`) |
 | Preview cloud | `npm run dev:streamlit` | Streamlit local |
 
-- Guide : `deploy/streamlit-cloud.md`
-- **Remplacé (juillet 2026)** : stack Docker/NAS (`docker-compose.yml`, nginx) → Streamlit Cloud
-- L'UI React dans `frontend/` reste la référence visuelle ; Streamlit est un accès cloud complémentaire
+- Guides : `deploy/docker.md`, `deploy/streamlit-cloud.md`, `docs/GETTING_STARTED.md`
+- Docker et Streamlit Cloud coexistent : Docker pour React en production ; Streamlit pour accès cloud léger
+- L'UI React dans `frontend/` reste la référence visuelle complète
