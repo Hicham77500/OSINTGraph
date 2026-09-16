@@ -432,7 +432,7 @@ export const CarnetViewPage: React.FC = () => {
   }
 
   return (
-    <div className="workspace-page">
+    <div className="workspace-page omarchy-shell">
       <nav className="breadcrumb" aria-label="Breadcrumb">
         <Link to="/">{t('carnetView.breadcrumbDossiers')}</Link>
         <ChevronRight size={14} className="breadcrumb-sep" />

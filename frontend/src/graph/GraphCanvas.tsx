@@ -80,15 +80,15 @@ function buildCytoscapeStyle(): cytoscape.StylesheetStyle[] {
       selector: 'node',
       style: {
         shape: 'ellipse',
-        width:  64,
-        height: 64,
+        width:  58,
+        height: 58,
 
         // Colored bubble (entity-type color via data attribute)
         'background-color':   'data(bgColor)',
-        'background-opacity': 0.13,
-        'border-width':       1.5,
+        'background-opacity': 0.22,
+        'border-width':       2,
         'border-color':       'data(bgColor)',
-        'border-opacity':     0.45,
+        'border-opacity':     0.75,
 
         // Icon centered inside the bubble
         'background-image':    'data(iconImage)',
@@ -101,13 +101,13 @@ function buildCytoscapeStyle(): cytoscape.StylesheetStyle[] {
         content:              'data(label)',
         'text-valign':        'bottom',
         'text-halign':        'center',
-        'font-family':        'Inter, sans-serif',
-        'font-size':          '11px',
+        'font-family':        'JetBrains Mono, IBM Plex Mono, monospace',
+        'font-size':          '10px',
         'font-weight':        '500',
-        color:                '#e2e8f0',
-        'text-margin-y':      8,
-        'text-outline-width': 3,
-        'text-outline-color': '#0a0c14',
+        color:                '#d1d7dc',
+        'text-margin-y':      10,
+        'text-outline-width': 2,
+        'text-outline-color': '#0a0c0d',
         'text-max-width':     '110px',
         'text-wrap':          'ellipsis',
       } as any,
@@ -116,12 +116,13 @@ function buildCytoscapeStyle(): cytoscape.StylesheetStyle[] {
     {
       selector: 'node:selected',
       style: {
-        'background-opacity': 0.28,
+        'background-opacity': 0.32,
         'border-width':       2.5,
-        'border-opacity':     0.9,
-        'underlay-color':     'data(bgColor)',
-        'underlay-padding':   10,
-        'underlay-opacity':   0.18,
+        'border-color':       '#4caf50',
+        'border-opacity':     1,
+        'underlay-color':     '#4caf50',
+        'underlay-padding':   12,
+        'underlay-opacity':   0.2,
         'underlay-shape':     'ellipse',
       } as any,
     },
@@ -134,27 +135,41 @@ function buildCytoscapeStyle(): cytoscape.StylesheetStyle[] {
     {
       selector: 'edge',
       style: {
-        width:                 1.8,
-        'line-color':          'data(edgeColor)',
-        'target-arrow-color':  'data(edgeColor)',
+        width:                 1.4,
+        'line-color':          '#4a545c',
+        'line-opacity':        0.85,
+        'target-arrow-color':  '#4a545c',
         'target-arrow-shape':  'triangle',
-        'arrow-scale':         0.9,
+        'arrow-scale':         0.75,
         'curve-style':         'bezier',
         label:                 'data(label)',
-        'font-size':           '10px',
-        'font-family':         'Inter, sans-serif',
-        color:                 '#94a3b8',
+        'font-size':           '9px',
+        'font-family':         'JetBrains Mono, monospace',
+        color:                 '#8a939c',
         'text-outline-width':  2,
-        'text-outline-color':  '#0a0c14',
+        'text-outline-color':  '#0a0c0d',
         'text-background-opacity': 0,
       } as any,
     },
     {
       selector: 'edge:selected',
       style: {
-        'line-color':         '#6366f1',
-        'target-arrow-color': '#6366f1',
-        width: 2.8,
+        'line-color':         '#4caf50',
+        'target-arrow-color': '#4caf50',
+        'line-opacity':       1,
+        width: 2.2,
+      } as any,
+    },
+    {
+      selector: 'node.dimmed',
+      style: {
+        opacity: 0.22,
+      } as any,
+    },
+    {
+      selector: 'edge.dimmed',
+      style: {
+        opacity: 0.15,
       } as any,
     },
     // ── Connect-mode highlight ──────────────────────
@@ -443,8 +458,8 @@ export const GraphCanvas: FC<GraphCanvasProps> = ({ onContextMenu }) => {
           ))}
         </select>
         <button
-          className="btn btn-ghost"
-          style={{ fontSize: '0.75rem', padding: '0.35rem 0.5rem' }}
+          type="button"
+          className="btn btn-ghost graph-filter-btn"
           onClick={() => setFocusNodeId(selectedNodeId)}
           disabled={!selectedNodeId}
         >
@@ -452,8 +467,8 @@ export const GraphCanvas: FC<GraphCanvasProps> = ({ onContextMenu }) => {
         </button>
         {focusNodeId && (
           <button
-            className="btn btn-ghost"
-            style={{ fontSize: '0.75rem', padding: '0.35rem 0.5rem' }}
+            type="button"
+            className="btn btn-ghost graph-filter-btn"
             onClick={() => setFocusNodeId(null)}
           >
             {t('graph.clearFocus')}

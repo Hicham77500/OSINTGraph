@@ -35,15 +35,15 @@ export const DossierPage: React.FC = () => {
   }
 
   return (
-    <div className="workspace-page">
+    <div className="workspace-page omarchy-shell">
       <Link to="/" className="back-link">
         <ArrowLeft size={14} /> {t('dossier.backToDossiers')}
       </Link>
 
-      <header className="workspace-header dossier-page-header">
+      <header className="omarchy-hero omarchy-hero-compact dossier-page-header">
         <div>
-          <h1>{currentDossier?.name ?? t('dossier.title')}</h1>
-          <p className="workspace-subtitle">{t('dossier.hubSubtitle')}</p>
+          <h1 className="omarchy-display-title">{currentDossier?.name ?? t('dossier.title')}</h1>
+          <p className="omarchy-lead">{t('dossier.hubSubtitle')}</p>
         </div>
         <div className="workspace-header-actions">
           <LanguageSwitcher />

@@ -1,0 +1,14 @@
+{
+  "id": "ipinfo_lookup",
+  "name": "IPinfo Lookup",
+  "version": "1.0.0",
+  "author": "OSINTGraph Team",
+  "category": "Geospatial",
+  "license": "MIT",
+  "description": "ASN, organisation et localisation approximative via l'API IPinfo.",
+  "permissions": ["internet"],
+  "providers": ["ipinfo"],
+  "input_types": ["IP"],
+  "output_types": ["ORGANIZATION", "LOCATION"],
+  "entrypoint": "plugin.py"
+}

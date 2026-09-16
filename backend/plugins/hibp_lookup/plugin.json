@@ -1,0 +1,14 @@
+{
+  "id": "hibp_lookup",
+  "name": "HaveIBeenPwned",
+  "version": "1.0.0",
+  "author": "OSINTGraph Team",
+  "category": "Identity",
+  "license": "MIT",
+  "description": "Vérifie si un e-mail figure dans les violations publiques référencées par Have I Been Pwned (API v3).",
+  "permissions": ["internet"],
+  "providers": ["hibp"],
+  "input_types": ["EMAIL"],
+  "output_types": ["DOMAIN"],
+  "entrypoint": "plugin.py"
+}

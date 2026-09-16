@@ -10,6 +10,7 @@ from typing import Any
 from plugins.registry import PluginRegistry
 from plugins.base import PluginContext
 from services.api_manager import api_manager
+from services.transform_hub import merge_hub_with_plugins, plugin_env_keys, env_configured
 
 logger = logging.getLogger("osintgraph.router.plugins")
 router = APIRouter()
@@ -38,8 +39,10 @@ async def get_transforms():
     # Format them for the frontend
     result = []
     for m in manifests:
+        pid = m.get("id")
+        env_keys = plugin_env_keys(pid, m.get("providers") or [])
         result.append({
-            "id": m.get("id"),
+            "id": pid,
             "name": m.get("name"),
             "description": m.get("description"),
             "category": m.get("category"),
@@ -47,8 +50,18 @@ async def get_transforms():
             "output_types": m.get("output_types", []),
             "permissions": m.get("permissions", []),
             "providers": m.get("providers", []),
+            "env_keys": env_keys,
+            "requires_api_key": bool(env_keys),
+            "configured": env_configured(env_keys),
         })
     return result
+
+
+@router.get("/hub")
+async def get_transform_hub():
+    """Maltego-style partner catalog merged with installed plugins."""
+    manifests = PluginRegistry.get_all_manifests()
+    return merge_hub_with_plugins(manifests)
 
 
 @router.post("/run")

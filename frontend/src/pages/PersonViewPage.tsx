@@ -63,7 +63,7 @@ export const PersonViewPage: React.FC = () => {
   )
 
   return (
-    <div className="person-view">
+    <div className="person-view omarchy-shell">
       <Link to={`/dossier/${dossierId}`} className="back-link">
         <ArrowLeft size={14} /> {t('personView.backToDossier')}
       </Link>

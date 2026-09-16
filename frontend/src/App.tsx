@@ -12,6 +12,7 @@ import './pages/DossiersPage.css'
 export default function App() {
   return (
     <BrowserRouter>
+      <div className="app-omarchy">
       <CommandSearch />
       <Routes>
         <Route path="/" element={<DossiersPage />} />
@@ -21,6 +22,7 @@ export default function App() {
         <Route path="/dossier/:dossierId/graph" element={<CarnetGraphPage />} />
         <Route path="/dossier/:dossierId/person/:entityId" element={<PersonViewPage />} />
       </Routes>
+      </div>
     </BrowserRouter>
   )
 }

@@ -1,0 +1,290 @@
+/* ====================================================
+   Maltego-inspired investigation workspace
+   Reference: https://www.maltego.com/
+   ==================================================== */
+
+.maltego-workspace {
+  --mt-green: #4caf50;
+  --mt-green-bright: #6fdc6f;
+  --mt-green-dim: rgba(76, 175, 80, 0.14);
+  --mt-green-glow: rgba(76, 175, 80, 0.35);
+  --mt-bg: #0f1113;
+  --mt-panel: #181b1f;
+  --mt-panel-elevated: #1f2328;
+  --mt-border: rgba(255, 255, 255, 0.09);
+  --mt-text: #e2e6ea;
+  --mt-text-muted: #7a848d;
+
+  background: var(--mt-bg);
+}
+
+/* ── Investigation chrome (CarnetGraphPage) ─────────── */
+.investigation-workspace {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--mt-bg, #0f1113);
+}
+
+.investigation-workspace-body {
+  flex: 1;
+  min-height: 0;
+}
+
+.maltego-investigation-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.45rem 0.75rem;
+  background: linear-gradient(180deg, #15181c 0%, #121518 100%);
+  border-bottom: 1px solid var(--mt-border, rgba(255, 255, 255, 0.09));
+  flex-shrink: 0;
+}
+
+.maltego-investigation-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  min-width: 0;
+}
+
+.maltego-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--mt-text-muted, #7a848d);
+  text-decoration: none;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+}
+
+.maltego-back:hover {
+  color: var(--mt-green-bright, #6fdc6f);
+  border-color: var(--mt-border);
+}
+
+.maltego-investigation-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.maltego-investigation-label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mt-green, #4caf50);
+}
+
+.maltego-investigation-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--mt-text, #e2e6ea);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.maltego-investigation-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.maltego-hub-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.35rem 0.65rem;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border: 1px solid var(--mt-green-bright, #6fdc6f);
+  background: transparent;
+  color: var(--mt-green-bright, #6fdc6f);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.maltego-hub-btn:hover {
+  background: rgba(111, 220, 111, 0.1);
+}
+
+.maltego-product-tag {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mt-text-muted);
+  border: 1px solid var(--mt-border);
+  padding: 0.25rem 0.55rem;
+  border-radius: var(--radius-sm);
+}
+
+/* ── Main layout ────────────────────────────────────── */
+.maltego-workspace.main-layout {
+  background: var(--mt-bg);
+}
+
+.maltego-workspace .toolbar {
+  background: #14171a;
+  border-bottom: 1px solid var(--mt-border);
+  min-height: 44px;
+}
+
+.maltego-workspace .brand-icon {
+  color: var(--mt-green);
+}
+
+.maltego-workspace .brand-name {
+  color: var(--mt-text);
+}
+
+.maltego-workspace .toolbar-btn.active,
+.maltego-workspace .toolbar-btn.connect-active {
+  color: var(--mt-green-bright) !important;
+  background: var(--mt-green-dim) !important;
+  border-color: var(--mt-green-glow) !important;
+}
+
+.maltego-workspace .btn-primary {
+  background: var(--mt-green);
+  color: #0a0f0a;
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.maltego-workspace .btn-primary:hover {
+  background: var(--mt-green-bright);
+}
+
+.maltego-workspace .sidebar {
+  background: var(--mt-panel);
+  border-color: var(--mt-border) !important;
+}
+
+.maltego-workspace .canvas-area {
+  background: #0a0c0d;
+}
+
+.maltego-workspace .panel-header h3 {
+  color: var(--mt-text-muted);
+}
+
+.maltego-workspace .panel-header h3::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 10px;
+  background: var(--mt-green);
+  margin-right: 8px;
+  vertical-align: middle;
+  border-radius: 1px;
+}
+
+.maltego-workspace .inspector-tab.active {
+  color: var(--mt-green-bright);
+  border-bottom-color: var(--mt-green);
+}
+
+.maltego-workspace .confidence-fill {
+  background: linear-gradient(90deg, #2e7d32, var(--mt-green-bright));
+}
+
+.maltego-workspace .transform-item:hover {
+  border-color: var(--mt-green-glow);
+}
+
+.maltego-workspace .transform-run-btn.btn-primary {
+  background: var(--mt-green-dim);
+  color: var(--mt-green-bright);
+  border: 1px solid var(--mt-green-glow);
+}
+
+.maltego-workspace .transform-run-btn.btn-primary:hover {
+  background: var(--mt-green);
+  color: #0a0f0a;
+}
+
+.maltego-workspace .transform-progress-bar {
+  background: var(--mt-green);
+  opacity: 0.45;
+}
+
+.maltego-workspace .node-list-item.selected {
+  background: var(--mt-green-dim);
+  box-shadow: inset 2px 0 0 var(--mt-green);
+}
+
+.maltego-workspace .entity-type-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* ── Graph canvas ───────────────────────────────────── */
+.maltego-workspace .graph-canvas-wrapper {
+  background-color: #0a0c0d;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.028) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.maltego-workspace .graph-filters {
+  top: 0.65rem;
+  left: 0.65rem;
+  right: 0.65rem;
+  padding: 0.35rem 0.5rem;
+  background: rgba(20, 23, 26, 0.92);
+  border: 1px solid var(--mt-border);
+  border-radius: var(--radius-sm);
+  backdrop-filter: blur(6px);
+}
+
+.maltego-workspace .graph-filters select,
+.maltego-workspace .graph-filters .btn {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: #121518;
+  border-color: var(--mt-border);
+}
+
+.maltego-workspace .graph-legend {
+  background: rgba(20, 23, 26, 0.92);
+  border-color: var(--mt-border);
+  font-family: var(--font-mono);
+  border-radius: var(--radius-sm);
+}
+
+.maltego-workspace .connect-hint {
+  border-color: var(--mt-green-glow);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.maltego-workspace .edge-type-picker {
+  border-color: var(--mt-green-glow);
+  border-radius: var(--radius-sm);
+  background: var(--mt-panel-elevated);
+}
+
+.maltego-workspace .graph-empty-state h2 {
+  font-family: var(--font-mono);
+  color: var(--mt-text);
+}
+
+.maltego-workspace .graph-empty-state p {
+  max-width: 280px;
+  text-align: center;
+  line-height: 1.5;
+}

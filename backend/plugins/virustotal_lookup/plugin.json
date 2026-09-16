@@ -1,0 +1,14 @@
+{
+  "id": "virustotal_lookup",
+  "name": "VirusTotal Lookup",
+  "version": "1.0.0",
+  "author": "OSINTGraph Team",
+  "category": "Cyber Threat Intelligence",
+  "license": "MIT",
+  "description": "Réputation et relations passives pour domaine ou IP via l'API VirusTotal v3.",
+  "permissions": ["internet"],
+  "providers": ["virustotal"],
+  "input_types": ["DOMAIN", "IP"],
+  "output_types": ["DOMAIN", "IP"],
+  "entrypoint": "plugin.py"
+}

@@ -21,6 +21,11 @@ const TRANSFORM_EDGE_TYPE: Record<string, EdgeType> = {
   spiderfoot_scan:  'linked_to',
   sherlock_lookup:  'owns',
   death_search:     'linked_to',
+  crtsh_lookup:     'owns',
+  urlscan_lookup:   'linked_to',
+  virustotal_lookup:'linked_to',
+  otx_lookup:       'linked_to',
+  ipinfo_lookup:    'linked_to',
 }
 
 function resolveEdgeType(transformName: string, outputType: string): EdgeType {
@@ -36,6 +41,9 @@ interface Transform {
   category: string
   input_types: string[]
   output_types: string[]
+  requires_api_key?: boolean
+  configured?: boolean
+  env_keys?: string[]
 }
 
 interface ResultNode {
@@ -290,11 +298,14 @@ export const TransformPanel: React.FC<TransformPanelProps> = ({ node }) => {
             <div className="transform-info">
               <div className="transform-name">{tf.name}</div>
               <div className="transform-desc">{tf.description}</div>
+              {tf.requires_api_key && !tf.configured && (
+                <div className="transform-api-hint">{t('transforms.apiKeyRequired', { keys: (tf.env_keys ?? []).join(', ') })}</div>
+              )}
             </div>
             <button
               className={`btn btn-primary transform-run-btn ${running === tf.id ? 'loading' : ''}`}
               onClick={() => runTransform(tf)}
-              disabled={running !== null}
+              disabled={running !== null || (tf.requires_api_key === true && tf.configured === false)}
             >
               {running === tf.id
                 ? <Loader size={12} className="loading-spin" />

@@ -97,7 +97,34 @@ const en = {
       maigret_lookup:  { display_name: 'Maigret — Username Dossier', description: 'Build a comprehensive dossier from 3000+ sites (maigret)' },
       spiderfoot_scan: { display_name: 'SpiderFoot — OSINT Scan',    description: 'Multi-source passive recon via SpiderFoot (200+ modules)' },
       death_search:    { display_name: 'INSEE Death Records Search', description: 'Public registry of deaths in France (since 1970, data.gouv.fr)' },
+      crtsh_lookup:    { display_name: 'crt.sh Subdomains', description: 'Subdomains from public Certificate Transparency logs' },
+      urlscan_lookup:  { display_name: 'Urlscan.io Search', description: 'Public urlscan.io submissions for a domain or URL' },
+      virustotal_lookup: { display_name: 'VirusTotal Lookup', description: 'Domain/IP reputation and relations via VirusTotal API v3' },
+      otx_lookup:      { display_name: 'AlienVault OTX', description: 'Open threat pulses for domain or IP indicators' },
+      ipinfo_lookup:   { display_name: 'IPinfo Lookup', description: 'ASN, organization, and geo metadata for an IP' },
     },
+    apiKeyRequired: 'API key required: {{keys}}',
+  },
+
+  transformHub: {
+    open:              'Transform hub',
+    title:             'OSINTGraph Transform Hub',
+    subtitle:          'Maltego Data Hub–style catalog — installed plugins vs planned partner integrations',
+    close:             'Close',
+    filterPlaceholder: 'Filter partners…',
+    filter: {
+      all:           'All',
+      installed:     'Installed',
+      not_installed: 'Not installed',
+    },
+    stats:             '{{shown}} shown · {{installed}}/{{total}} installed',
+    loading:           'Loading catalog…',
+    planned:           'Planned',
+    installed:         'Installed',
+    byProvider:        'by {{provider}}',
+    keyOk:             'API configured',
+    keyMissing:        'API key missing',
+    notBundled:        'Not bundled',
   },
 
   deathSearch: {
@@ -221,6 +248,8 @@ const en = {
     focusNode:     'Focus node',
     clearFocus:    'Clear focus',
     legend:        'Graph legend',
+    investigationLabel: 'Investigation',
+    linkAnalysis:       'Link analysis',
   },
 
   canvas: {

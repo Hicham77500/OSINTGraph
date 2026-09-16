@@ -99,7 +99,34 @@ const fr: Translations = {
       maigret_lookup:  { display_name: 'Maigret — Dossier pseudo', description: 'Dossier complet sur un pseudo via 3000+ sites (maigret)' },
       spiderfoot_scan: { display_name: 'SpiderFoot — Scan OSINT',    description: 'Recon passif multi-sources via SpiderFoot (200+ modules)' },
       death_search:    { display_name: 'Recherche décès INSEE',      description: 'Fichier public des personnes décédées en France (depuis 1970, data.gouv.fr)' },
+      crtsh_lookup:    { display_name: 'crt.sh — Sous-domaines',     description: 'Sous-domaines via les logs Certificate Transparency publics' },
+      urlscan_lookup:  { display_name: 'Urlscan.io',                   description: 'Scans publics urlscan.io pour un domaine ou une URL' },
+      virustotal_lookup: { display_name: 'VirusTotal',                 description: 'Réputation et relations domaine/IP (API v3)' },
+      otx_lookup:      { display_name: 'AlienVault OTX',               description: 'Pulses threat intel ouverts pour domaine ou IP' },
+      ipinfo_lookup:   { display_name: 'IPinfo',                       description: 'ASN, organisation et géolocalisation approximative' },
     },
+    apiKeyRequired: 'Clé API requise : {{keys}}',
+  },
+
+  transformHub: {
+    open:              'Hub transforms',
+    title:             'Hub des transformations OSINTGraph',
+    subtitle:          'Catalogue inspiré du Maltego Data Hub — modules installés vs intégrations partenaires planifiées',
+    close:             'Fermer',
+    filterPlaceholder: 'Filtrer les partenaires…',
+    filter: {
+      all:           'Tous',
+      installed:     'Installés',
+      not_installed: 'Non installés',
+    },
+    stats:             '{{shown}} affichés · {{installed}}/{{total}} installés',
+    loading:           'Chargement du catalogue…',
+    planned:           'Planifié',
+    installed:         'Installé',
+    byProvider:        'par {{provider}}',
+    keyOk:             'API configurée',
+    keyMissing:        'Clé API manquante',
+    notBundled:        'Non inclus',
   },
 
   deathSearch: {
@@ -223,6 +250,8 @@ const fr: Translations = {
     focusNode:     'Focaliser le nœud',
     clearFocus:    'Effacer la focalisation',
     legend:        'Légende du graphe',
+    investigationLabel: 'Investigation',
+    linkAnalysis:       'Analyse de liens',
   },
 
   canvas: {

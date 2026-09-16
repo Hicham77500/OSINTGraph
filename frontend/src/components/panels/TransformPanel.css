@@ -23,6 +23,11 @@
 .transform-info { flex: 1; }
 .transform-name { font-size: 12px; font-weight: 600; color: var(--text-primary); }
 .transform-desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.transform-api-hint {
+  font-size: 10px;
+  color: var(--accent-warning, #e6a817);
+  margin-top: 4px;
+}
 
 .transform-run-btn {
   padding: 5px 10px;

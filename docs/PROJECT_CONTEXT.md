@@ -85,7 +85,7 @@ Entity Types are now dynamic and managed by the backend `EntityTypeRegistry`. De
 
 ## UI conventions
 
-- Thème **Matte & Vintage** (`index.css`, `DossiersPage.css`, `CarnetViewPage.css`) — IBM Plex Mono pour les données techniques
+- Thème **Omarchy-inspired** (`index.css`, `styles/omarchy-theme.css`) — fond noir, **JetBrains Mono**, bordures fines, accents gris froid (réf. [omarchy.fr](https://omarchy.fr/))
 - i18n keys under `dossier.*` and `carnetView.*` in `en.ts` / `fr.ts`
 - Provenance badges on entity cards: `status`, confidence %
 

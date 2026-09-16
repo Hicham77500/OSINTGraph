@@ -1,0 +1,222 @@
+/* ====================================================
+   Omarchy-inspired theme layer for OSINTGraph
+   Reference: https://omarchy.fr/ — monochrome, mono, pixel accents
+   ==================================================== */
+
+.app-omarchy {
+  min-height: 100%;
+  position: relative;
+  isolation: isolate;
+}
+
+.app-omarchy::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-color: var(--bg-base);
+  background-image:
+    radial-gradient(circle at 8% 92%, rgba(255, 255, 255, 0.04) 0, transparent 42%),
+    radial-gradient(circle at 92% 88%, rgba(255, 255, 255, 0.035) 0, transparent 38%),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(255, 255, 255, 0.012) 3px,
+      rgba(255, 255, 255, 0.012) 4px
+    );
+}
+
+/* ── Top bar (Omarchy nav) ─────────────────────────── */
+.omarchy-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--border-default);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.omarchy-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+.omarchy-mark {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #e8ecec 0%, #6b7280 100%);
+  box-shadow:
+    2px 2px 0 #2a2f33,
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.omarchy-topbar-brand {
+  font-weight: 500;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.omarchy-topbar-brand:hover {
+  color: #fff;
+}
+
+.omarchy-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.omarchy-topbar .trash-link {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  padding: 0.35rem 0.65rem;
+}
+
+/* ── Hero / display title ───────────────────────────── */
+.omarchy-hero {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  padding: 0 0.5rem;
+}
+
+.omarchy-display-title {
+  font-family: var(--font-mono);
+  font-size: clamp(1.75rem, 4.5vw, 2.75rem);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin-bottom: 0.75rem;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  text-shadow:
+    1px 1px 0 #3d4348,
+    2px 2px 0 #2a2f33,
+    3px 3px 0 #1a1d20;
+}
+
+.omarchy-lead {
+  max-width: 36rem;
+  margin: 0 auto;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.55;
+  font-family: var(--font-sans);
+}
+
+.omarchy-hero-compact {
+  text-align: left;
+  margin-bottom: 1.75rem;
+}
+
+.omarchy-hero-compact .omarchy-display-title {
+  font-size: clamp(1.35rem, 3vw, 1.85rem);
+  text-align: left;
+  text-transform: none;
+  letter-spacing: -0.02em;
+}
+
+.omarchy-hero-compact .omarchy-lead {
+  margin: 0;
+  text-align: left;
+  font-size: 0.88rem;
+}
+
+.omarchy-hero-compact.dossier-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.workspace-page.omarchy-shell {
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.person-view.omarchy-shell {
+  height: 100vh;
+  overflow-y: auto;
+}
+
+/* ── Cards & panels ─────────────────────────────────── */
+.omarchy-shell .glass-panel,
+.omarchy-shell .dossier-card {
+  border-radius: var(--radius-sm);
+  border-color: var(--border-default);
+  background: var(--bg-surface);
+}
+
+.omarchy-shell .dossier-card:hover {
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
+  transform: translateY(-1px);
+}
+
+.omarchy-shell .dossier-card h2,
+.omarchy-shell .carnet-card h3 {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.omarchy-shell .graph-hero-card {
+  border-radius: var(--radius-sm);
+  border-color: var(--border-default);
+  background: var(--bg-elevated);
+}
+
+.omarchy-shell .graph-hero-content h2 {
+  background: none;
+  -webkit-text-fill-color: unset;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+.omarchy-shell .onboarding-banner {
+  border-color: var(--border-default);
+  border-radius: var(--radius-sm);
+}
+
+.omarchy-shell .onboarding-banner h2 {
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+.omarchy-shell .carnet-section-title {
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+}
+
+/* ── Toolbar in graph view ──────────────────────────── */
+.main-layout .toolbar {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  border-bottom-color: var(--border-default);
+}
+
+.main-layout .brand-name {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 500;
+}
+
+.main-layout .brand-icon {
+  color: var(--text-primary);
+}

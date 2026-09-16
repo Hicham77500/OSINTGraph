@@ -1,0 +1,14 @@
+{
+  "id": "otx_lookup",
+  "name": "AlienVault OTX",
+  "version": "1.0.0",
+  "author": "OSINTGraph Team",
+  "category": "Cyber Threat Intelligence",
+  "license": "MIT",
+  "description": "Contexte threat intel OTX pour domaine ou IP (pulses publics, API OTX).",
+  "permissions": ["internet"],
+  "providers": ["otx"],
+  "input_types": ["DOMAIN", "IP"],
+  "output_types": ["DOMAIN"],
+  "entrypoint": "plugin.py"
+}

@@ -40,7 +40,7 @@ export const TrashPage: React.FC = () => {
   }
 
   return (
-    <div className="workspace-page">
+    <div className="workspace-page omarchy-shell">
       <Link to="/" className="back-link">
         <ArrowLeft size={14} /> {t('trash.backToDossiers')}
       </Link>

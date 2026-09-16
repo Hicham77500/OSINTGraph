@@ -9,7 +9,7 @@ import './InspectorPanel.css'
 export const InspectorPanel: React.FC = () => {
   const { nodes, edges, selectedNodeId, selectedEdgeId, removeNode, removeEdge } = useGraphStore()
   const { t } = useTranslation()
-  const [activeTab, setActiveTab] = useState<'properties' | 'transforms' | 'history'>('properties')
+  const [activeTab, setActiveTab] = useState<'properties' | 'transforms' | 'history'>('transforms')
 
   const selectedNode = nodes.find(n => n.id === selectedNodeId)
   const selectedEdge = edges.find(e => e.id === selectedEdgeId)

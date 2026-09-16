@@ -11,10 +11,13 @@
 ## Mise à jour — Septembre 2026
 
 - 🔍 **Recherche décès INSEE** — plugin `death_search`, modal fiche personne, demande d'actes encadrée ([`docs/DEATH_SEARCH.md`](docs/DEATH_SEARCH.md))
-- 🔌 **10 plugins OSINT** — Sherlock, Maigret, Holehe, Shodan, DNS, WHOIS, SpiderFoot, etc. avec streaming WebSocket en temps réel
+- 🧩 **Transform Hub** — catalogue partenaires type Maltego, registre clés API (ℹ), ~20+ plugins CTI / web ([`docs/TRANSFORM_HUB.md`](docs/TRANSFORM_HUB.md))
+- 🔎 **Recherche web, social & visuelle** — modales investigation, assistants publics, pages réelles sur le graphe (Brave / DDG)
+- 🔌 **Plugins OSINT** — Sherlock, Maigret, Holehe, Shodan, DNS, WHOIS, SpiderFoot, etc. avec streaming WebSocket
+- 🧬 **Entités étendues** — `PHONE`, `LOCATION`, `SOCIAL_ACCOUNT`, `IMAGE`, immatriculation
 - 🐳 **Docker production** — déploiement React + API via `docker compose` ([`deploy/docker.md`](deploy/docker.md))
-- ☁️ **UI Streamlit cloud** — accès distant simplifié + onboarding et bouton « Charger la démo » ([`deploy/streamlit-cloud.md`](deploy/streamlit-cloud.md))
-- 📚 **Documentation revue** — guide [`GETTING_STARTED`](docs/GETTING_STARTED.md), workflow fork [`CONTRIBUTING.md`](CONTRIBUTING.md), captures README restaurées
+- ☁️ **UI Streamlit cloud** — accès distant simplifié ([`deploy/streamlit-cloud.md`](deploy/streamlit-cloud.md))
+- 📚 **Documentation** — [`GETTING_STARTED`](docs/GETTING_STARTED.md), périmètre [`OSINT_TOOLS_SCOPE`](docs/OSINT_TOOLS_SCOPE.md), captures README (dossier démo **TEst**)
 - ⚙️ **Setup simplifié** — scripts `setup.ps1` / `setup.sh`, `npm run setup`, arrêt dev cross-platform (`dev:stop`)
 
 ## Aperçu / Preview

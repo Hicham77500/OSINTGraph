@@ -14,6 +14,7 @@ EXPECTED_PLUGINS = {
     "sherlock_lookup",
     "shodan_lookup",
     "ip_geolocation",
+    "ipinfo_lookup",
     "phone_lookup",
     "holehe_lookup",
     "dns_lookup",
@@ -21,6 +22,11 @@ EXPECTED_PLUGINS = {
     "maigret_lookup",
     "spiderfoot_scan",
     "death_search",
+    "hibp_lookup",
+    "crtsh_lookup",
+    "urlscan_lookup",
+    "virustotal_lookup",
+    "otx_lookup",
 }
 
 

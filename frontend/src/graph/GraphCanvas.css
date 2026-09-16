@@ -168,6 +168,11 @@
   font-size: 0.75rem;
 }
 
+.graph-filter-btn {
+  font-size: 0.75rem;
+  padding: 0.35rem 0.5rem;
+}
+
 .graph-legend {
   position: absolute;
   bottom: 0.75rem;

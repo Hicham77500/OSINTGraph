@@ -24,19 +24,24 @@ export const DossiersPage: React.FC = () => {
   }
 
   return (
-    <div className="workspace-page">
-      <header className="workspace-header workspace-header-row">
-        <div>
-          <h1>OSINTGraph</h1>
-          <p className="workspace-subtitle">{t('dossiers.subtitle')}</p>
+    <div className="workspace-page omarchy-shell">
+      <nav className="omarchy-topbar" aria-label="Navigation">
+        <div className="omarchy-topbar-left">
+          <span className="omarchy-mark" aria-hidden />
+          <Link to="/" className="omarchy-topbar-brand">OSINTGraph</Link>
         </div>
-        <div className="workspace-header-actions">
+        <div className="omarchy-topbar-right">
           <LanguageSwitcher />
           <Link to="/trash" className="btn btn-ghost trash-link">
-            <Trash2 size={16} />
+            <Trash2 size={14} />
             {t('dossiers.trash')}
           </Link>
         </div>
+      </nav>
+
+      <header className="omarchy-hero">
+        <h1 className="omarchy-display-title">OSINTGraph</h1>
+        <p className="omarchy-lead">{t('dossiers.subtitle')}</p>
       </header>
 
       {isLoading && <p className="workspace-loading">{t('dossiers.loading')}</p>}

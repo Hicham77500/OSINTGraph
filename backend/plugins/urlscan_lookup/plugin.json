@@ -1,0 +1,14 @@
+{
+  "id": "urlscan_lookup",
+  "name": "Urlscan.io Search",
+  "version": "1.0.0",
+  "author": "OSINTGraph Team",
+  "category": "Web Intelligence",
+  "license": "MIT",
+  "description": "Recherche les scans publics urlscan.io associés à un domaine (clé API recommandée).",
+  "permissions": ["internet"],
+  "providers": ["urlscan"],
+  "input_types": ["DOMAIN", "URL"],
+  "output_types": ["URL"],
+  "entrypoint": "plugin.py"
+}

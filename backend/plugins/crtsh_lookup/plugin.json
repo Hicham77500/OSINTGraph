@@ -1,0 +1,14 @@
+{
+  "id": "crtsh_lookup",
+  "name": "crt.sh Subdomains",
+  "version": "1.0.0",
+  "author": "OSINTGraph Team",
+  "category": "Network",
+  "license": "MIT",
+  "description": "Énumère les noms vus dans les logs Certificate Transparency publics (crt.sh).",
+  "permissions": ["internet"],
+  "providers": [],
+  "input_types": ["DOMAIN"],
+  "output_types": ["DOMAIN"],
+  "entrypoint": "plugin.py"
+}

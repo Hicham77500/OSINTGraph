@@ -5,6 +5,7 @@ import { EntityPanel } from '../panels/EntityPanel'
 import { InspectorPanel } from '../panels/InspectorPanel'
 import { ContextMenu } from '../menus/ContextMenu'
 import './MainLayout.css'
+import '../../styles/maltego-workspace.css'
 
 interface ContextMenuState {
   x: number
@@ -25,7 +26,7 @@ export const MainLayout: React.FC = () => {
   const closeContextMenu = () => setContextMenu(null)
 
   return (
-    <div className="main-layout" onClick={closeContextMenu}>
+    <div className="main-layout maltego-workspace" onClick={closeContextMenu}>
       {/* Top toolbar */}
       <Toolbar
         leftCollapsed={leftCollapsed}

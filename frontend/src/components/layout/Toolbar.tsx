@@ -80,7 +80,6 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         <div className="toolbar-brand">
           <GitGraph size={18} className="brand-icon" />
           <span className="brand-name">OSINTGraph</span>
-          <span className="brand-workspace">{currentWorkspace}</span>
         </div>
 
         <div className="toolbar-divider" />
