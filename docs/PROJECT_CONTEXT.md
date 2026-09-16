@@ -81,6 +81,8 @@ Entity Types are now dynamic and managed by the backend `EntityTypeRegistry`. De
 - `fetchEntities(dossierId, carnetId)` — entities scoped to carnet
 - Observations for timeline/notes: `GET /api/v1/entities/:id/observations` per entity in carnet
 - Transforms (Plugins): `GET /transforms` returns a dynamic list of available plugins parsed from `plugin.json` manifests.
+- Transform Hub: `GET /transforms/hub`, UI on graph page — see [`TRANSFORM_HUB.md`](TRANSFORM_HUB.md).
+- Investigation API: `POST /api/v1/investigation/visual-search/upload`, `GET /api/v1/investigation/general-search` — see [`OSINT_TOOLS_SCOPE.md`](OSINT_TOOLS_SCOPE.md).
 - Death records: `POST /transforms/run` with `transform: death_search`, or modal UI on Person view — see [`DEATH_SEARCH.md`](DEATH_SEARCH.md).
 
 ## UI conventions

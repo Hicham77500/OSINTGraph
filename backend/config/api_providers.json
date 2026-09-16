@@ -1,0 +1,72 @@
+{
+  "BRAVE_SEARCH_API_KEY": {
+    "provider": "Brave Search API",
+    "signup_url": "https://brave.com/search/api/",
+    "docs_url": "https://api.search.brave.com/app/documentation/web-search/get-started"
+  },
+  "HIBP_API_KEY": {
+    "provider": "Have I Been Pwned",
+    "signup_url": "https://haveibeenpwned.com/API/Key",
+    "docs_url": "https://haveibeenpwned.com/API/v3"
+  },
+  "SHODAN_API_KEY": {
+    "provider": "Shodan",
+    "signup_url": "https://account.shodan.io/register",
+    "docs_url": "https://developer.shodan.io/api"
+  },
+  "VIRUSTOTAL_API_KEY": {
+    "provider": "VirusTotal",
+    "signup_url": "https://www.virustotal.com/gui/join-us",
+    "docs_url": "https://www.virustotal.com/gui/my-apikey"
+  },
+  "OTX_API_KEY": {
+    "provider": "AlienVault OTX",
+    "signup_url": "https://otx.alienvault.com/",
+    "docs_url": "https://otx.alienvault.com/api"
+  },
+  "URLSCAN_API_KEY": {
+    "provider": "urlscan.io",
+    "signup_url": "https://urlscan.io/user/signup",
+    "docs_url": "https://urlscan.io/docs/api/"
+  },
+  "IPINFO_API_KEY": {
+    "provider": "IPinfo",
+    "signup_url": "https://ipinfo.io/signup",
+    "docs_url": "https://ipinfo.io/developers"
+  },
+  "HUNTER_API_KEY": {
+    "provider": "Hunter.io",
+    "signup_url": "https://hunter.io/users/sign_up",
+    "docs_url": "https://hunter.io/api-documentation"
+  },
+  "DOMAINTOOLS_API_KEY": {
+    "provider": "DomainTools",
+    "signup_url": "https://www.domaintools.com/products/api-integration/",
+    "docs_url": "https://www.domaintools.com/resources/api-documentation/"
+  },
+  "HOSTIO_API_KEY": {
+    "provider": "Host.io",
+    "signup_url": "https://host.io/pricing",
+    "docs_url": "https://host.io/docs"
+  },
+  "DNSDB_API_KEY": {
+    "provider": "Farsight DNSDB",
+    "signup_url": "https://www.farsightsecurity.com/get-started/",
+    "docs_url": "https://docs.farsightsecurity.com/"
+  },
+  "HYBRID_ANALYSIS_API_KEY": {
+    "provider": "Hybrid Analysis",
+    "signup_url": "https://www.hybrid-analysis.com/signup",
+    "docs_url": "https://www.hybrid-analysis.com/docs/api/v2"
+  },
+  "FULLCONTACT_API_KEY": {
+    "provider": "FullContact",
+    "signup_url": "https://www.fullcontact.com/developer-portal/",
+    "docs_url": "https://docs.fullcontact.com/"
+  },
+  "DISCOGS_API_KEY": {
+    "provider": "Discogs",
+    "signup_url": "https://www.discogs.com/settings/developers",
+    "docs_url": "https://www.discogs.com/developers"
+  }
+}

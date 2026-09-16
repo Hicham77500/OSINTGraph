@@ -1,0 +1,129 @@
+.api-key-help {
+  position: relative;
+}
+
+.api-key-help-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-size: inherit;
+}
+
+.api-key-help-trigger:hover {
+  opacity: 0.85;
+}
+
+.api-key-help.compact .api-key-help-trigger {
+  color: #1565c0;
+  padding: 2px;
+}
+
+.api-key-help-panel {
+  position: absolute;
+  z-index: 20;
+  right: 0;
+  top: calc(100% + 6px);
+  width: min(280px, 90vw);
+  padding: 10px 12px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  color: #222;
+  text-align: left;
+}
+
+.api-key-help.inline .api-key-help-panel {
+  left: 0;
+  right: auto;
+}
+
+.api-key-help-intro,
+.api-key-help-foot {
+  margin: 0 0 8px;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: #555;
+}
+
+.api-key-help-foot {
+  margin: 8px 0 0;
+  margin-bottom: 0;
+}
+
+.api-key-help-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.api-key-help-row-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.api-key-help-row-title code {
+  font-size: 0.68rem;
+  background: #f0f0f0;
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.api-key-help-provider {
+  font-size: 0.68rem;
+  color: #666;
+}
+
+.api-key-help-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+
+.api-key-help-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  color: #1565c0;
+  text-decoration: none;
+}
+
+.api-key-help-links a:hover {
+  text-decoration: underline;
+}
+
+.api-key-help-muted {
+  font-size: 0.72rem;
+  color: #888;
+}
+
+/* Dark sidebar (transform panel) */
+.transform-item .api-key-help.compact .api-key-help-panel {
+  right: 0;
+  left: auto;
+}
+
+.transform-api-key-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.transform-api-key-row .transform-api-hint {
+  flex: 1;
+  margin-top: 0;
+}

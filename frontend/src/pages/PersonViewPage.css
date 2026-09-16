@@ -30,6 +30,13 @@
   box-shadow: var(--shadow-sm);
 }
 
+.person-overview-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
 .person-meta h1 {
   font-size: 1.4rem;
   font-family: var(--font-mono);

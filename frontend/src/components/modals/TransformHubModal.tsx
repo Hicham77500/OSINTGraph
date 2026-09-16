@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { X, Search, KeyRound, CheckCircle2, CircleDashed } from 'lucide-react'
+import { X, Search, KeyRound, CheckCircle2, CircleDashed, ExternalLink } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { apiClient } from '../../services/api'
+import { ApiKeyHelp, type ApiKeyHelpItem } from '../common/ApiKeyHelp'
 import './TransformHubModal.css'
 
 type HubEntry = {
@@ -17,6 +18,7 @@ type HubEntry = {
   installed?: boolean
   configured?: boolean
   tags?: string[]
+  api_key_help?: ApiKeyHelpItem[]
 }
 
 type HubResponse = {
@@ -38,15 +40,23 @@ export const TransformHubModal: React.FC<TransformHubModalProps> = ({ open, onCl
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState<FilterMode>('all')
   const [loading, setLoading] = useState(false)
+  const [apiKeyItems, setApiKeyItems] = useState<ApiKeyHelpItem[]>([])
 
   useEffect(() => {
     if (!open) return
     setLoading(true)
-    apiClient.get('/transforms/hub').then(res => {
-      if (res.ok && res.data) {
-        const data = res.data as HubResponse
+    Promise.all([
+      apiClient.get('/transforms/hub'),
+      apiClient.get('/transforms/api-keys'),
+    ]).then(([hubRes, keysRes]) => {
+      if (hubRes.ok && hubRes.data) {
+        const data = hubRes.data as HubResponse
         setEntries(data.entries ?? [])
         setStats(data.stats ?? null)
+      }
+      if (keysRes.ok && keysRes.data) {
+        const items = (keysRes.data as { items?: ApiKeyHelpItem[] }).items ?? []
+        setApiKeyItems(items)
       }
     }).finally(() => setLoading(false))
   }, [open])
@@ -108,7 +118,30 @@ export const TransformHubModal: React.FC<TransformHubModalProps> = ({ open, onCl
               })}
             </span>
           )}
+          {apiKeyItems.length > 0 && (
+            <div className="transform-hub-api-banner">
+              <ApiKeyHelp items={apiKeyItems} variant="inline" />
+            </div>
+          )}
         </div>
+
+        {apiKeyItems.length > 0 && (
+          <div className="transform-hub-quick-links" aria-label={t('transformHub.apiKey.quickLinks')}>
+            {apiKeyItems.map(item => item.signup_url && (
+              <a
+                key={item.env_key}
+                href={item.signup_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transform-hub-quick-link"
+                title={item.env_key}
+              >
+                <ExternalLink size={11} aria-hidden />
+                {item.provider ?? item.env_key}
+              </a>
+            ))}
+          </div>
+        )}
 
         {loading ? (
           <div className="transform-hub-loading">{t('transformHub.loading')}</div>
@@ -129,12 +162,20 @@ export const TransformHubModal: React.FC<TransformHubModalProps> = ({ open, onCl
                 <p className="hub-desc">{entry.description}</p>
                 <div className="hub-card-footer">
                   <span className="hub-category">{entry.category}</span>
-                  {entry.installed && entry.env_keys && entry.env_keys.length > 0 && (
-                    <span className={`hub-key ${entry.configured ? 'ok' : 'missing'}`} title={entry.env_keys.join(', ')}>
-                      {entry.configured ? <CheckCircle2 size={12} /> : <KeyRound size={12} />}
-                      {entry.configured ? t('transformHub.keyOk') : t('transformHub.keyMissing')}
-                    </span>
-                  )}
+                  <div className="hub-card-footer-actions">
+                    {entry.env_keys && entry.env_keys.length > 0 && (
+                      <ApiKeyHelp
+                        items={entry.api_key_help ?? entry.env_keys.map(k => ({ env_key: k }))}
+                        variant="compact"
+                      />
+                    )}
+                    {entry.installed && entry.env_keys && entry.env_keys.length > 0 && (
+                      <span className={`hub-key ${entry.configured ? 'ok' : 'missing'}`} title={entry.env_keys.join(', ')}>
+                        {entry.configured ? <CheckCircle2 size={12} /> : <KeyRound size={12} />}
+                        {entry.configured ? t('transformHub.keyOk') : t('transformHub.keyMissing')}
+                      </span>
+                    )}
+                  </div>
                   {!entry.installed && (
                     <span className="hub-key muted">
                       <CircleDashed size={12} />

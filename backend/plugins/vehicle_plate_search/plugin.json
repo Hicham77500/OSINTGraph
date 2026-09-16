@@ -1,0 +1,14 @@
+{
+  "id": "vehicle_plate_search",
+  "name": "Vehicle Plate (public web)",
+  "version": "1.0.0",
+  "author": "OSINTGraph Team",
+  "category": "Identity",
+  "license": "MIT",
+  "description": "Immatriculation — mentions publiques web/forums uniquement (pas d'API registre non autorisée).",
+  "permissions": ["internet"],
+  "providers": [],
+  "input_types": ["VEHICLE_PLATE"],
+  "output_types": ["URL"],
+  "entrypoint": "plugin.py"
+}

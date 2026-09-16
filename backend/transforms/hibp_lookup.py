@@ -18,13 +18,7 @@ class HIBPLookup(Transform):
         api_key = os.getenv("HIBP_API_KEY", "")
 
         if not api_key:
-            log.append("[HIBP] Warning: no HIBP_API_KEY set — using demo mode")
-            # Demo fallback
-            nodes.append({
-                "type": "domain",
-                "label": "example-breach.com",
-                "properties": {"breach_name": "ExampleBreach", "source": "hibp_demo", "email": value}
-            })
+            log.append("[HIBP] HIBP_API_KEY missing — configure official API key.")
             return {"nodes": nodes, "edges": [], "log": log}
 
         try:

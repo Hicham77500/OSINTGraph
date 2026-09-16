@@ -2,8 +2,10 @@ import React, { useState, useEffect, useRef } from 'react'
 import {
   GitGraph, Upload, Download, Save, LayoutGrid,
   Undo, Redo, Search, ChevronLeft, ChevronRight,
-  Layers, Cpu, Link2
+  Layers, Cpu, Link2, ImageIcon, Globe,
 } from 'lucide-react'
+import { ImageInvestigationModal } from '../modals/ImageInvestigationModal'
+import { GeneralSearchModal } from '../modals/GeneralSearchModal'
 import { useTranslation } from 'react-i18next'
 import { LanguageSwitcher } from './LanguageSwitcher'
 import { useGraphStore } from '../../graph/graphStore'
@@ -28,6 +30,8 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   const { t } = useTranslation()
   const [showImport, setShowImport] = useState(false)
   const [showExport, setShowExport] = useState(false)
+  const [showImageInvestigation, setShowImageInvestigation] = useState(false)
+  const [showGeneralSearch, setShowGeneralSearch] = useState(false)
   const [saving, setSaving] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const lastSavedRef = useRef(JSON.stringify({ nodes, edges }))
@@ -136,6 +140,18 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         <div className="toolbar-divider" />
 
         {/* Actions */}
+        <button className="btn btn-ghost toolbar-btn" onClick={() => setShowGeneralSearch(true)}
+          data-tooltip={t('toolbar.generalSearchTooltip')}>
+          <Globe size={14} />
+          <span>{t('toolbar.generalSearch')}</span>
+        </button>
+
+        <button className="btn btn-ghost toolbar-btn" onClick={() => setShowImageInvestigation(true)}
+          data-tooltip={t('toolbar.visualSearchTooltip')}>
+          <ImageIcon size={14} />
+          <span>{t('toolbar.visualSearch')}</span>
+        </button>
+
         <button className="btn btn-ghost toolbar-btn" onClick={() => setShowImport(true)}
           data-tooltip={t('toolbar.importTooltip')}>
           <Upload size={14} />
@@ -191,6 +207,20 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
       {showImport && <ImportModal onClose={() => setShowImport(false)} />}
       {showExport && <ExportModal onClose={() => setShowExport(false)} />}
+      <GeneralSearchModal
+        open={showGeneralSearch}
+        onClose={() => setShowGeneralSearch(false)}
+        onAttachToGraph={(newNodes, newEdges) => {
+          useGraphStore.getState().mergeNodes(newNodes, newEdges)
+        }}
+      />
+      <ImageInvestigationModal
+        open={showImageInvestigation}
+        onClose={() => setShowImageInvestigation(false)}
+        onAttachToGraph={(newNodes, newEdges) => {
+          useGraphStore.getState().mergeNodes(newNodes, newEdges)
+        }}
+      />
     </>
   )
 }

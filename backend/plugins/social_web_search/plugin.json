@@ -1,0 +1,14 @@
+{
+  "id": "social_web_search",
+  "name": "Social Networks Search",
+  "version": "1.0.0",
+  "author": "OSINTGraph Team",
+  "category": "Social",
+  "license": "MIT",
+  "description": "Assistants Facebook, Instagram, X, LinkedIn, TikTok, YouTube, GitHub, Reddit, Telegram, etc. (recherche publique / site:).",
+  "permissions": ["internet"],
+  "providers": [],
+  "input_types": ["USERNAME", "PERSON", "EMAIL"],
+  "output_types": ["URL"],
+  "entrypoint": "plugin.py"
+}

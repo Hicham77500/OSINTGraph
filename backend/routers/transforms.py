@@ -10,7 +10,13 @@ from typing import Any
 from plugins.registry import PluginRegistry
 from plugins.base import PluginContext
 from services.api_manager import api_manager
-from services.transform_hub import merge_hub_with_plugins, plugin_env_keys, env_configured
+from services.transform_hub import (
+    merge_hub_with_plugins,
+    plugin_env_keys,
+    env_configured,
+    api_key_help,
+    load_api_providers,
+)
 
 logger = logging.getLogger("osintgraph.router.plugins")
 router = APIRouter()
@@ -53,8 +59,25 @@ async def get_transforms():
             "env_keys": env_keys,
             "requires_api_key": bool(env_keys),
             "configured": env_configured(env_keys),
+            "api_key_help": api_key_help(env_keys),
         })
     return result
+
+
+@router.get("/api-keys")
+async def get_api_key_registry():
+    """Official signup/docs links for optional transform API keys."""
+    providers = load_api_providers()
+    items = [
+        {
+            "env_key": env_key,
+            "provider": meta.get("provider"),
+            "signup_url": meta.get("signup_url"),
+            "docs_url": meta.get("docs_url"),
+        }
+        for env_key, meta in sorted(providers.items())
+    ]
+    return {"items": items}
 
 
 @router.get("/hub")
@@ -99,7 +122,7 @@ async def run_transform(req: TransformRequest, request: Request):
             entity=DummyEntity(req.value),  # Simple entity wrapper
             api_manager=api_manager,
             logger=logger,
-            config=req.options,
+            config={**req.options, "input_type": req.input_type},
             progress_callback=progress_callback,
         )
         

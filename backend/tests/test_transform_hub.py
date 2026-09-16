@@ -1,6 +1,6 @@
 """Transform hub catalog and merge."""
 from plugins.registry import PluginRegistry
-from services.transform_hub import load_catalog, merge_hub_with_plugins
+from services.transform_hub import load_catalog, merge_hub_with_plugins, api_key_help
 
 
 def test_catalog_loads():
@@ -9,6 +9,13 @@ def test_catalog_loads():
     ids = {e["id"] for e in entries}
     assert "hub_hibp" in ids
     assert "hub_virustotal" in ids
+
+
+def test_api_key_help_includes_signup_links():
+    help_items = api_key_help(["HIBP_API_KEY", "SHODAN_API_KEY"])
+    by_key = {h["env_key"]: h for h in help_items}
+    assert by_key["HIBP_API_KEY"]["signup_url"]
+    assert "haveibeenpwned" in by_key["HIBP_API_KEY"]["signup_url"]
 
 
 def test_merge_marks_installed_plugins():

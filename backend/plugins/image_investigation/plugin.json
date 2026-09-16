@@ -1,0 +1,14 @@
+{
+  "id": "image_investigation",
+  "name": "Visual Search Assistants",
+  "version": "1.0.0",
+  "author": "OSINTGraph Team",
+  "category": "Media",
+  "license": "MIT",
+  "description": "Génère des liens vers Google Lens, Bing, Yandex, TinEye pour une image (asset_id ou URL publique). Aucun résultat simulé.",
+  "permissions": ["internet"],
+  "providers": [],
+  "input_types": ["IMAGE"],
+  "output_types": ["URL"],
+  "entrypoint": "plugin.py"
+}

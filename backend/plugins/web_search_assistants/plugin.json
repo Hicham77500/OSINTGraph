@@ -1,0 +1,14 @@
+{
+  "id": "web_search_assistants",
+  "name": "Web Search (multi-engine)",
+  "version": "1.0.0",
+  "author": "OSINTGraph Team",
+  "category": "Web Intelligence",
+  "license": "MIT",
+  "description": "Liens Google, Bing, DuckDuckGo, Qwant, Yandex, Brave, Ecosia, Startpage — recherche prénom/nom, e-mail, pseudo, téléphone.",
+  "permissions": ["internet"],
+  "providers": ["brave"],
+  "input_types": ["PERSON", "USERNAME", "EMAIL", "PHONE"],
+  "output_types": ["URL"],
+  "entrypoint": "plugin.py"
+}

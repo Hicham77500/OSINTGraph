@@ -3,10 +3,11 @@ import { Play, Loader } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import {
   NodeData, EdgeData, EdgeType, NodeType,
-  ALL_EDGE_TYPES, createNode, createEdge,
+  ALL_EDGE_TYPES, ALL_NODE_TYPES, createNode, createEdge,
 } from '../../graph/nodeTypes'
 import { useGraphStore } from '../../graph/graphStore'
 import { apiClient } from '../../services/api'
+import { ApiKeyHelp, type ApiKeyHelpItem } from '../common/ApiKeyHelp'
 import { getSocket, wsClient } from '../../services/websocket'
 import './TransformPanel.css'
 
@@ -26,6 +27,27 @@ const TRANSFORM_EDGE_TYPE: Record<string, EdgeType> = {
   virustotal_lookup:'linked_to',
   otx_lookup:       'linked_to',
   ipinfo_lookup:    'linked_to',
+  image_investigation: 'linked_to',
+  nominatim_geocode: 'linked_to',
+  web_search_assistants: 'linked_to',
+  social_web_search: 'linked_to',
+  forum_search_assistants: 'linked_to',
+  vehicle_plate_search: 'linked_to',
+}
+
+function mapResultNodeType(raw: string): NodeType {
+  const t = raw.toLowerCase()
+  if (ALL_NODE_TYPES.includes(t as NodeType)) return t as NodeType
+  if (t === 'url') return 'domain'
+  if (t === 'social_account') return 'social_account'
+  return 'domain'
+}
+
+interface ResultCard {
+  title?: string
+  url: string
+  snippet?: string
+  source_engine?: string
 }
 
 function resolveEdgeType(transformName: string, outputType: string): EdgeType {
@@ -44,6 +66,7 @@ interface Transform {
   requires_api_key?: boolean
   configured?: boolean
   env_keys?: string[]
+  api_key_help?: ApiKeyHelpItem[]
 }
 
 interface ResultNode {
@@ -56,6 +79,8 @@ interface TransformResult {
   nodes: ResultNode[]
   edges: Array<{ source: string; target: string; type: string }>
   log: string[]
+  result_cards?: ResultCard[]
+  search_assistants?: Array<{ name: string; url: string }>
 }
 
 interface TransformEventBase {
@@ -89,6 +114,9 @@ export const TransformPanel: React.FC<TransformPanelProps> = ({ node }) => {
   const [running, setRunning] = useState<string | null>(null)
   const [logs, setLogs] = useState<string[]>([])
   const [progress, setProgress] = useState<{ current: number; total: number } | null>(null)
+  const [forumKeywords, setForumKeywords] = useState('reddit,forum,leak,pirate,breach,credential')
+  const [resultCards, setResultCards] = useState<ResultCard[]>([])
+  const [searchAssistants, setSearchAssistants] = useState<Array<{ name: string; url: string }>>([])
   const { updateNode } = useGraphStore()
   const { t } = useTranslation()
 
@@ -112,7 +140,7 @@ export const TransformPanel: React.FC<TransformPanelProps> = ({ node }) => {
   ) => {
     const edgeType = resolveEdgeType(transform.id, transform.output_types[0]?.toLowerCase() || 'linked_to')
     const newNodeObjects: NodeData[] = data.nodes.map(n =>
-      createNode(n.type.toLowerCase() as NodeType, n.label, n.properties ?? {})
+      createNode(mapResultNodeType(n.type), n.label, n.properties ?? {})
     )
     const newEdgeObjects: EdgeData[] = newNodeObjects.map(n =>
       createEdge(node.id, n.id, edgeType)
@@ -124,8 +152,9 @@ export const TransformPanel: React.FC<TransformPanelProps> = ({ node }) => {
   useEffect(() => {
     apiClient.get('/transforms').then(res => {
       if (res.ok && res.data) {
+        const nodeInput = node.type === 'plate' ? 'vehicle_plate' : node.type.toLowerCase()
         const compatible = (res.data as Transform[]).filter(
-          t => t.input_types && (t.input_types.includes('*') || t.input_types.some(type => type.toLowerCase() === node.type.toLowerCase()))
+          t => t.input_types && (t.input_types.includes('*') || t.input_types.some(type => type.toLowerCase() === nodeInput))
         )
         setTransforms(compatible)
       }
@@ -158,6 +187,10 @@ export const TransformPanel: React.FC<TransformPanelProps> = ({ node }) => {
       if (!transform) return
 
       mergeTransformResult(transform, data)
+      if (data.result_cards?.length) setResultCards(data.result_cards)
+      if (data.search_assistants?.length) {
+        setSearchAssistants(data.search_assistants.map(a => ({ name: a.name, url: a.url })))
+      }
       if (data.log?.length) {
         setLogs(prev => {
           const merged = [...prev]
@@ -202,20 +235,31 @@ export const TransformPanel: React.FC<TransformPanelProps> = ({ node }) => {
     mergedNodeCountRef.current = 0
     setRunning(transform.id)
     setLogs([t('transforms.starting', { name: transform.name })])
+    setResultCards([])
+    setSearchAssistants([])
     setProgress(null)
 
     try {
+      const options: Record<string, unknown> = {}
+      if (transform.id === 'forum_search_assistants') {
+        options.keywords = forumKeywords.split(',').map(s => s.trim()).filter(Boolean)
+      }
       const res = await apiClient.post('/transforms/run', {
         transform: transform.id,
-        input_type: node.type,
+        input_type: node.type === 'plate' ? 'vehicle_plate' : node.type,
         value: node.label,
         node_id: node.id,
+        options,
       })
 
       restCompletedRef.current = true
 
       if (res.ok && res.data) {
         const data = res.data as TransformResult & { ok?: boolean; error?: string }
+        if (data.result_cards?.length) setResultCards(data.result_cards)
+        if (data.search_assistants?.length) {
+          setSearchAssistants(data.search_assistants.map(a => ({ name: a.name, url: a.url })))
+        }
         if (mergedNodeCountRef.current === 0) {
           mergeTransformResult(transform, data)
         }
@@ -292,6 +336,18 @@ export const TransformPanel: React.FC<TransformPanelProps> = ({ node }) => {
         </div>
       )}
 
+      {transforms.some(t => t.id === 'forum_search_assistants') && (
+        <div className="transform-forum-kw">
+          <label htmlFor="forum-kw">{t('transforms.forumKeywords')}</label>
+          <input
+            id="forum-kw"
+            value={forumKeywords}
+            onChange={e => setForumKeywords(e.target.value)}
+            placeholder="reddit, pirate, leak…"
+          />
+        </div>
+      )}
+
       <div className="transform-list">
         {transforms.map(tf => (
           <div key={tf.id} className="transform-item">
@@ -299,7 +355,13 @@ export const TransformPanel: React.FC<TransformPanelProps> = ({ node }) => {
               <div className="transform-name">{tf.name}</div>
               <div className="transform-desc">{tf.description}</div>
               {tf.requires_api_key && !tf.configured && (
-                <div className="transform-api-hint">{t('transforms.apiKeyRequired', { keys: (tf.env_keys ?? []).join(', ') })}</div>
+                <div className="transform-api-key-row">
+                  <div className="transform-api-hint">{t('transforms.apiKeyRequired', { keys: (tf.env_keys ?? []).join(', ') })}</div>
+                  <ApiKeyHelp
+                    items={tf.api_key_help ?? (tf.env_keys ?? []).map(k => ({ env_key: k }))}
+                    variant="compact"
+                  />
+                </div>
               )}
             </div>
             <button
@@ -323,6 +385,36 @@ export const TransformPanel: React.FC<TransformPanelProps> = ({ node }) => {
           <span className="transform-progress-label">
             {t('transforms.progress', { pct: progressPct })}
           </span>
+        </div>
+      )}
+
+      {resultCards.length > 0 && (
+        <div className="transform-result-cards">
+          <div className="transform-result-cards-title">{t('transforms.resultCardsTitle')}</div>
+          {resultCards.map((card, i) => (
+            <a
+              key={`${card.url}-${i}`}
+              className="transform-result-card"
+              href={card.url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div className="transform-result-card-title">{card.title || card.url}</div>
+              {card.snippet && <div className="transform-result-card-snippet">{card.snippet}</div>}
+              <div className="transform-result-card-meta">{card.source_engine ?? card.url}</div>
+            </a>
+          ))}
+        </div>
+      )}
+
+      {searchAssistants.length > 0 && resultCards.length === 0 && (
+        <div className="transform-assistants-hint">
+          <p>{t('transforms.assistantsHint')}</p>
+          <div className="transform-assistants-links">
+            {searchAssistants.slice(0, 4).map(a => (
+              <a key={a.url} href={a.url} target="_blank" rel="noopener noreferrer">{a.name}</a>
+            ))}
+          </div>
         </div>
       )}
 

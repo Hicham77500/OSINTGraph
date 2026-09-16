@@ -27,6 +27,12 @@ EXPECTED_PLUGINS = {
     "urlscan_lookup",
     "virustotal_lookup",
     "otx_lookup",
+    "image_investigation",
+    "nominatim_geocode",
+    "web_search_assistants",
+    "social_web_search",
+    "forum_search_assistants",
+    "vehicle_plate_search",
 }
 
 

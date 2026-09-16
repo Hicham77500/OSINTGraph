@@ -1,0 +1,14 @@
+{
+  "id": "nominatim_geocode",
+  "name": "Nominatim Geocode",
+  "version": "1.0.0",
+  "author": "OSINTGraph Team",
+  "category": "Geospatial",
+  "license": "MIT",
+  "description": "Géocode un lieu (OpenStreetMap Nominatim) — coordonnées et métadonnées publiques.",
+  "permissions": ["internet"],
+  "providers": [],
+  "input_types": ["LOCATION", "PERSON"],
+  "output_types": ["LOCATION"],
+  "entrypoint": "plugin.py"
+}

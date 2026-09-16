@@ -15,8 +15,10 @@ from models.domain import (
 from services.ai_analysis import analyze_entity
 from services.context_readiness import compute_readiness
 from services import entity_resolution
+from routers.api_v1.investigation import router as investigation_router
 
 router = APIRouter()
+router.include_router(investigation_router)
 
 
 def _actor(request: Request) -> str:

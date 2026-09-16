@@ -192,6 +192,49 @@
   flex-wrap: wrap;
 }
 
+.hub-card-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.transform-hub-api-banner {
+  flex-basis: 100%;
+  margin-top: 4px;
+}
+
+.transform-hub-api-banner .api-key-help-trigger {
+  font-size: 0.75rem;
+  color: #1565c0;
+}
+
+.transform-hub-quick-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0 24px 12px;
+  background: #eceff1;
+  border-bottom: 1px solid #ddd;
+}
+
+.transform-hub-quick-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  padding: 4px 8px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  color: #1565c0;
+  text-decoration: none;
+}
+
+.transform-hub-quick-link:hover {
+  border-color: #1565c0;
+  text-decoration: underline;
+}
+
 .hub-category {
   font-size: 0.68rem;
   color: #777;

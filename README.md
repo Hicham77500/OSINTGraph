@@ -22,7 +22,7 @@
 
 ## Aperçu / Preview
 
-> *Les captures ci-dessous montrent l'interface **Matte & Vintage** (React) avec sauvegarde automatique.*
+> *Captures : interface **Matte & Vintage** (React), dossier démo **TEst** (`backend/scripts/seed_test_dossier.py`) — données fictives.*
 
 ### Liste des dossiers (statistiques)
 
@@ -34,7 +34,15 @@
 
 ### Graphe & transformations
 
-![Analyse graphe — transform Sherlock](docs/screenshots/sherlock-transform.png)
+![Analyse graphe — transforms](docs/screenshots/graph-transforms.png)
+
+### Hub transforms (catalogue partenaires)
+
+![Transform Hub](docs/screenshots/transform-hub.png)
+
+### Recherche web & social
+
+![Recherche générale](docs/screenshots/general-search.png)
 
 ## Modes d'utilisation
 
@@ -98,7 +106,10 @@ docker compose up --build
 | **Provenance** | Source, observation, evidence, confiance (CONFIRMED → CONTRADICTED) |
 | **Notes** | Saisie datée, édition et suppression dans les carnets |
 | **Import / Export** | Transfert de données (JSON/CSV) depuis/vers le graphe |
-| **Recherche décès INSEE** | Fichier public des décès en France (depuis 1970) — React + plugin backend |
+| **Recherche décès INSEE** | Fichier public des décès en France (depuis 1970) — graphe, fiche personne, mode local optionnel |
+| **Transform Hub** | Catalogue partenaires type Maltego, clés API (ℹ), ~20+ plugins CTI / web / social |
+| **Recherche web & social** | Multi-moteurs, réseaux, Reddit/forums (index public), plaque — résultats réels sur le graphe |
+| **Recherche visuelle** | Upload image, assistants Lens/Bing/Yandex, lien personne/lieu |
 | **Auto-save** | Sauvegarde transparente et continue de l'investigation |
 | **Corbeille** | Dossiers supprimés — restauration ou suppression définitive |
 
@@ -142,7 +153,9 @@ OSINTGraph/
 | SpiderFoot Scan | Domain, IP, Email… | Multi-types | Docker optionnel |
 | **Death Search (INSEE)** | Person | Person, Location | Parquet / DuckDB |
 
-> **HIBP** : code legacy dans `backend/transforms/hibp_lookup.py` — non migré en plugin. Utiliser Holehe ou un plugin dédié si besoin.
+> **HIBP** : plugin `hibp_lookup` + legacy `backend/transforms/hibp_lookup.py` (sans mode démo).
+
+Hub transforms, clés API et recherche investigation : [`docs/TRANSFORM_HUB.md`](docs/TRANSFORM_HUB.md) · périmètre outils : [`docs/OSINT_TOOLS_SCOPE.md`](docs/OSINT_TOOLS_SCOPE.md)
 
 ## Configuration recherche décès (optionnel)
 

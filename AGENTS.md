@@ -99,6 +99,9 @@ Une hypothèse IA n'est **jamais** un fait. Toujours conserver provenance et niv
 |---------|------|
 | `docs/PROJECT_CONTEXT.md` | UX investigation, carnets, routing map |
 | `docs/DEATH_SEARCH.md` | Recherche décès INSEE, config Parquet, demande d'actes |
+| `docs/TRANSFORM_HUB.md` | Hub transforms, plugins CTI, investigation API |
+| `docs/OSINT_TOOLS_SCOPE.md` | Intégré / planifié / hors périmètre (Telespot, VoidAccess, etc.) |
+| `docs/REDDIT_OSINT_MAP.md` | Outils cités sur Reddit → statut OSINTGraph |
 | `.cursor/rules/osintgraph-core.mdc` | Stack, architecture, conventions |
 | `.cursor/rules/investigation-ethics.mdc` | Limites légales et éthiques |
 | `.cursor/rules/backend-python.mdc` | Conventions backend |

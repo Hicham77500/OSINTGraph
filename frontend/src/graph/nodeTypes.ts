@@ -12,6 +12,8 @@ export type NodeType =
   | 'phone'
   | 'location'
   | 'social_account'
+  | 'image'
+  | 'plate'
 
 export type EdgeType = 
   | 'owns'
@@ -139,6 +141,22 @@ export const NODE_TYPE_CONFIG: Record<NodeType, NodeTypeConfig> = {
     label: 'Social Account',
     description: 'An account on a social network',
   },
+  plate: {
+    color: '#64748b',
+    bgColor: 'rgba(100,116,139,0.15)',
+    borderColor: 'rgba(100,116,139,0.6)',
+    iconSvg: '<path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/>',
+    label: 'Vehicle Plate',
+    description: 'Vehicle registration plate (public web search only)',
+  },
+  image: {
+    color: '#f59e0b',
+    bgColor: 'rgba(245,158,11,0.15)',
+    borderColor: 'rgba(245,158,11,0.6)',
+    iconSvg: '<rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>',
+    label: 'Image',
+    description: 'Investigation image with visual search provenance',
+  },
 }
 
 export const EDGE_TYPE_CONFIG: Record<EdgeType, { color: string; label: string }> = {
@@ -148,7 +166,7 @@ export const EDGE_TYPE_CONFIG: Record<EdgeType, { color: string; label: string }
   uses: { color: '#22c55e', label: 'Uses' },
 }
 
-export const ALL_NODE_TYPES: NodeType[] = ['person', 'email', 'domain', 'ip', 'username', 'organization', 'phone', 'location', 'social_account']
+export const ALL_NODE_TYPES: NodeType[] = ['person', 'email', 'domain', 'ip', 'username', 'organization', 'phone', 'location', 'social_account', 'image', 'plate']
 export const ALL_EDGE_TYPES: EdgeType[] = ['owns', 'linked_to', 'resolves_to', 'uses']
 
 // ---- Factory ----

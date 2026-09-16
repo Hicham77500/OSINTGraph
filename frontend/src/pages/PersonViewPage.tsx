@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import {
-  ArrowLeft, User, Share2, GitBranch, Clock, FileSearch, Sparkles, Search,
+  ArrowLeft, User, Share2, GitBranch, Clock, FileSearch, Sparkles, Search, ImageIcon,
 } from 'lucide-react'
+import { ImageInvestigationModal } from '../components/modals/ImageInvestigationModal'
 import { useTranslation } from 'react-i18next'
 import { apiClient } from '../services/api'
 import { DeathSearchModal } from '../components/modals/DeathSearchModal'
@@ -21,6 +22,7 @@ export const PersonViewPage: React.FC = () => {
   const [analysis, setAnalysis] = useState<AIAnalysis | null>(null)
   const [tab, setTab] = useState<Tab>('overview')
   const [deathSearchOpen, setDeathSearchOpen] = useState(false)
+  const [imageInvOpen, setImageInvOpen] = useState(false)
 
   useEffect(() => {
     if (!entityId) return
@@ -102,9 +104,14 @@ export const PersonViewPage: React.FC = () => {
             <p>{t('personView.overview.identity', { label: entity.label, type: entity.entity_type })}</p>
             <p>{t('personView.overview.properties', { props: JSON.stringify(entity.properties) })}</p>
             <p>{t('personView.overview.keyObservations', { count: observations.length })}</p>
-            <button className="btn btn-primary" onClick={() => setDeathSearchOpen(true)}>
-              <Search size={14} /> {t('personView.overview.deathSearch')}
-            </button>
+            <div className="person-overview-actions">
+              <button className="btn btn-primary" onClick={() => setDeathSearchOpen(true)}>
+                <Search size={14} /> {t('personView.overview.deathSearch')}
+              </button>
+              <button className="btn btn-ghost" onClick={() => setImageInvOpen(true)}>
+                <ImageIcon size={14} /> {t('personView.overview.visualSearch')}
+              </button>
+            </div>
           </div>
         )}
 
@@ -212,6 +219,11 @@ export const PersonViewPage: React.FC = () => {
           initialLastName={entity.label}
         />
       )}
+      <ImageInvestigationModal
+        open={imageInvOpen}
+        onClose={() => setImageInvOpen(false)}
+        linkedPerson={entity.label}
+      />
     </div>
   )
 }

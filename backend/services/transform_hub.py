@@ -6,11 +6,37 @@ import os
 from pathlib import Path
 from typing import Any
 
-_CATALOG_PATH = Path(__file__).resolve().parent.parent / "config" / "transform_hub_catalog.json"
+_CONFIG_DIR = Path(__file__).resolve().parent.parent / "config"
+_CATALOG_PATH = _CONFIG_DIR / "transform_hub_catalog.json"
+_API_PROVIDERS_PATH = _CONFIG_DIR / "api_providers.json"
 
 
 def _catalog_path() -> Path:
     return _CATALOG_PATH
+
+
+def load_api_providers() -> dict[str, dict[str, Any]]:
+    path = _API_PROVIDERS_PATH
+    if not path.exists():
+        return {}
+    with path.open(encoding="utf-8") as f:
+        data = json.load(f)
+    return data if isinstance(data, dict) else {}
+
+
+def api_key_help(env_keys: list[str] | None) -> list[dict[str, Any]]:
+    """Resolve signup/docs links for each env var name."""
+    registry = load_api_providers()
+    out: list[dict[str, Any]] = []
+    for key in env_keys or []:
+        meta = registry.get(key, {})
+        out.append({
+            "env_key": key,
+            "provider": meta.get("provider") or key.replace("_API_KEY", "").replace("_", " ").title(),
+            "signup_url": meta.get("signup_url"),
+            "docs_url": meta.get("docs_url"),
+        })
+    return out
 
 
 def load_catalog() -> list[dict[str, Any]]:
@@ -55,12 +81,14 @@ def merge_hub_with_plugins(
         else:
             entry["installed"] = False
         entry["configured"] = env_configured(item.get("env_keys") or [])
+        entry["api_key_help"] = api_key_help(item.get("env_keys") or [])
         entries.append(entry)
 
     available = sum(1 for e in entries if e.get("installed"))
     configured = sum(1 for e in entries if e.get("installed") and e.get("configured"))
     return {
         "entries": entries,
+        "api_providers": load_api_providers(),
         "stats": {
             "total": len(entries),
             "installed": available,

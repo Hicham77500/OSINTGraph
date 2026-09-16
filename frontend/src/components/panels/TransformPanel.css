@@ -1,5 +1,28 @@
 .transform-panel { padding: 0; }
 
+.transform-forum-kw {
+  padding: 8px 10px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.transform-forum-kw label {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.transform-forum-kw input {
+  font-size: 11px;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-base);
+  color: var(--text-primary);
+}
+
 .transform-list {
   display: flex;
   flex-direction: column;
@@ -59,6 +82,74 @@
   justify-content: center;
   font-size: 10px;
   color: var(--text-secondary);
+}
+
+.transform-result-cards {
+  margin: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 220px;
+  overflow: auto;
+}
+
+.transform-result-cards-title {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.transform-result-card {
+  display: block;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
+  text-decoration: none;
+  color: inherit;
+}
+
+.transform-result-card:hover {
+  border-color: var(--border-accent);
+}
+
+.transform-result-card-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.transform-result-card-snippet {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  line-height: 1.35;
+}
+
+.transform-result-card-meta {
+  font-size: 9px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  opacity: 0.85;
+}
+
+.transform-assistants-hint {
+  margin: 8px;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.transform-assistants-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.transform-assistants-links a {
+  font-size: 10px;
+  color: var(--accent-warning, #e6a817);
 }
 
 .transform-log {

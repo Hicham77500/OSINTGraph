@@ -2,14 +2,17 @@ import React, { useState } from 'react'
 import { NODE_TYPE_CONFIG, EDGE_TYPE_CONFIG } from '../../graph/nodeTypes'
 import { useGraphStore } from '../../graph/graphStore'
 import { useTranslation } from 'react-i18next'
-import { Tag, Clock, Zap, Trash2, ChevronDown, ChevronUp, Copy, ExternalLink } from 'lucide-react'
+import { Tag, Clock, Zap, Trash2, ChevronDown, ChevronUp, Copy, ExternalLink, ImageIcon } from 'lucide-react'
 import { TransformPanel } from './TransformPanel'
+import { ImageInvestigationModal } from '../modals/ImageInvestigationModal'
 import './InspectorPanel.css'
 
 export const InspectorPanel: React.FC = () => {
   const { nodes, edges, selectedNodeId, selectedEdgeId, removeNode, removeEdge } = useGraphStore()
   const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState<'properties' | 'transforms' | 'history'>('transforms')
+  const [imageInvOpen, setImageInvOpen] = useState(false)
+  const mergeNodes = useGraphStore(s => s.mergeNodes)
 
   const selectedNode = nodes.find(n => n.id === selectedNodeId)
   const selectedEdge = edges.find(e => e.id === selectedEdgeId)
@@ -112,6 +115,15 @@ export const InspectorPanel: React.FC = () => {
         {/* Properties tab */}
         {activeTab === 'properties' && (
           <div className="props-list fade-in">
+            {(['person', 'location', 'image'] as const).includes(selectedNode.type as 'person' | 'location' | 'image') && (
+              <button
+                type="button"
+                className="btn btn-primary inspector-visual-btn"
+                onClick={() => setImageInvOpen(true)}
+              >
+                <ImageIcon size={12} /> {t('imageInvestigation.openFromInspector')}
+              </button>
+            )}
             {selectedNode.metadata?.source && (
               <div className="prop-row">
                 <span className="prop-key">{t('inspector.propSource')}</span>
@@ -150,7 +162,6 @@ export const InspectorPanel: React.FC = () => {
           <TransformPanel node={selectedNode} />
         )}
 
-        {/* History tab */}
         {activeTab === 'history' && (
           <div className="history-list fade-in">
             {(!selectedNode.transformHistory || selectedNode.transformHistory.length === 0) && (
@@ -169,6 +180,14 @@ export const InspectorPanel: React.FC = () => {
           </div>
         )}
       </div>
+
+      <ImageInvestigationModal
+        open={imageInvOpen}
+        onClose={() => setImageInvOpen(false)}
+        linkedPerson={selectedNode.type === 'person' ? selectedNode.label : selectedNode.properties.linked_person}
+        linkedPlace={selectedNode.type === 'location' ? selectedNode.label : selectedNode.properties.linked_place}
+        onAttachToGraph={mergeNodes}
+      />
     </div>
   )
 }

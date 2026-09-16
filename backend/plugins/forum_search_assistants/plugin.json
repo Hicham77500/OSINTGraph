@@ -1,0 +1,14 @@
+{
+  "id": "forum_search_assistants",
+  "name": "Forums & Reddit (keywords)",
+  "version": "1.0.0",
+  "author": "OSINTGraph Team",
+  "category": "Web Intelligence",
+  "license": "MIT",
+  "description": "Recherche publique Reddit et forums via mots-clés analyste (ex. contexte CTI). Options: keywords[] dans le transform.",
+  "permissions": ["internet"],
+  "providers": [],
+  "input_types": ["PERSON", "USERNAME", "EMAIL", "PHONE"],
+  "output_types": ["URL"],
+  "entrypoint": "plugin.py"
+}
